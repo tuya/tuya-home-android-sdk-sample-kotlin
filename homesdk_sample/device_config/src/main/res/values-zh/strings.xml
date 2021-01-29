@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="device_config_module_title">设备配网</string>
+
+    <string name="device_config_ez_title">EZ 模式</string>
+    <string name="device_config_ap_title">AP 模式</string>
+    <string name="device_config_wifi_ssid">WIFI 名称</string>
+    <string name="device_config_wifi_password">WIFI 密码</string>
+    <string name="device_config_search">搜索</string>
+</resources>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Tuya SDK</string>
+
+    <string name="user_guide_title">Tuya SDK Sample</string>
+    <string name="user_login">Login</string>
+    <string name="user_country_code">Country Code</string>
+    <string name="user_account_tips">Email Address or Phone Number</string>
+    <string name="user_password">Password</string>
+    <string name="user_forget_password_tips">Forget Password?</string>
+    <string name="user_register">Register</string>
+    <string name="user_verification_code">Verification Code</string>
+    <string name="user_send_code">Send Verification Code</string>
+    <string name="user_reset_password">Reset Password</string>
+    <string name="user_new_password">Reset Password</string>
+
+    <string name="user_info_title">User Information</string>
+    <string name="user_name">User Name</string>
+    <string name="user_phone_number">Phone Number</string>
+    <string name="user_email_address">Email Address</string>
+
+    <string name="user_management">USER MANAGEMENT</string>
+    <string name="user_logout">Logout</string>
+
+    <string name="user_time_zone">Time Zone</string>
+    <string name="app_version_tips">SDK Ver: %s</string>
+    <string name="main_logo">Tuya Smart</string>
+
+
+</resources>

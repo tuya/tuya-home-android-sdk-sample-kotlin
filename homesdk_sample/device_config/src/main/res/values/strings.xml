@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="device_config_module_title">DEVICE NETWORK CONFIGURATION</string>
+
+    <string name="device_config_ez_title">EZ Mode</string>
+    <string name="device_config_ap_title">AP Mode</string>
+    <string name="device_config_wifi_ssid">WIFI SSID</string>
+    <string name="device_config_wifi_password">WIFI Password</string>
+    <string name="device_config_search">Search</string>
+</resources>
