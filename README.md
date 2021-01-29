@@ -14,7 +14,7 @@ Get Started
 Issue Feedback
 ------------------------
 
-You can provide feedback on your issue via **Github Issue** or **Technical Support Council** [](https://service.console.tuya.com)
+You can provide feedback on your issue via **Github Issue** or [Technical Support Council](https://service.console.tuya.com)
 
 LICENSE
 ------------------------
