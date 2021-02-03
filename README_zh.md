@@ -14,6 +14,7 @@ Tuya Android Home SDK Sample
 App 图片
 ---
 ![main_page](img/main_page_zh.jpg)
+
 问题反馈
 ---
 
