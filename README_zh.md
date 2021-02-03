@@ -1,9 +1,9 @@
 Tuya Android Home SDK Sample
-========================
+===
 [中文版](README_zh.md) | [English](README.md)
 
 开始
-------------------------
+---
 
 [准备工作](https://developer.tuya.com/zh/docs/app-development/android-app-sdk/preparation?id=Ka7mqlxh7vgi9)
 
@@ -11,11 +11,14 @@ Tuya Android Home SDK Sample
 
 [SDK功能](https://developer.tuya.com/zh/docs/app-development/android-app-sdk/featureoverview?id=Ka69nt97vtsfu)
 
+App 图片
+---
+![main_page](img/main_page_zh.jpg)
 问题反馈
-------------------------
+---
 
 您可以通过**Github Issue** 或通过[**工单**](https://service.console.tuya.com)来进行反馈您所碰到的问题
 
 LICENSE
-------------------------
+---
 Tuya Android Home SDK Sample是在MIT许可下提供的。更多信息请参考[LICENSE](LICENSE)文件
