@@ -7,11 +7,11 @@ This sample demonstrates the use of Tuya Android Home SDK to build an IoT App fr
 Get Started
 ---
 
-[Preparation for Integration](https://developer.tuya.com/en/docs/app-development/android-app-sdk/preparation?id=Ka7mqlxh7vgi9)
+- [Preparation for Integration](https://developer.tuya.com/en/docs/app-development/android-app-sdk/preparation?id=Ka7mqlxh7vgi9)
 
-[Integration](https://developer.tuya.com/en/docs/app-development/android-app-sdk/integration/integrated?id=Ka69nt96cw0uj)
+- [Integration](https://developer.tuya.com/en/docs/app-development/android-app-sdk/integration/integrated?id=Ka69nt96cw0uj)
 
-[SDK Features](https://developer.tuya.com/en/docs/app-development/android-app-sdk/featureoverview?id=Ka69nt97vtsfu)
+- [SDK Features](https://developer.tuya.com/en/docs/app-development/android-app-sdk/featureoverview?id=Ka69nt97vtsfu)
 
 App Images
 ---
@@ -20,8 +20,8 @@ App Images
 Issue Feedback
 ---
 
-You can provide feedback on your issue via **Github Issue** or [Technical Support Council](https://service.console.tuya.com)
+You can provide feedback on your issue via **Github Issue** or [Technical Ticket](https://service.console.tuya.com).
 
-LICENSE
+License
 ---
 Tuya Android Home SDK Sample is available under the MIT license. Please see the [LICENSE](LICENSE) file for more info.
