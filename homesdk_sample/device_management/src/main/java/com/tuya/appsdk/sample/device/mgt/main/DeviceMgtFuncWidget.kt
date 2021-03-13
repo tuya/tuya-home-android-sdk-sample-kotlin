@@ -20,6 +20,7 @@ import android.widget.TextView
 import android.widget.Toast
 import com.tuya.appsdk.sample.device.mgt.R
 import com.tuya.appsdk.sample.device.mgt.list.activity.DeviceMgtListActivity
+import com.tuya.appsdk.sample.device.mgt.list.enum.DeviceListTypePage
 import com.tuya.appsdk.sample.resource.HomeModel
 
 /**
@@ -30,9 +31,10 @@ import com.tuya.appsdk.sample.resource.HomeModel
  */
 class DeviceMgtFuncWidget {
 
+
     fun render(context: Context): View {
         val rootView =
-            LayoutInflater.from(context).inflate(R.layout.device_mgt_view_func, null, false)
+                LayoutInflater.from(context).inflate(R.layout.device_mgt_view_func, null, false)
         initView(rootView)
         return rootView
     }
@@ -42,17 +44,33 @@ class DeviceMgtFuncWidget {
         rootView.findViewById<TextView>(R.id.tvDeviceList).setOnClickListener {
             if (!HomeModel.INSTANCE.checkHomeId(rootView.context)) {
                 Toast.makeText(
-                    rootView.context,
-                    rootView.context.getString(R.string.home_current_home_tips),
-                    Toast.LENGTH_LONG
+                        rootView.context,
+                        rootView.context.getString(R.string.home_current_home_tips),
+                        Toast.LENGTH_LONG
                 ).show()
                 return@setOnClickListener
             }
+            val intent = Intent(it.context, DeviceMgtListActivity::class.java)
+            intent.putExtra("type", DeviceListTypePage.NORMAL_DEVICE_LIST)
+            it.context.startActivity(intent)
+        }
 
-            it.context.startActivity(Intent(it.context, DeviceMgtListActivity::class.java))
+
+        // ZigBee Gateway List
+        rootView.findViewById<TextView>(R.id.tv_zb_gateway_list).setOnClickListener {
+            if (!HomeModel.INSTANCE.checkHomeId(rootView.context)) {
+                Toast.makeText(
+                        rootView.context,
+                        rootView.context.getString(R.string.home_current_home_tips),
+                        Toast.LENGTH_LONG
+                ).show()
+                return@setOnClickListener
+            }
+            val intent = Intent(it.context, DeviceMgtListActivity::class.java)
+            intent.putExtra("type", DeviceListTypePage.ZIGBEE_GATEWAY_LIST)
+            it.context.startActivity(intent)
         }
 
     }
-
 
 }

@@ -11,11 +11,6 @@
  */
 package com.tuya.appsdk.sample.home.newHome
 
-import android.Manifest
-import android.content.Context
-import android.content.pm.PackageManager
-import android.location.Location
-import android.location.LocationManager
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -23,7 +18,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.core.app.ActivityCompat
+import com.tuya.appsdk.sample.resource.HomeModel
 import com.tuya.appsdk.sample.user.R
 import com.tuya.smart.home.sdk.TuyaHomeSdk
 import com.tuya.smart.home.sdk.bean.HomeBean
@@ -52,30 +47,33 @@ class NewHomeActivity : AppCompatActivity() {
             val strCity = findViewById<EditText>(R.id.etCity).text.toString()
 
             TuyaHomeSdk.getHomeManagerInstance().createHome(
-                strHomeName,
-                // Get location by yourself, here just sample as Shanghai's location
-                120.52,
-                30.40,
-                strCity,
-                arrayListOf(),
-                object : ITuyaHomeResultCallback {
-                    override fun onSuccess(bean: HomeBean?) {
-                        Toast.makeText(
-                            this@NewHomeActivity,
-                            "Create Home success",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
+                    strHomeName,
+                    // Get location by yourself, here just sample as Shanghai's location
+                    120.52,
+                    30.40,
+                    strCity,
+                    arrayListOf(),
+                    object : ITuyaHomeResultCallback {
+                        override fun onSuccess(bean: HomeBean?) {
+                            HomeModel.INSTANCE.setCurrentHome(this@NewHomeActivity, bean?.homeId
+                                    ?: 0)
+                            finish()
+                            Toast.makeText(
+                                    this@NewHomeActivity,
+                                    "Create Home success",
+                                    Toast.LENGTH_LONG
+                            ).show()
+                        }
 
-                    override fun onError(errorCode: String?, errorMsg: String?) {
-                        Toast.makeText(
-                            this@NewHomeActivity,
-                            "Create Home error->$errorMsg",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
+                        override fun onError(errorCode: String?, errorMsg: String?) {
+                            Toast.makeText(
+                                    this@NewHomeActivity,
+                                    "Create Home error->$errorMsg",
+                                    Toast.LENGTH_LONG
+                            ).show()
+                        }
 
-                }
+                    }
             )
         }
     }

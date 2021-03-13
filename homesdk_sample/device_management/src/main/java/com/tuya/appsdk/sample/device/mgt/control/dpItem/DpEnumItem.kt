@@ -34,12 +34,12 @@ import com.tuya.smart.sdk.api.ITuyaDevice
  * @since 2021/1/21 3:06 PM
  */
 class DpEnumItem @JvmOverloads constructor(
-    context: Context,
-    attrs: AttributeSet? = null,
-    defStyle: Int = 0,
-    schemaBean: SchemaBean,
-    value: String,
-    device: ITuyaDevice
+        context: Context,
+        attrs: AttributeSet? = null,
+        defStyle: Int = 0,
+        schemaBean: SchemaBean,
+        value: String,
+        device: ITuyaDevice
 ) : FrameLayout(context, attrs, defStyle) {
 
     init {

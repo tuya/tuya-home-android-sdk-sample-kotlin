@@ -17,7 +17,8 @@
             android:name="com.tuya.appsdk.sample.home.newHome.NewHomeActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
-        <activity android:name="com.tuya.appsdk.sample.home.edit.HomeEditActivity"
+        <activity
+            android:name="com.tuya.appsdk.sample.home.edit.HomeEditActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
     </application>

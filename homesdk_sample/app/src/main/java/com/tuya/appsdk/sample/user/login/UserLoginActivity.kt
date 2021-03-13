@@ -56,32 +56,32 @@ class UserLoginActivity : AppCompatActivity(), View.OnClickListener {
             if (it == R.id.btnLogin) {
                 // Login with phone
                 TuyaHomeSdk.getUserInstance().loginWithPhonePassword(strCountryCode,
-                    strAccount,
-                    strPassword,
-                    object : ILoginCallback {
-                        override fun onSuccess(user: User?) {
-                            Toast.makeText(
-                                this@UserLoginActivity,
-                                "Login success",
-                                Toast.LENGTH_LONG
-                            ).show()
+                        strAccount,
+                        strPassword,
+                        object : ILoginCallback {
+                            override fun onSuccess(user: User?) {
+                                Toast.makeText(
+                                        this@UserLoginActivity,
+                                        "Login success",
+                                        Toast.LENGTH_LONG
+                                ).show()
 
-                            startActivity(
-                                Intent(
-                                    this@UserLoginActivity,
-                                    MainSampleListActivity::class.java
+                                startActivity(
+                                        Intent(
+                                                this@UserLoginActivity,
+                                                MainSampleListActivity::class.java
+                                        )
                                 )
-                            )
-                        }
+                            }
 
-                        override fun onError(code: String?, error: String?) {
-                            Toast.makeText(
-                                this@UserLoginActivity,
-                                "login error->$error",
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
-                    })
+                            override fun onError(code: String?, error: String?) {
+                                Toast.makeText(
+                                        this@UserLoginActivity,
+                                        "login error->$error",
+                                        Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        })
             } else if (it == R.id.btnForget) {
                 startActivity(Intent(this, UserResetPasswordActivity::class.java))
             }

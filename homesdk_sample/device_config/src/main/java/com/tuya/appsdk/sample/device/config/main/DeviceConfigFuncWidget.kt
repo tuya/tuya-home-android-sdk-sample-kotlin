@@ -20,7 +20,11 @@ import android.widget.TextView
 import android.widget.Toast
 import com.tuya.appsdk.sample.device.config.R
 import com.tuya.appsdk.sample.device.config.ap.DeviceConfigAPActivity
+import com.tuya.appsdk.sample.device.config.ble.DeviceConfigBleActivity
+import com.tuya.appsdk.sample.device.config.dual.DeviceConfigDualActivity
 import com.tuya.appsdk.sample.device.config.ez.DeviceConfigEZActivity
+import com.tuya.appsdk.sample.device.config.zigbee.gateway.DeviceConfigZbGatewayActivity
+import com.tuya.appsdk.sample.device.config.zigbee.sub.DeviceConfigZbSubDeviceActivity
 import com.tuya.appsdk.sample.resource.HomeModel
 
 /**
@@ -31,9 +35,12 @@ import com.tuya.appsdk.sample.resource.HomeModel
  */
 class DeviceConfigFuncWidget {
 
+
+    lateinit var mContext: Context
     fun render(context: Context): View {
         val rootView =
-            LayoutInflater.from(context).inflate(R.layout.device_config_view_func, null, false)
+                LayoutInflater.from(context).inflate(R.layout.device_config_view_func, null, false)
+        mContext = context
         initView(rootView)
         return rootView
     }
@@ -41,30 +48,93 @@ class DeviceConfigFuncWidget {
     private fun initView(rootView: View) {
         // EZ Mode
         rootView.findViewById<TextView>(R.id.tvEzMode).setOnClickListener {
-            if (!HomeModel.INSTANCE.checkHomeId(rootView.context)) {
+            if (!HomeModel.INSTANCE.checkHomeId(mContext)) {
                 Toast.makeText(
-                    rootView.context,
-                    rootView.context.getString(R.string.home_current_home_tips),
-                    Toast.LENGTH_LONG
+                        mContext,
+                        mContext.getString(R.string.home_current_home_tips),
+                        Toast.LENGTH_LONG
                 ).show()
                 return@setOnClickListener
             }
-
             it.context.startActivity(Intent(it.context, DeviceConfigEZActivity::class.java))
         }
 
         // AP Mode
         rootView.findViewById<TextView>(R.id.tvApMode).setOnClickListener {
-            if (!HomeModel.INSTANCE.checkHomeId(rootView.context)) {
+            if (!HomeModel.INSTANCE.checkHomeId(mContext)) {
                 Toast.makeText(
-                    rootView.context,
-                    rootView.context.getString(R.string.home_current_home_tips),
-                    Toast.LENGTH_LONG
+                        mContext,
+                        mContext.getString(R.string.home_current_home_tips),
+                        Toast.LENGTH_LONG
                 ).show()
                 return@setOnClickListener
             }
-
             it.context.startActivity(Intent(it.context, DeviceConfigAPActivity::class.java))
         }
+
+        // Ble Low Energy
+        rootView.findViewById<TextView>(R.id.tv_ble).setOnClickListener {
+            if (!HomeModel.INSTANCE.checkHomeId(mContext)) {
+                Toast.makeText(
+                        mContext,
+                        mContext.getString(R.string.home_current_home_tips),
+                        Toast.LENGTH_LONG
+                ).show()
+                return@setOnClickListener
+            }
+            it.context.startActivity(Intent(it.context, DeviceConfigBleActivity::class.java))
+        }
+
+        // Dual Mode
+        rootView.findViewById<TextView>(R.id.tv_dual_mode).setOnClickListener {
+            if (!HomeModel.INSTANCE.checkHomeId(mContext)) {
+                Toast.makeText(
+                        mContext,
+                        mContext.getString(R.string.home_current_home_tips),
+                        Toast.LENGTH_LONG
+                ).show()
+                return@setOnClickListener
+            }
+            it.context.startActivity(Intent(it.context, DeviceConfigDualActivity::class.java))
+
+        }
+
+
+        // ZigBee Gateway
+        rootView.findViewById<TextView>(R.id.tv_zigBee_gateway).setOnClickListener {
+            if (!HomeModel.INSTANCE.checkHomeId(mContext)) {
+                Toast.makeText(
+                        mContext,
+                        mContext.getString(R.string.home_current_home_tips),
+                        Toast.LENGTH_LONG
+                ).show()
+                return@setOnClickListener
+            }
+            it.context.startActivity(Intent(it.context, DeviceConfigZbGatewayActivity::class.java))
+
+        }
+
+        // ZigBee Sub Device
+        rootView.findViewById<TextView>(R.id.tv_zigBee_subDevice).setOnClickListener {
+            if (!HomeModel.INSTANCE.checkHomeId(mContext)) {
+                Toast.makeText(
+                        mContext,
+                        mContext.getString(R.string.home_current_home_tips),
+                        Toast.LENGTH_LONG
+                ).show()
+                return@setOnClickListener
+            }
+            it.context.startActivity(
+                    Intent(
+                            it.context,
+                            DeviceConfigZbSubDeviceActivity::class.java
+                    )
+            )
+
+        }
+
+
     }
+
+
 }

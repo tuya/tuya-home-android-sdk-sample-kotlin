@@ -31,12 +31,12 @@ import com.tuya.smart.sdk.api.ITuyaDevice
  * @since 2021/1/21 3:06 PM
  */
 class DpCharTypeItem @JvmOverloads constructor(
-    context: Context,
-    attrs: AttributeSet? = null,
-    defStyle: Int = 0,
-    schemaBean: SchemaBean,
-    value: String,
-    device: ITuyaDevice
+        context: Context,
+        attrs: AttributeSet? = null,
+        defStyle: Int = 0,
+        schemaBean: SchemaBean,
+        value: String,
+        device: ITuyaDevice
 ) : FrameLayout(context, attrs, defStyle) {
 
     init {
@@ -47,7 +47,7 @@ class DpCharTypeItem @JvmOverloads constructor(
         val etDp = findViewById<EditText>(R.id.etDp)
         etDp.setText(value)
 
-        if (schemaBean.mode.contains("w")){
+        if (schemaBean.mode.contains("w")) {
             // Data can be issued by the cloud.
             etDp.setOnEditorActionListener { v, actionId, event ->
                 if (actionId == EditorInfo.IME_ACTION_DONE) {

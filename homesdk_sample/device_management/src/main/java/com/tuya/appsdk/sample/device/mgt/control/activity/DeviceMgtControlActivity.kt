@@ -44,7 +44,6 @@ class DeviceMgtControlActivity : AppCompatActivity() {
         }
 
 
-
         val llDp = findViewById<LinearLayout>(R.id.llDp)
 
         val deviceId = intent.getStringExtra("deviceId")
@@ -54,7 +53,7 @@ class DeviceMgtControlActivity : AppCompatActivity() {
 
             findViewById<Button>(R.id.btnReset).setOnClickListener {
                 // device reset factory
-                mDevice.resetFactory(object :IResultCallback{
+                mDevice.resetFactory(object : IResultCallback {
                     override fun onSuccess() {
                         finish()
                     }
@@ -67,7 +66,7 @@ class DeviceMgtControlActivity : AppCompatActivity() {
 
             findViewById<Button>(R.id.btnRemove).setOnClickListener {
                 // remove device
-                mDevice.removeDevice(object :IResultCallback{
+                mDevice.removeDevice(object : IResultCallback {
                     override fun onSuccess() {
                         finish()
                     }
@@ -90,53 +89,53 @@ class DeviceMgtControlActivity : AppCompatActivity() {
                         when (bean.getSchemaType()) {
                             BoolSchemaBean.type -> {
                                 val vItem = DpBooleanItem(
-                                    this,
-                                    schemaBean = bean,
-                                    value = value as Boolean,
-                                    device = mDevice
+                                        this,
+                                        schemaBean = bean,
+                                        value = value as Boolean,
+                                        device = mDevice
                                 )
                                 llDp.addView(vItem)
                             }
                             EnumSchemaBean.type -> {
                                 val vItem = DpEnumItem(
-                                    this,
-                                    schemaBean = bean,
-                                    value = value.toString(),
-                                    device = mDevice
+                                        this,
+                                        schemaBean = bean,
+                                        value = value.toString(),
+                                        device = mDevice
                                 )
                                 llDp.addView(vItem)
                             }
                             StringSchemaBean.type -> {
                                 val vItem = DpCharTypeItem(
-                                    this,
-                                    schemaBean = bean,
-                                    value = value as String,
-                                    device = mDevice
+                                        this,
+                                        schemaBean = bean,
+                                        value = value as String,
+                                        device = mDevice
                                 )
                                 llDp.addView(vItem)
                             }
                             ValueSchemaBean.type -> {
                                 val vItem = DpIntegerItem(
-                                    this,
-                                    schemaBean = bean,
-                                    value = value as Int,
-                                    device = mDevice
+                                        this,
+                                        schemaBean = bean,
+                                        value = value as Int,
+                                        device = mDevice
                                 )
                                 llDp.addView(vItem)
                             }
                             BitmapSchemaBean.type -> {
                                 val vItem =
-                                    DpFaultItem(this, schemaBean = bean, value = value.toString())
+                                        DpFaultItem(this, schemaBean = bean, value = value.toString())
                                 llDp.addView(vItem)
                             }
                         }
                     } else if (bean.type == DataTypeEnum.RAW.type) {
                         // raw | file
                         val vItem = DpRawTypeItem(
-                            this,
-                            schemaBean = bean,
-                            value = value.toString(),
-                            device = mDevice
+                                this,
+                                schemaBean = bean,
+                                value = value.toString(),
+                                device = mDevice
                         )
                         llDp.addView(vItem)
                     }

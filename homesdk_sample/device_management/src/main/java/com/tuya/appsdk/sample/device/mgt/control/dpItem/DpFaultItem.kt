@@ -26,11 +26,11 @@ import com.tuya.smart.android.device.bean.SchemaBean
  * @since 2021/1/21 3:06 PM
  */
 class DpFaultItem @JvmOverloads constructor(
-    context: Context,
-    attrs: AttributeSet? = null,
-    defStyle: Int = 0,
-    schemaBean: SchemaBean,
-    value: String
+        context: Context,
+        attrs: AttributeSet? = null,
+        defStyle: Int = 0,
+        schemaBean: SchemaBean,
+        value: String
 ) : FrameLayout(context, attrs, defStyle) {
 
     init {

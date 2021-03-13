@@ -34,8 +34,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:gravity="center_vertical"
                 android:background="@color/white"
+                android:gravity="center_vertical"
                 android:orientation="horizontal">
 
                 <TextView
@@ -63,8 +63,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:gravity="center_vertical"
                 android:background="@color/white"
+                android:gravity="center_vertical"
                 android:orientation="horizontal">
 
                 <TextView
@@ -92,8 +92,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:gravity="center_vertical"
                 android:background="@color/white"
+                android:gravity="center_vertical"
                 android:orientation="horizontal">
 
                 <TextView
@@ -121,8 +121,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:gravity="center_vertical"
                 android:background="@color/white"
+                android:gravity="center_vertical"
                 android:orientation="horizontal">
 
                 <TextView
@@ -150,8 +150,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:gravity="center_vertical"
                 android:background="@color/white"
+                android:gravity="center_vertical"
                 android:orientation="horizontal">
 
                 <TextView
@@ -165,11 +165,64 @@
                     android:layout_height="1px"
                     android:layout_weight="1" />
 
-                <TextView
-                    android:id="@+id/tvTimeZone"
+                <Button
+                    android:id="@+id/btTimeZone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
             </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#FF888888" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@color/white"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/user_unit_temperature"
+                    android:textSize="18dp" />
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="1px"
+                    android:layout_weight="1" />
+
+                <Button
+                    android:id="@+id/Temperature"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#FF888888" />
+
+            <Button
+                android:id="@+id/Updata"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="50dp"
+                android:text="@string/user_update_coordinate"
+
+                />
+
+
+            <Button
+                android:id="@+id/deactive"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
+                android:text="@string/user_deactive_account" />
+
+
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>

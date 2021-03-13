@@ -35,7 +35,7 @@ import java.util.regex.Pattern
  */
 class UserResetPasswordActivity : AppCompatActivity(), View.OnClickListener {
     private val check =
-        "^([a-z0-9A-Z]+[-|\\.]?)+[a-z0-9A-Z]@([a-z0-9A-Z]+(-[a-z0-9A-Z]+)?\\.)+[a-zA-Z]{2,}$"
+            "^([a-z0-9A-Z]+[-|\\.]?)+[a-z0-9A-Z]@([a-z0-9A-Z]+(-[a-z0-9A-Z]+)?\\.)+[a-zA-Z]{2,}$"
     private val regex: Pattern = Pattern.compile(check)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,38 +66,38 @@ class UserResetPasswordActivity : AppCompatActivity(), View.OnClickListener {
                 val callback = object : IResetPasswordCallback {
                     override fun onSuccess() {
                         Toast.makeText(
-                            this@UserResetPasswordActivity,
-                            "Register success",
-                            Toast.LENGTH_LONG
+                                this@UserResetPasswordActivity,
+                                "Register success",
+                                Toast.LENGTH_LONG
                         ).show()
                     }
 
                     override fun onError(code: String?, error: String?) {
                         Toast.makeText(
-                            this@UserResetPasswordActivity,
-                            "Register error->$error",
-                            Toast.LENGTH_LONG
+                                this@UserResetPasswordActivity,
+                                "Register error->$error",
+                                Toast.LENGTH_LONG
                         ).show()
                     }
                 }
 
-                if (isEmail) {
+                if (!isEmail) {
                     // Reset phone password
                     TuyaHomeSdk.getUserInstance().resetPhonePassword(
-                        strCountryCode,
-                        strAccount,
-                        strPassword,
-                        strCode,
-                        callback
+                            strCountryCode,
+                            strAccount,
+                            strPassword,
+                            strCode,
+                            callback
                     )
                 } else {
                     // Reset email password
                     TuyaHomeSdk.getUserInstance().resetEmailPassword(
-                        strCountryCode,
-                        strAccount,
-                        strPassword,
-                        strCode,
-                        callback
+                            strCountryCode,
+                            strAccount,
+                            strPassword,
+                            strCode,
+                            callback
                     )
                 }
 
@@ -106,46 +106,46 @@ class UserResetPasswordActivity : AppCompatActivity(), View.OnClickListener {
                 if (isEmail) {
                     // Get verification code code by email
                     TuyaHomeSdk.getUserInstance().getRegisterEmailValidateCode(strCountryCode,
-                        strAccount,
-                        object : IResultCallback {
-                            override fun onSuccess() {
-                                Toast.makeText(
-                                    this@UserResetPasswordActivity,
-                                    "Got validateCode",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            }
+                            strAccount,
+                            object : IResultCallback {
+                                override fun onSuccess() {
+                                    Toast.makeText(
+                                            this@UserResetPasswordActivity,
+                                            "Got validateCode",
+                                            Toast.LENGTH_LONG
+                                    ).show()
+                                }
 
-                            override fun onError(code: String?, error: String?) {
-                                Toast.makeText(
-                                    this@UserResetPasswordActivity,
-                                    "getValidateCode error->$error",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            }
-                        })
+                                override fun onError(code: String?, error: String?) {
+                                    Toast.makeText(
+                                            this@UserResetPasswordActivity,
+                                            "getValidateCode error->$error",
+                                            Toast.LENGTH_LONG
+                                    ).show()
+                                }
+                            })
                 } else {
                     // Get verification code code by phone
                     TuyaHomeSdk.getUserInstance().getValidateCode(
-                        strCountryCode,
-                        strAccount,
-                        object : IValidateCallback {
-                            override fun onSuccess() {
-                                Toast.makeText(
-                                    this@UserResetPasswordActivity,
-                                    "Got validateCode",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            }
+                            strCountryCode,
+                            strAccount,
+                            object : IValidateCallback {
+                                override fun onSuccess() {
+                                    Toast.makeText(
+                                            this@UserResetPasswordActivity,
+                                            "Got validateCode",
+                                            Toast.LENGTH_LONG
+                                    ).show()
+                                }
 
-                            override fun onError(code: String?, error: String?) {
-                                Toast.makeText(
-                                    this@UserResetPasswordActivity,
-                                    "getValidateCode error->$error",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            }
-                        })
+                                override fun onError(code: String?, error: String?) {
+                                    Toast.makeText(
+                                            this@UserResetPasswordActivity,
+                                            "getValidateCode error->$error",
+                                            Toast.LENGTH_LONG
+                                    ).show()
+                                }
+                            })
                 }
             }
         }

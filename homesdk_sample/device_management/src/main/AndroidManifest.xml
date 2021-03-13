@@ -11,5 +11,10 @@
             android:name=".control.activity.DeviceMgtControlActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".list.activity.DeviceSubZigbeeActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
     </application>
 </manifest>

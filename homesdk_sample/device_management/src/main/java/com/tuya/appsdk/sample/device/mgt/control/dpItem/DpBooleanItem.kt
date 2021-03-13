@@ -31,12 +31,12 @@ import com.tuya.smart.sdk.api.ITuyaDevice
  * @since 2021/1/21 3:06 PM
  */
 class DpBooleanItem @JvmOverloads constructor(
-    context: Context,
-    attrs: AttributeSet? = null,
-    defStyle: Int = 0,
-    schemaBean: SchemaBean,
-    value: Boolean,
-    device: ITuyaDevice
+        context: Context,
+        attrs: AttributeSet? = null,
+        defStyle: Int = 0,
+        schemaBean: SchemaBean,
+        value: Boolean,
+        device: ITuyaDevice
 ) : FrameLayout(context, attrs, defStyle) {
 
     init {
@@ -55,6 +55,7 @@ class DpBooleanItem @JvmOverloads constructor(
                     val isChecked = !swDp.isChecked
                     map[schemaBean.id] = isChecked
                     JSONObject.toJSONString(map)?.let {
+
                         device.publishDps(it, object : IResultCallback {
                             override fun onSuccess() {
                                 swDp.isChecked = isChecked

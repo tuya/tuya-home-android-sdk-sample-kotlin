@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.tuya.appsdk.sample.device.mgt.R
 import com.tuya.appsdk.sample.device.mgt.list.adapter.DeviceMgtAdapter
+import com.tuya.appsdk.sample.device.mgt.list.enum.DeviceListTypePage
 import com.tuya.appsdk.sample.resource.HomeModel
 import com.tuya.smart.home.sdk.TuyaHomeSdk
 import com.tuya.smart.home.sdk.bean.HomeBean
@@ -33,22 +34,39 @@ import com.tuya.smart.sdk.bean.DeviceBean
  * @since 2021/1/21 9:58 AM
  */
 class DeviceMgtListActivity : AppCompatActivity() {
+
     lateinit var adapter: DeviceMgtAdapter
+    var type = DeviceListTypePage.NORMAL_DEVICE_LIST
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.device_mgt_activity_list)
 
+        // Get Device List Type
+        type = intent.getIntExtra("type", DeviceListTypePage.NORMAL_DEVICE_LIST)
+
+
+        initToolbar()
+
+        // Set List
+        val rvList = findViewById<RecyclerView>(R.id.rvList)
+        rvList.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+
+        adapter = DeviceMgtAdapter(type)
+        rvList.adapter = adapter
+    }
+
+    private fun initToolbar() {
         val toolbar: Toolbar = findViewById<View>(R.id.topAppBar) as Toolbar
         toolbar.setNavigationOnClickListener {
             finish()
         }
 
-        val rvList = findViewById<RecyclerView>(R.id.rvList)
-        rvList.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-
-        adapter = DeviceMgtAdapter()
-        rvList.adapter = adapter
+        toolbar.title = when (type) {
+            DeviceListTypePage.NORMAL_DEVICE_LIST -> getString(R.string.device_mgt_list)
+            DeviceListTypePage.ZIGBEE_GATEWAY_LIST -> getString(R.string.device_zb_gateway_list)
+            else -> getString(R.string.device_mgt_list)
+        }
     }
 
     override fun onResume() {
@@ -61,9 +79,16 @@ class DeviceMgtListActivity : AppCompatActivity() {
          */
         TuyaHomeSdk.newHomeInstance(homeId).getHomeDetail(object : ITuyaHomeResultCallback {
             override fun onSuccess(bean: HomeBean?) {
-                bean?.let {
-                    adapter.data = it.deviceList as ArrayList<DeviceBean>
-                    adapter.notifyDataSetChanged()
+                bean?.let { it ->
+                    if (type == DeviceListTypePage.NORMAL_DEVICE_LIST) {
+                        adapter.data = it.deviceList as ArrayList<DeviceBean>
+                        adapter.notifyDataSetChanged()
+                    } else {
+                        adapter.data = it.deviceList.filter {
+                            it.isZigBeeWifi
+                        } as ArrayList<DeviceBean>
+                        adapter.notifyDataSetChanged()
+                    }
                 }
 
             }
