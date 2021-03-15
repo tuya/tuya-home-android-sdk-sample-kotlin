@@ -38,7 +38,7 @@ class HomeListAdapter(val type: Int) : RecyclerView.Adapter<HomeListAdapter.View
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val holder = ViewHolder(
-            LayoutInflater.from(parent.context).inflate(R.layout.home_item_list, parent, false)
+                LayoutInflater.from(parent.context).inflate(R.layout.home_item_list, parent, false)
         )
 
         if (type == HomeListPageType.LIST) {

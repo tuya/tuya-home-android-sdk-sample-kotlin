@@ -51,7 +51,7 @@ class UserFuncActivity : AppCompatActivity(), View.OnClickListener {
         try {
             val pInfo: PackageInfo = packageManager.getPackageInfo(packageName, 0)
             findViewById<TextView>(R.id.tvAppVersion).text =
-                String.format(getString(R.string.app_version_tips), pInfo.versionName)
+                    String.format(getString(R.string.app_version_tips), pInfo.versionName)
         } catch (e: PackageManager.NameNotFoundException) {
             e.printStackTrace()
         }

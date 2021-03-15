@@ -15,15 +15,17 @@
 
         <meta-data
             android:name="TUYA_SMART_APPKEY"
-            android:value="INPUT YOUR APPKEY HERE" />
+            android:value="" />
         <meta-data
             android:name="TUYA_SMART_SECRET"
-            android:value="INPUT YOUR APPSECRET HERE" />
+            android:value="" />
+
 
         <!--        Main        -->
-        <activity android:name=".main.MainSampleListActivity"
+        <activity
+            android:name=".main.MainSampleListActivity"
             android:exported="false"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
 
         <!--        User        -->
         <activity
@@ -42,12 +44,14 @@
             android:name=".user.register.UserRegisterActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
-        <activity android:name=".user.resetPassword.UserResetPasswordActivity"
+        <activity
+            android:name=".user.resetPassword.UserResetPasswordActivity"
             android:exported="false"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".user.info.UserInfoActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".user.info.UserInfoActivity"
             android:exported="false"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

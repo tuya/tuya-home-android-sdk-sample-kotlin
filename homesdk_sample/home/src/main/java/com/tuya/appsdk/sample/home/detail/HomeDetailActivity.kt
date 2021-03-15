@@ -56,24 +56,24 @@ class HomeDetailActivity : AppCompatActivity() {
 
                     // Get home weather info
                     TuyaHomeSdk.newHomeInstance(homeId).getHomeWeatherSketch(bean.lon,
-                        bean.lat,
-                        object : IIGetHomeWetherSketchCallBack {
-                            override fun onSuccess(result: WeatherBean?) {
-                                result?.let {
-                                    findViewById<TextView>(R.id.tvWeather).text = it.condition
-                                    findViewById<TextView>(R.id.tvHomeTemperature).text = it.temp
+                            bean.lat,
+                            object : IIGetHomeWetherSketchCallBack {
+                                override fun onSuccess(result: WeatherBean?) {
+                                    result?.let {
+                                        findViewById<TextView>(R.id.tvWeather).text = it.condition
+                                        findViewById<TextView>(R.id.tvHomeTemperature).text = it.temp
+                                    }
                                 }
-                            }
 
-                            override fun onFailure(errorCode: String?, errorMsg: String?) {
-                                Toast.makeText(
-                                    this@HomeDetailActivity,
-                                    "get home weather error->$errorMsg",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            }
+                                override fun onFailure(errorCode: String?, errorMsg: String?) {
+                                    Toast.makeText(
+                                            this@HomeDetailActivity,
+                                            "get home weather error->$errorMsg",
+                                            Toast.LENGTH_LONG
+                                    ).show()
+                                }
 
-                        })
+                            })
                 }
 
             }
@@ -92,8 +92,8 @@ class HomeDetailActivity : AppCompatActivity() {
         }
 
         // Dismiss home
-        findViewById<Button>(R.id.btnDismiss).setOnClickListener{
-            TuyaHomeSdk.newHomeInstance(homeId).dismissHome(object : IResultCallback{
+        findViewById<Button>(R.id.btnDismiss).setOnClickListener {
+            TuyaHomeSdk.newHomeInstance(homeId).dismissHome(object : IResultCallback {
                 override fun onSuccess() {
                     finish()
                 }

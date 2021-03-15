@@ -15,7 +15,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -23,8 +22,6 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.tuya.appsdk.sample.user.R
 import com.tuya.smart.home.sdk.TuyaHomeSdk
 import com.tuya.smart.home.sdk.bean.HomeBean
-import com.tuya.smart.home.sdk.bean.WeatherBean
-import com.tuya.smart.home.sdk.callback.IIGetHomeWetherSketchCallBack
 import com.tuya.smart.home.sdk.callback.ITuyaHomeResultCallback
 import com.tuya.smart.sdk.api.IResultCallback
 
@@ -71,26 +68,26 @@ class HomeEditActivity : AppCompatActivity() {
             val strHomeName = findViewById<EditText>(R.id.etHomeName).text.toString()
             val strCity = findViewById<EditText>(R.id.etCity).text.toString()
             TuyaHomeSdk.newHomeInstance(homeId).updateHome(
-                strHomeName,
-                // Get location by yourself, here just sample as Shanghai's location
-                120.52,
-                30.40,
-                strCity,
-                arrayListOf(),
-                false,
-                object : IResultCallback {
-                    override fun onSuccess() {
-                        Toast.makeText(
-                            this@HomeEditActivity,
-                            "Update success",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
+                    strHomeName,
+                    // Get location by yourself, here just sample as Shanghai's location
+                    120.52,
+                    30.40,
+                    strCity,
+                    arrayListOf(),
+                    false,
+                    object : IResultCallback {
+                        override fun onSuccess() {
+                            Toast.makeText(
+                                    this@HomeEditActivity,
+                                    "Update success",
+                                    Toast.LENGTH_LONG
+                            ).show()
+                        }
 
-                    override fun onError(code: String?, error: String?) {
+                        override fun onError(code: String?, error: String?) {
 
+                        }
                     }
-                }
             )
         }
     }

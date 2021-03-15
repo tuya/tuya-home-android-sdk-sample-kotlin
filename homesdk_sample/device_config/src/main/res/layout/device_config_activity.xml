@@ -59,13 +59,20 @@
                     android:layout_height="wrap_content" />
             </com.google.android.material.textfield.TextInputLayout>
 
+            <TextView
+                android:layout_width="match_parent"
+                android:textSize="18sp"
+                android:layout_marginTop="25dp"
+                android:layout_height="wrap_content"
+                android:text="@string/device_config_sp_mode_hint" />
 
             <Button
                 android:id="@+id/btnSearch"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:layout_marginTop="50dp"
+                android:layout_marginTop="20dp"
                 android:text="@string/device_config_search" />
+
 
             <com.google.android.material.progressindicator.CircularProgressIndicator
                 android:id="@+id/cpiLoading"

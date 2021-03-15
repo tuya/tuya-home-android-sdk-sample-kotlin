@@ -19,12 +19,11 @@ import android.view.View
 import android.widget.TextView
 import com.tuya.appsdk.sample.home.list.HomeListActivity
 import com.tuya.appsdk.sample.home.list.enum.HomeListPageType
-import com.tuya.appsdk.sample.resource.HomeModel
 import com.tuya.appsdk.sample.home.newHome.NewHomeActivity
+import com.tuya.appsdk.sample.resource.HomeModel
 import com.tuya.appsdk.sample.user.R
 import com.tuya.smart.home.sdk.TuyaHomeSdk
 import com.tuya.smart.home.sdk.bean.HomeBean
-import com.tuya.smart.home.sdk.callback.ITuyaGetHomeListCallback
 import com.tuya.smart.home.sdk.callback.ITuyaHomeResultCallback
 
 /**
@@ -35,10 +34,12 @@ import com.tuya.smart.home.sdk.callback.ITuyaHomeResultCallback
  */
 class HomeFuncWidget {
     lateinit var tvCurrentHomeName: TextView
+    lateinit var mContext: Context
 
     fun render(context: Context): View {
+        mContext = context
         val rootView =
-            LayoutInflater.from(context).inflate(R.layout.home_view_func, null, false)
+                LayoutInflater.from(context).inflate(R.layout.home_view_func, null, false)
         initView(rootView)
         return rootView
     }
@@ -71,19 +72,23 @@ class HomeFuncWidget {
         val currentHomeId = HomeModel.INSTANCE.getCurrentHome(tvCurrentHomeName.context)
         if (currentHomeId != 0L) {
             TuyaHomeSdk.newHomeInstance(currentHomeId)
-                .getHomeDetail(object : ITuyaHomeResultCallback {
-                    override fun onSuccess(bean: HomeBean?) {
-                        bean?.let {
-                            tvCurrentHomeName.text = it.name
+                    .getHomeDetail(object : ITuyaHomeResultCallback {
+                        override fun onSuccess(bean: HomeBean?) {
+                            bean?.let {
+                                tvCurrentHomeName.text = it.name
+                                if (it.name == null) {
+                                    HomeModel.INSTANCE.clear(mContext)
+                                }
+                            }
+
+
                         }
 
-                    }
+                        override fun onError(errorCode: String?, errorMsg: String?) {
 
-                    override fun onError(errorCode: String?, errorMsg: String?) {
+                        }
 
-                    }
-
-                })
+                    })
         }
     }
 

@@ -69,71 +69,71 @@ class DeviceConfigEZActivity : AppCompatActivity(), View.OnClickListener {
                 val homeId = HomeModel.INSTANCE.getCurrentHome(this)
                 // Get Network Configuration Token
                 TuyaHomeSdk.getActivatorInstance().getActivatorToken(homeId,
-                    object : ITuyaActivatorGetToken {
-                        override fun onSuccess(token: String) {
-                            // Start network configuration -- EZ mode
-                            val builder = ActivatorBuilder()
-                                .setSsid(strSsid)
-                                .setContext(v.context)
-                                .setPassword(strPassword)
-                                .setActivatorModel(ActivatorModelEnum.TY_EZ)
-                                .setTimeOut(100)
-                                .setToken(token)
-                                .setListener(object : ITuyaSmartActivatorListener {
+                        object : ITuyaActivatorGetToken {
+                            override fun onSuccess(token: String) {
+                                // Start network configuration -- EZ mode
+                                val builder = ActivatorBuilder()
+                                        .setSsid(strSsid)
+                                        .setContext(v.context)
+                                        .setPassword(strPassword)
+                                        .setActivatorModel(ActivatorModelEnum.TY_EZ)
+                                        .setTimeOut(100)
+                                        .setToken(token)
+                                        .setListener(object : ITuyaSmartActivatorListener {
 
-                                    @Override
-                                    override fun onStep(step: String?, data: Any?) {
-                                        Log.i(TAG, "$step --> $data")
-                                    }
+                                            @Override
+                                            override fun onStep(step: String?, data: Any?) {
+                                                Log.i(TAG, "$step --> $data")
+                                            }
 
-                                    override fun onActiveSuccess(devResp: DeviceBean?) {
-                                        cpiLoading.visibility = View.GONE
+                                            override fun onActiveSuccess(devResp: DeviceBean?) {
+                                                cpiLoading.visibility = View.GONE
 
-                                        Log.i(TAG, "Activate success")
-                                        Toast.makeText(
-                                            this@DeviceConfigEZActivity,
-                                            "Activate success",
-                                            Toast.LENGTH_LONG
-                                        ).show()
+                                                Log.i(TAG, "Activate success")
+                                                Toast.makeText(
+                                                        this@DeviceConfigEZActivity,
+                                                        "Activate success",
+                                                        Toast.LENGTH_LONG
+                                                ).show()
 
-                                        finish()
-                                    }
+                                                finish()
+                                            }
 
-                                    override fun onError(
-                                        errorCode: String?,
-                                        errorMsg: String?
-                                    ) {
-                                        cpiLoading.visibility = View.GONE
-                                        btnSearch.isClickable = true
+                                            override fun onError(
+                                                    errorCode: String?,
+                                                    errorMsg: String?
+                                            ) {
+                                                cpiLoading.visibility = View.GONE
+                                                btnSearch.isClickable = true
 
-                                        Toast.makeText(
-                                            this@DeviceConfigEZActivity,
-                                            "Activate error-->$errorMsg",
-                                            Toast.LENGTH_LONG
-                                        ).show()
-                                    }
-                                }
-                                )
+                                                Toast.makeText(
+                                                        this@DeviceConfigEZActivity,
+                                                        "Activate error-->$errorMsg",
+                                                        Toast.LENGTH_LONG
+                                                ).show()
+                                            }
+                                        }
+                                        )
 
-                            val mTuyaActivator =
-                                TuyaHomeSdk.getActivatorInstance().newMultiActivator(builder)
+                                val mTuyaActivator =
+                                        TuyaHomeSdk.getActivatorInstance().newMultiActivator(builder)
 
 
-                            //Start configuration
-                            mTuyaActivator.start()
+                                //Start configuration
+                                mTuyaActivator.start()
 
-                            //Show loading progress, disable btnSearch clickable
-                            cpiLoading.visibility = View.VISIBLE
-                            btnSearch.isClickable = false
+                                //Show loading progress, disable btnSearch clickable
+                                cpiLoading.visibility = View.VISIBLE
+                                btnSearch.isClickable = false
 
-                            //Stop configuration
+                                //Stop configuration
 //                                mTuyaActivator.stop()
-                            //Exit the page to destroy some cache data and monitoring data.
+                                //Exit the page to destroy some cache data and monitoring data.
 //                                mTuyaActivator.onDestroy()
-                        }
+                            }
 
-                        override fun onFailure(s: String, s1: String) {}
-                    })
+                            override fun onFailure(s: String, s1: String) {}
+                        })
             }
         }
     }

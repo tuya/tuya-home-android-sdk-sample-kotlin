@@ -50,7 +50,7 @@ class HomeListActivity : AppCompatActivity() {
         // Set title
         val topAppBar = findViewById<MaterialToolbar>(R.id.topAppBar)
         topAppBar.title =
-            getString(if (type == HomeListPageType.SWITCH) R.string.home_switch_home else R.string.home_home_list)
+                getString(if (type == HomeListPageType.SWITCH) R.string.home_switch_home else R.string.home_home_list)
 
         // Set list
         val rvList = findViewById<RecyclerView>(R.id.rvList)

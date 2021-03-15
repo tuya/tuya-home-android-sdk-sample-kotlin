@@ -32,12 +32,12 @@ import kotlin.math.pow
  * @since 2021/1/21 3:06 PM
  */
 class DpIntegerItem @JvmOverloads constructor(
-    context: Context,
-    attrs: AttributeSet? = null,
-    defStyle: Int = 0,
-    schemaBean: SchemaBean,
-    value: Int,
-    device: ITuyaDevice
+        context: Context,
+        attrs: AttributeSet? = null,
+        defStyle: Int = 0,
+        schemaBean: SchemaBean,
+        value: Int,
+        device: ITuyaDevice
 ) : FrameLayout(context, attrs, defStyle) {
 
     init {
@@ -50,7 +50,7 @@ class DpIntegerItem @JvmOverloads constructor(
         val scale = 10.0.pow(valueSchemaBean.scale.toDouble())
 
         var curValue = (value * valueSchemaBean.step + valueSchemaBean.min).toFloat() / scale
-        if (curValue > valueSchemaBean.max){
+        if (curValue > valueSchemaBean.max) {
             curValue = valueSchemaBean.max.toDouble()
         }
         slDp.value = curValue.toFloat()
@@ -61,11 +61,12 @@ class DpIntegerItem @JvmOverloads constructor(
 
         findViewById<TextView>(R.id.tvDpName).text = "${schemaBean.name}(${valueSchemaBean.unit})"
 
-        if (schemaBean.mode.contains("w")){
+        if (schemaBean.mode.contains("w")) {
             // Data can be issued by the cloud.
             slDp.addOnChangeListener { slider, sValue, fromUser ->
                 val map = HashMap<String, Any>()
-                map[schemaBean.id] = (((sValue * scale) - valueSchemaBean.min) / valueSchemaBean.step).toInt()
+                map[schemaBean.id] =
+                        (((sValue * scale) - valueSchemaBean.min) / valueSchemaBean.step).toInt()
                 JSONObject.toJSONString(map)?.let {
                     device.publishDps(it, object : IResultCallback {
                         override fun onSuccess() {

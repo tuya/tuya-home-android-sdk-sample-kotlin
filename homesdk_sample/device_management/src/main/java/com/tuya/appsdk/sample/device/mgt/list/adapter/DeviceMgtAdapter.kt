@@ -20,6 +20,8 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.tuya.appsdk.sample.device.mgt.R
 import com.tuya.appsdk.sample.device.mgt.control.activity.DeviceMgtControlActivity
+import com.tuya.appsdk.sample.device.mgt.list.activity.DeviceSubZigbeeActivity
+import com.tuya.appsdk.sample.device.mgt.list.enum.DeviceListTypePage
 import com.tuya.smart.sdk.bean.DeviceBean
 
 /**
@@ -28,18 +30,34 @@ import com.tuya.smart.sdk.bean.DeviceBean
  * @author qianqi <a href="mailto:developer@tuya.com"/>
  * @since 2021/1/21 10:06 AM
  */
-class DeviceMgtAdapter : RecyclerView.Adapter<DeviceMgtAdapter.ViewHolder>() {
+class DeviceMgtAdapter(val type: Int) : RecyclerView.Adapter<DeviceMgtAdapter.ViewHolder>() {
     var data: ArrayList<DeviceBean> = arrayListOf()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val holder = ViewHolder(
-            LayoutInflater.from(parent.context).inflate(R.layout.device_mgt_item, parent, false)
+                LayoutInflater.from(parent.context).inflate(R.layout.device_mgt_item, parent, false)
         )
         holder.itemView.setOnClickListener {
-            // Navigate to device management
-            val intent = Intent(it.context, DeviceMgtControlActivity::class.java)
-            intent.putExtra("deviceId", data[holder.adapterPosition].devId)
-            it.context.startActivity(intent)
+            when (type) {
+                DeviceListTypePage.ZIGBEE_GATEWAY_LIST -> {
+                    // Navigate to zigBee sub device list
+                    val intent = Intent(it.context, DeviceSubZigbeeActivity::class.java)
+                    intent.putExtra("deviceId", data[holder.adapterPosition].devId)
+                    it.context.startActivity(intent)
+                }
+                DeviceListTypePage.NORMAL_DEVICE_LIST -> {
+                    // Navigate to device management
+                    val intent = Intent(it.context, DeviceMgtControlActivity::class.java)
+                    intent.putExtra("deviceId", data[holder.adapterPosition].devId)
+                    it.context.startActivity(intent)
+                }
+                else -> {
+                    // Navigate to zigBee sub device management
+                    val intent = Intent(it.context, DeviceMgtControlActivity::class.java)
+                    intent.putExtra("deviceId", data[holder.adapterPosition].devId)
+                    it.context.startActivity(intent)
+                }
+            }
         }
         return holder
     }
@@ -52,7 +70,7 @@ class DeviceMgtAdapter : RecyclerView.Adapter<DeviceMgtAdapter.ViewHolder>() {
         val bean = data[position]
         holder.tvDeviceName.text = bean.name
         holder.tvStatus.text =
-            holder.itemView.context.getString(if (bean.isOnline) R.string.device_mgt_online else R.string.device_mgt_offline)
+                holder.itemView.context.getString(if (bean.isOnline) R.string.device_mgt_online else R.string.device_mgt_offline)
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
