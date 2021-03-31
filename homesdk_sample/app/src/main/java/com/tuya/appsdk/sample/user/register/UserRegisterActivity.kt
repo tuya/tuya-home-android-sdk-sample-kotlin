@@ -38,6 +38,7 @@ class UserRegisterActivity : AppCompatActivity(), View.OnClickListener {
     private val check =
             "^([a-z0-9A-Z]+[-|\\.]?)+[a-z0-9A-Z]@([a-z0-9A-Z]+(-[a-z0-9A-Z]+)?\\.)+[a-zA-Z]{2,}$"
     private val regex: Pattern = Pattern.compile(check)
+    private val mRegisterType = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -126,26 +127,29 @@ class UserRegisterActivity : AppCompatActivity(), View.OnClickListener {
                             })
                 } else {
                     // Get verification code code by phone
-                    TuyaHomeSdk.getUserInstance().getValidateCode(
-                            strCountryCode,
-                            strAccount,
-                            object : IValidateCallback {
-                                override fun onSuccess() {
-                                    Toast.makeText(
-                                            this@UserRegisterActivity,
-                                            "Got validateCode",
-                                            Toast.LENGTH_LONG
-                                    ).show()
-                                }
+                    TuyaHomeSdk.getUserInstance().sendVerifyCodeWithUserName(
+                        strAccount,
+                        "",
+                        strCountryCode,
+                        mRegisterType,
+                        object :IResultCallback{
+                            override fun onSuccess() {
+                                Toast.makeText(
+                                    this@UserRegisterActivity,
+                                    "Got validateCode",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
 
-                                override fun onError(code: String?, error: String?) {
-                                    Toast.makeText(
-                                            this@UserRegisterActivity,
-                                            "getValidateCode error->$error",
-                                            Toast.LENGTH_LONG
-                                    ).show()
-                                }
-                            })
+                            override fun onError(code: String?, error: String?) {
+                                Toast.makeText(
+                                    this@UserRegisterActivity,
+                                    "getValidateCode error->$error",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+
+                        })
                 }
             }
         }

@@ -75,4 +75,15 @@
         android:id="@+id/tv_zigBee_subDevice"
         android:text="@string/device_config_zb_sub_device_title" />
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="20dp"
+        android:background="#FF888888" />
+
+    <TextView
+        style="@style/item_func"
+        android:id="@+id/tv_qrcode_subDevice"
+        android:text="@string/device_qr_code_service_title"/>
+
 </LinearLayout>

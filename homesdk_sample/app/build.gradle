@@ -58,12 +58,14 @@ dependencies {
     implementation 'com.alibaba:fastjson:1.1.67.android'
     implementation 'com.squareup.okhttp3:okhttp-urlconnection:3.14.9'
 
-    implementation 'com.tuya.smart:tuyasmart:3.24.0'
+    implementation 'com.tuya.smart:tuyasmart:3.25.1'
 
     implementation project(':base_res')
     implementation project(":home")
     implementation project(":device_config")
     implementation project(":device_management")
+
+    implementation 'cn.yipianfengye.android:zxing-library:2.2'
 
 
 }

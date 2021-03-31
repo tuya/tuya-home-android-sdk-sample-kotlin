@@ -14,6 +14,7 @@ package com.tuya.appsdk.sample
 
 import android.app.Application
 import com.tuya.smart.home.sdk.TuyaHomeSdk
+import com.uuzuche.lib_zxing.activity.ZXingLibrary
 
 /**
  * Base Application
@@ -27,5 +28,6 @@ class BaseApplication : Application() {
 
         TuyaHomeSdk.init(this)
         TuyaHomeSdk.setDebugMode(true)
+        ZXingLibrary.initDisplayOpinion(this)
     }
 }

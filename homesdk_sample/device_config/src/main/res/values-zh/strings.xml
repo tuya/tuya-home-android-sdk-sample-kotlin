@@ -10,6 +10,7 @@
     <string name="device_config_zb_gateway_title">Zigbee 网关</string>
     <string name="device_config_zb_sub_device_title">Zigbee 子设备</string>
     <string name="device_config_choose_gateway_title">选择网关</string>
+    <string name="device_qr_code_service_title">QR 扫码</string>
 
     <string name="device_config_wifi_ssid">WIFI 名称</string>
     <string name="device_config_wifi_password">WIFI 密码</string>

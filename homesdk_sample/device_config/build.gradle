@@ -51,4 +51,7 @@ dependencies {
 
     implementation project(':base_res')
 
+    implementation 'cn.yipianfengye.android:zxing-library:2.2'
+
+
 }

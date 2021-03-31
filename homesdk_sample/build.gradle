@@ -18,6 +18,13 @@ allprojects {
     repositories {
         google()
         jcenter()
+        maven {url'https : //dl.bintray.com/jenly/maven ' }
+        maven {
+            url "https://maven-other.tuya.com/repository/maven-releases/"
+            mavenContent {
+                releasesOnly()
+            }
+        }
     }
 }
 
