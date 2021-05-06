@@ -17,6 +17,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -44,6 +45,7 @@ class DeviceConfigEZActivity : AppCompatActivity(), View.OnClickListener {
 
     lateinit var cpiLoading: CircularProgressIndicator
     lateinit var btnSearch: Button
+    lateinit var mContentTv: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,6 +56,8 @@ class DeviceConfigEZActivity : AppCompatActivity(), View.OnClickListener {
             finish()
         }
         toolbar.title = getString(R.string.device_config_ez_title)
+        mContentTv=findViewById(R.id.content_tv)
+        mContentTv.text=getString(R.string.device_config_ez_description)
 
         cpiLoading = findViewById(R.id.cpiLoading)
         btnSearch = findViewById(R.id.btnSearch)

@@ -45,12 +45,6 @@ class DeviceMgtAdapter(val type: Int) : RecyclerView.Adapter<DeviceMgtAdapter.Vi
                     intent.putExtra("deviceId", data[holder.adapterPosition].devId)
                     it.context.startActivity(intent)
                 }
-                DeviceListTypePage.NORMAL_DEVICE_LIST -> {
-                    // Navigate to device management
-                    val intent = Intent(it.context, DeviceMgtControlActivity::class.java)
-                    intent.putExtra("deviceId", data[holder.adapterPosition].devId)
-                    it.context.startActivity(intent)
-                }
                 else -> {
                     // Navigate to zigBee sub device management
                     val intent = Intent(it.context, DeviceMgtControlActivity::class.java)

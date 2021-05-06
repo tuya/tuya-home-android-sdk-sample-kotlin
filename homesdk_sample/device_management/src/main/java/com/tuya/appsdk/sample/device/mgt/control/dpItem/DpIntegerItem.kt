@@ -52,6 +52,8 @@ class DpIntegerItem @JvmOverloads constructor(
         var curValue = (value * valueSchemaBean.step + valueSchemaBean.min).toFloat() / scale
         if (curValue > valueSchemaBean.max) {
             curValue = valueSchemaBean.max.toDouble()
+        }else if(curValue < valueSchemaBean.min){
+            curValue = valueSchemaBean.min.toDouble()
         }
         slDp.value = curValue.toFloat()
 

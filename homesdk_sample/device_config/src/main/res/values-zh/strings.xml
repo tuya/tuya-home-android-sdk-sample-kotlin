@@ -3,7 +3,15 @@
     <string name="device_config_module_title">设备配网</string>
 
     <string name="device_config_ez_title">EZ 模式</string>
+    <string name="device_config_ez_description">EZ 配网是指 App 发送包含 Wi-Fi 名
+        和 Wi-Fi 密码的 UDP 广播包或者组播包，
+        设备的 Wi-Fi 芯片可以接收到该 UDP 包，通过特定的 UDP 组织形式就可以解密出 Wi-Fi
+        名和 Wi-Fi 密码，接着设备配置 Wi-Fi，然后设备可上网连接云，
+        将设备信息注册到云端的过程</string>
     <string name="device_config_ap_title">AP 模式</string>
+    <string name="device_config_ap_description">AP模式，也称为热点模式。 手机连接智能设备的热点，双方建立了Socket连接，
+        通过约定的端口交换数据。\n让设备处于配对模式，然后将手机的Wi-Fi切换到设备的热点。
+        输入您希望设备连接的Wi-Fi的SSID和密码，然后点击“搜索”。</string>
     <string name="device_config_ble_title">低功耗蓝牙模式</string>
 
     <string name="device_config_dual_title">双模模式</string>

@@ -3,7 +3,20 @@
     <string name="device_config_module_title">DEVICE NETWORK CONFIGURATION</string>
 
     <string name="device_config_ez_title">EZ Mode</string>
+    <string name="device_config_ez_description">EZ Mode ,it means that the App sends a UDP broadcast
+        packet or multicast packet containing Wi-Fi name and Wi-Fi password, the Wi-Fi
+        chip of the device can receive the UDP packet and decrypt the Wi-Fi name and Wi-Fi
+        password through a specific form of UDP organization, then the device configures Wi-Fi,
+        and then the device can go online to connect to the cloud, the process of registering the
+        device information to the cloud
+
+Translated with www.DeepL.com/Translator (free version)</string>
     <string name="device_config_ap_title">AP Mode</string>
+    <string name="device_config_ap_description">AP Mode, also known as hotspot mode.
+        The mobile phone connects the smart device’s hotspot, and the two parties establish
+        a Socket connection to exchange data through the agreed port.Let the device in pairing mode,
+        \nthen switch iPhone’s Wi-Fi to the device’s hotspot. Type in the SSID and password
+        of which Wi-Fi you want the device connect to, then tap Search.</string>
     <string name="device_config_ble_title">Bluetooth Low Energy</string>
     <string name="device_config_dual_title">Dual Mode</string>
     <string name="device_config_zb_gateway_title">Zigbee Gateway</string>
