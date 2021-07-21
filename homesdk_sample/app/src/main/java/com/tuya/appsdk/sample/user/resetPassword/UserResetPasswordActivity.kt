@@ -88,8 +88,8 @@ class UserResetPasswordActivity : AppCompatActivity(), View.OnClickListener {
                     TuyaHomeSdk.getUserInstance().resetPhonePassword(
                         strCountryCode,
                         strAccount,
-                        strPassword,
                         strCode,
+                        strPassword,
                         callback
                     )
                 } else {
@@ -97,61 +97,37 @@ class UserResetPasswordActivity : AppCompatActivity(), View.OnClickListener {
                     TuyaHomeSdk.getUserInstance().resetEmailPassword(
                         strCountryCode,
                         strAccount,
-                        strPassword,
                         strCode,
+                        strPassword,
                         callback
                     )
                 }
 
             } else if (it == R.id.btnCode) {
-                // Get verification code
-                if (isEmail) {
-                    // Get verification code code by email
-                    TuyaHomeSdk.getUserInstance().getRegisterEmailValidateCode(strCountryCode,
-                        strAccount,
-                        object : IResultCallback {
-                            override fun onSuccess() {
-                                Toast.makeText(
-                                    this@UserResetPasswordActivity,
-                                    "Got validateCode",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            }
+                // Get verification code code
+                TuyaHomeSdk.getUserInstance().sendVerifyCodeWithUserName(
+                    strAccount,
+                    "",
+                    strCountryCode,
+                    mResetPasswordType,
+                    object : IResultCallback {
+                        override fun onSuccess() {
+                            Toast.makeText(
+                                this@UserResetPasswordActivity,
+                                "Got validateCode",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
 
-                            override fun onError(code: String?, error: String?) {
-                                Toast.makeText(
-                                    this@UserResetPasswordActivity,
-                                    "getValidateCode error->$error",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            }
-                        })
-                } else {
-                    // Get verification code code by phone
-                    TuyaHomeSdk.getUserInstance().sendVerifyCodeWithUserName(
-                        strAccount,
-                        "",
-                        strCountryCode,
-                        mResetPasswordType,
-                        object :IResultCallback{
-                            override fun onSuccess() {
-                                Toast.makeText(
-                                    this@UserResetPasswordActivity,
-                                    "Got validateCode",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            }
+                        override fun onError(code: String?, error: String?) {
+                            Toast.makeText(
+                                this@UserResetPasswordActivity,
+                                "getValidateCode error->$error",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
 
-                            override fun onError(code: String?, error: String?) {
-                                Toast.makeText(
-                                    this@UserResetPasswordActivity,
-                                    "getValidateCode error->$error",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            }
-
-                        })
-                }
+                    })
             }
         }
     }
