@@ -36,7 +36,7 @@ import java.util.regex.Pattern
  */
 class UserRegisterActivity : AppCompatActivity(), View.OnClickListener {
     private val check =
-            "^([a-z0-9A-Z]+[-|\\.]?)+[a-z0-9A-Z]@([a-z0-9A-Z]+(-[a-z0-9A-Z]+)?\\.)+[a-zA-Z]{2,}$"
+        "^([a-z0-9A-Z]+[-|\\.]?)+[a-z0-9A-Z]@([a-z0-9A-Z]+(-[a-z0-9A-Z]+)?\\.)+[a-zA-Z]{2,}$"
     private val regex: Pattern = Pattern.compile(check)
     private val mRegisterType = 1
 
@@ -67,17 +67,17 @@ class UserRegisterActivity : AppCompatActivity(), View.OnClickListener {
                 val callback = object : IRegisterCallback {
                     override fun onSuccess(user: User?) {
                         Toast.makeText(
-                                this@UserRegisterActivity,
-                                "Register success",
-                                Toast.LENGTH_LONG
+                            this@UserRegisterActivity,
+                            "Register success",
+                            Toast.LENGTH_LONG
                         ).show()
                     }
 
                     override fun onError(code: String?, error: String?) {
                         Toast.makeText(
-                                this@UserRegisterActivity,
-                                "Register error->$error",
-                                Toast.LENGTH_LONG
+                            this@UserRegisterActivity,
+                            "Register error->$error",
+                            Toast.LENGTH_LONG
                         ).show()
                     }
                 }
@@ -85,72 +85,48 @@ class UserRegisterActivity : AppCompatActivity(), View.OnClickListener {
                 if (isEmail) {
                     // Register by email
                     TuyaHomeSdk.getUserInstance().registerAccountWithEmail(
-                            strCountryCode,
-                            strAccount,
-                            strPassword,
-                            strCode,
-                            callback
+                        strCountryCode,
+                        strAccount,
+                        strPassword,
+                        strCode,
+                        callback
                     )
                 } else {
                     // Register by phone
                     TuyaHomeSdk.getUserInstance().registerAccountWithPhone(
-                            strCountryCode,
-                            strAccount,
-                            strPassword,
-                            strCode,
-                            callback
+                        strCountryCode,
+                        strAccount,
+                        strPassword,
+                        strCode,
+                        callback
                     )
                 }
 
             } else if (it == R.id.btnCode) {
-                // Get verification code
-                if (isEmail) {
-                    // Get verification code code by email
-                    TuyaHomeSdk.getUserInstance().getRegisterEmailValidateCode(strCountryCode,
-                            strAccount,
-                            object : IResultCallback {
-                                override fun onSuccess() {
-                                    Toast.makeText(
-                                            this@UserRegisterActivity,
-                                            "Got validateCode",
-                                            Toast.LENGTH_LONG
-                                    ).show()
-                                }
+                // Get verification code code
+                TuyaHomeSdk.getUserInstance().sendVerifyCodeWithUserName(
+                    strAccount,
+                    "",
+                    strCountryCode,
+                    mRegisterType,
+                    object : IResultCallback {
+                        override fun onSuccess() {
+                            Toast.makeText(
+                                this@UserRegisterActivity,
+                                "Got validateCode",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
 
-                                override fun onError(code: String?, error: String?) {
-                                    Toast.makeText(
-                                            this@UserRegisterActivity,
-                                            "getValidateCode error->$error",
-                                            Toast.LENGTH_LONG
-                                    ).show()
-                                }
-                            })
-                } else {
-                    // Get verification code code by phone
-                    TuyaHomeSdk.getUserInstance().sendVerifyCodeWithUserName(
-                        strAccount,
-                        "",
-                        strCountryCode,
-                        mRegisterType,
-                        object :IResultCallback{
-                            override fun onSuccess() {
-                                Toast.makeText(
-                                    this@UserRegisterActivity,
-                                    "Got validateCode",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            }
+                        override fun onError(code: String?, error: String?) {
+                            Toast.makeText(
+                                this@UserRegisterActivity,
+                                "getValidateCode error->$error",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
 
-                            override fun onError(code: String?, error: String?) {
-                                Toast.makeText(
-                                    this@UserRegisterActivity,
-                                    "getValidateCode error->$error",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            }
-
-                        })
-                }
+                    })
             }
         }
     }
