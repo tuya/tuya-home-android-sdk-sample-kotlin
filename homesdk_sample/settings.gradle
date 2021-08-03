@@ -5,3 +5,4 @@ include ':app'
 include ':home'
 
 rootProject.name = "TuyaSDKSample"
+include ':ipc'

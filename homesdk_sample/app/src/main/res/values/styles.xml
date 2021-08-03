@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 必选配置 -->
+    <!-- Base application theme. -->
+    <style name="Base_BizBundle_Theme" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="status_font_color">@color/status_font_color</item>
+        <item name="status_bg_color">@color/status_bg_color</item>
+        <item name="navbar_font_color">@color/navbar_font_color</item>
+        <item name="navbar_bg_color">@color/navbar_bg_color</item>
+        <item name="app_bg_color">@color/app_bg_color</item>
+        <item name="fragment_bg_color">@color/app_bg_color</item>
+        <item name="list_primary_color">@color/list_primary_color</item>
+        <item name="list_sub_color">@color/list_sub_color</item>
+        <item name="list_secondary_color">@color/list_secondary_color</item>
+        <item name="list_line_color">@color/list_line_color</item>
+        <item name="list_bg_color">@color/list_bg_color</item>
+        <item name="primary_button_font_color">@color/primary_button_font_color</item>
+        <item name="primary_button_bg_color">@color/primary_button_bg_color</item>
+        <item name="secondary_button_font_color">@color/secondary_button_font_color</item>
+        <item name="secondary_button_bg_color">@color/secondary_button_bg_color</item>
+        <item name="notice_font_color">@color/notice_font_color</item>
+        <item name="notice_bg_color">@color/notice_bg_color</item>
+        <item name="bg_normal_text_bt">@drawable/bg_text_bts</item>
+        <item name="app_name">@string/app_name</item>
+        <item name="is_splash_used">false</item>
+        <item name="ap_default_ssid">@string/ap_mode_ssid</item>
+        <item name="is_scan_support">true</item>
+        <item name="ap_connect_description">@string/ty_ap_connect_description</item>
+        <item name="is_need_blemesh_support">@bool/is_need_blemesh_support</item>
+        <item name="status_bg_color_75">@color/status_bg_color_75</item>
+        <item name="status_bg_color_90">@color/status_bg_color_90</item>
+    </style>
+</resources>

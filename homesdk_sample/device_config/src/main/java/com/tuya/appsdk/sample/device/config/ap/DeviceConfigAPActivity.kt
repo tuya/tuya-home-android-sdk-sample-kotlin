@@ -50,7 +50,7 @@ class DeviceConfigAPActivity : AppCompatActivity(), View.OnClickListener {
     lateinit var cpiLoading: CircularProgressIndicator
     lateinit var btnSearch: Button
     lateinit var mToken: String
-    lateinit var mTuyaActivator: ITuyaActivator
+    private var mTuyaActivator: ITuyaActivator? = null
     lateinit var strSsid: String
     lateinit var strPassword: String
     lateinit var mContentTv: TextView
@@ -154,12 +154,10 @@ class DeviceConfigAPActivity : AppCompatActivity(), View.OnClickListener {
                     }
                 }
                 )
-
         mTuyaActivator =
-                TuyaHomeSdk.getActivatorInstance().newActivator(builder)
-
+            TuyaHomeSdk.getActivatorInstance().newActivator(builder)
         //Start configuration
-        mTuyaActivator.start()
+        mTuyaActivator?.start()
 
 
     }
@@ -170,10 +168,10 @@ class DeviceConfigAPActivity : AppCompatActivity(), View.OnClickListener {
      */
     private fun onClickSetting() {
         var wifiSettingsIntent = Intent("android.settings.WIFI_SETTINGS")
-        if (null == wifiSettingsIntent.resolveActivity(getPackageManager())) {
+        if (null == wifiSettingsIntent.resolveActivity(packageManager)) {
             wifiSettingsIntent = Intent(Settings.ACTION_WIFI_SETTINGS)
         }
-        if (null == wifiSettingsIntent.resolveActivity(getPackageManager())){
+        if (null == wifiSettingsIntent.resolveActivity(packageManager)){
             return
         }
         startActivity(wifiSettingsIntent)
@@ -181,7 +179,7 @@ class DeviceConfigAPActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onDestroy() {
         super.onDestroy()
-        mTuyaActivator.onDestroy()
+        mTuyaActivator?.onDestroy()
     }
 
 }

@@ -1,4 +1,4 @@
-package com.tuya.appsdk.sample.device.config.qrcode
+package com.tuya.appsdk.sample.device.config.scan
 
 import android.Manifest
 import android.content.Intent
@@ -12,7 +12,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.material.appbar.MaterialToolbar
 import com.tuya.appsdk.sample.device.config.R
-import com.tuya.appsdk.sample.device.config.qrcode.DeviceConfigQrCodeDeviceActivity
 import com.tuya.appsdk.sample.resource.HomeModel
 import com.tuya.smart.home.sdk.TuyaHomeSdk
 import com.tuya.smart.home.sdk.builder.TuyaQRCodeActivatorBuilder

@@ -49,4 +49,5 @@ dependencies {
 
 
     implementation project(':base_res')
+    implementation project(':ipc')
 }

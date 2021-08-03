@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Tuya SDK</string>
+    <string name="app_name">Tuya SDK Kotlin</string>
 
     <string name="user_guide_title">涂鸦SDK例子</string>
     <string name="user_login">登录</string>

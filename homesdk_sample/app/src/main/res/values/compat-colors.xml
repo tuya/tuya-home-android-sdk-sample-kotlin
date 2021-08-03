@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <!--
+Automatically generated files, it should not be modified manually!!!
+-->
+    <color name="status_bg_color">@color/ty_theme_color_b2</color>
+    <color name="list_primary_color">@color/ty_theme_color_b6_n1</color>
+    <color name="list_sub_color">@color/ty_theme_color_b6_n2</color>
+    <color name="primary_button_select_color">@color/ty_theme_color_m1_2</color>
+    <color name="list_bg_color">@color/ty_theme_color_b6</color>
+    <color name="list_line_color">@color/ty_theme_color_b6_n7</color>
+    <color name="navbar_font_color">@color/ty_theme_color_b2_n5</color>
+    <color name="primary_button_font_color">@color/ty_theme_color_m1_n1</color>
+    <color name="list_secondary_color">@color/ty_theme_color_b6_2_n1</color>
+    <color name="app_bg_color">@color/ty_theme_color_b1</color>
+    <color name="primary_button_bg_color">@color/ty_theme_color_m1</color>
+    <color name="secondary_button_font_color">@color/ty_theme_color_m1</color>
+    <color name="status_font_color">@color/ty_theme_color_b2_n5</color>
+    <color name="notice_bg_color">#FFF8D8</color>
+    <color name="secondary_button_bg_color">#FFFFFF</color>
+    <color name="navbar_bg_color">#303030</color>
+    <color name="notice_font_color">#FF5A28</color>
+    <color name="secondary_button_select_color">#1affffff</color>
+    <color name="home_index_bg_start_color">#FF5A28</color>
+</resources>
