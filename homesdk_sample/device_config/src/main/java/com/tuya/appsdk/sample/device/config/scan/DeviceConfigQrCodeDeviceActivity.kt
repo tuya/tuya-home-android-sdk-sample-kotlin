@@ -20,6 +20,7 @@ import com.tuya.smart.sdk.api.ITuyaSmartActivatorListener
 import com.tuya.smart.sdk.bean.DeviceBean
 import com.uuzuche.lib_zxing.activity.CaptureActivity
 import com.uuzuche.lib_zxing.activity.CodeUtils
+import org.json.JSONObject
 import java.util.*
 
 /**
@@ -31,6 +32,7 @@ import java.util.*
 class DeviceConfigQrCodeDeviceActivity : AppCompatActivity(), View.OnClickListener {
     private var topAppBar: MaterialToolbar? = null
     private var bt_search: Button? = null
+    private var mUuid: String? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.device_config_info_hint_activity)
@@ -117,27 +119,31 @@ class DeviceConfigQrCodeDeviceActivity : AppCompatActivity(), View.OnClickListen
 
     private fun initQrCode(result: String) {
         val homeId = HomeModel.INSTANCE.getCurrentHome(this)
-        val builder = TuyaQRCodeActivatorBuilder()
-            .setUuid(result)
-            .setHomeId(homeId)
-            .setContext(this)
-            .setTimeOut(100)
-            .setListener(object : ITuyaSmartActivatorListener {
-                override fun onError(errorCode: String, errorMsg: String) {}
-                override fun onActiveSuccess(devResp: DeviceBean) {
-                    Toast.makeText(
-                        this@DeviceConfigQrCodeDeviceActivity,
-                        "ActiveSuccess",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
+        val obj = JSONObject(result)
+        val actionObj = obj.optJSONObject("actionData")
+        if (null != actionObj) {
+            mUuid = actionObj.optString("uuid")
+            val builder = TuyaQRCodeActivatorBuilder()
+                .setUuid(mUuid)
+                .setHomeId(homeId)
+                .setContext(this)
+                .setTimeOut(100)
+                .setListener(object : ITuyaSmartActivatorListener {
+                    override fun onError(errorCode: String, errorMsg: String) {}
+                    override fun onActiveSuccess(devResp: DeviceBean) {
+                        Toast.makeText(
+                            this@DeviceConfigQrCodeDeviceActivity,
+                            "ActiveSuccess",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
 
-                override fun onStep(step: String, data: Any) {}
-            })
-        val iTuyaActivator = TuyaHomeSdk.getActivatorInstance().newQRCodeDevActivator(builder)
-        iTuyaActivator.start()
+                    override fun onStep(step: String, data: Any) {}
+                })
+            val iTuyaActivator = TuyaHomeSdk.getActivatorInstance().newQRCodeDevActivator(builder)
+            iTuyaActivator.start()
+        }
     }
-
     companion object {
         private const val REQUEST_CODE_SCAN = 1
     }
