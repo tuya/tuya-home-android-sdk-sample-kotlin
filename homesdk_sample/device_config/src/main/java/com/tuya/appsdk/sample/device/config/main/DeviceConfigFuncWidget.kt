@@ -23,7 +23,8 @@ import com.tuya.appsdk.sample.device.config.ap.DeviceConfigAPActivity
 import com.tuya.appsdk.sample.device.config.ble.DeviceConfigBleActivity
 import com.tuya.appsdk.sample.device.config.dual.DeviceConfigDualActivity
 import com.tuya.appsdk.sample.device.config.ez.DeviceConfigEZActivity
-import com.tuya.appsdk.sample.device.config.qrcode.DeviceConfigQrCodeDeviceActivity
+import com.tuya.appsdk.sample.device.config.scan.DeviceConfigQrCodeDeviceActivity
+import com.tuya.appsdk.sample.device.config.qrcode.QrCodeConfigActivity
 import com.tuya.appsdk.sample.device.config.zigbee.gateway.DeviceConfigZbGatewayActivity
 import com.tuya.appsdk.sample.device.config.zigbee.sub.DeviceConfigZbSubDeviceActivity
 import com.tuya.appsdk.sample.resource.HomeModel
@@ -134,7 +135,7 @@ class DeviceConfigFuncWidget {
 
         }
 
-        // Qr Code
+        // Scan Qr Code
         rootView.findViewById<TextView>(R.id.tv_qrcode_subDevice).setOnClickListener {
             if (!HomeModel.INSTANCE.checkHomeId(mContext)) {
                 Toast.makeText(
@@ -152,7 +153,23 @@ class DeviceConfigFuncWidget {
             )
 
         }
-
+        //  Qr Code
+        rootView.findViewById<TextView>(R.id.tv_qr_code).setOnClickListener{
+            if (!HomeModel.INSTANCE.checkHomeId(mContext)) {
+                Toast.makeText(
+                    rootView.context,
+                    rootView.context.getString(R.string.home_current_home_tips),
+                    Toast.LENGTH_LONG
+                ).show()
+                return@setOnClickListener
+            }
+            it.context.startActivity(
+                Intent(
+                    it.context,
+                    QrCodeConfigActivity::class.java
+                )
+            )
+        }
 
 
     }

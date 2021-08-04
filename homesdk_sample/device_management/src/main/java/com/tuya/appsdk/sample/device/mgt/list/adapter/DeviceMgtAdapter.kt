@@ -22,6 +22,7 @@ import com.tuya.appsdk.sample.device.mgt.R
 import com.tuya.appsdk.sample.device.mgt.control.activity.DeviceMgtControlActivity
 import com.tuya.appsdk.sample.device.mgt.list.activity.DeviceSubZigbeeActivity
 import com.tuya.appsdk.sample.device.mgt.list.enum.DeviceListTypePage
+import com.tuya.smart.android.demo.camera.CameraUtils
 import com.tuya.smart.sdk.bean.DeviceBean
 
 /**
@@ -38,6 +39,9 @@ class DeviceMgtAdapter(val type: Int) : RecyclerView.Adapter<DeviceMgtAdapter.Vi
                 LayoutInflater.from(parent.context).inflate(R.layout.device_mgt_item, parent, false)
         )
         holder.itemView.setOnClickListener {
+            if (CameraUtils.ipcProcess(it.context, data[holder.adapterPosition].devId)) {
+                return@setOnClickListener
+            }
             when (type) {
                 DeviceListTypePage.ZIGBEE_GATEWAY_LIST -> {
                     // Navigate to zigBee sub device list

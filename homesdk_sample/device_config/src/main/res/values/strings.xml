@@ -22,12 +22,16 @@ Translated with www.DeepL.com/Translator (free version)</string>
     <string name="device_config_zb_gateway_title">Zigbee Gateway</string>
     <string name="device_config_zb_sub_device_title">Zigbee Subdevice</string>
     <string name="device_config_choose_gateway_title">Choose Gateway</string>
-    <string name="device_qr_code_service_title">QR Code</string>
-
+    <string name="device_qr_code_service_title">Scan QR Code</string>
+    <string name="device_config_qr_code_title">QR Code</string>
     <string name="device_config_wifi_ssid">WIFI SSID</string>
     <string name="device_config_wifi_password">WIFI Password</string>
     <string name="device_config_search">Search</string>
 
+
+    <string name="btn_save">Save</string>
+    <string name="hint_wifi_name">Wifi SSID</string>
+    <string name="hint_wifi_pwd">Wifi password</string>
 
     <string name="device_config_ble_hint">Single-point Bluetooth devices are devices that have a one-to-one connection with a cell phone terminal via Bluetooth, such as Bluetooth bracelets,
         Bluetooth headsets, Bluetooth speakers, etc.

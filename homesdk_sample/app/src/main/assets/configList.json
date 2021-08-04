@@ -1,0 +1,202 @@
+{
+  "deviceDetail": [
+    {
+      "type": "header"
+    },
+    {
+      "type": "device_info"
+    },
+    {
+      "type": "device_net_info"
+    },
+    {
+      "type":"group_edit_devices"
+    },
+    {
+      "type": "off_line_warn"
+    },
+    {
+      "type": "section_other"
+    },
+    {
+      "type":"group_create"
+    },
+    {
+      "type":"help_and_feedback"
+    },
+    {
+      "type":"check_device_network"
+    },
+    {
+      "type":"check_firmware_update"
+    },
+    {
+      "type":"c_test_insert"
+    },
+    {
+      "type":"c_test_async_insert"
+    },
+    {
+      "type": "empty",
+      "height": 10
+    },
+    {
+      "type": "footer"
+    }
+  ],
+  "cameraSettingIndex": [
+    {
+      "type": "cameraSetting_iconInfoItem"
+    },
+    {
+      "type": "CameraSetting_besharedItem"
+    },
+    {
+      "type": "cameraSetting_infoItem"
+    },
+    {
+      "type": "cameraSetting_autoItem"
+    },
+    {
+      "type": "cameraSetting_networkItem"
+    },
+    {
+      "type": "cameraSetting_thirdPartyItem"
+    },
+    {
+      "type": "cameraSetting_basicSectionHeaderCfgItem"
+    },
+    {
+      "type": "CameraSetting_indicatorLightItem"
+    },
+    {
+      "type": "cameraSetting_privateModeCfgItem"
+    },
+    {
+      "type": "cameraSetting_basicFuncCfgItem"
+    },
+    {
+      "type": "cameraSetting_nightvisionCfgItem"
+    },
+    {
+      "type": "cameraSetting_irNightCfgItem"
+    },
+    {
+      "type": "cameraSetting_displaySettingCfgItem"
+    },
+    {
+      "type": "cameraSetting_workModeCfgItem"
+    },
+    {
+      "type": "cameraSetting_soundCfgItem"
+    },
+    {
+      "type": "cameraSetting_advanceSectionHeaderCfgItem"
+    },
+    {
+      "type": "CameraSetting_soundDetectedItem"
+    },
+    {
+      "type": "CameraSetting_apModeItem"
+    },
+    {
+      "type": "cameraSetting_detectCfgItem"
+    },
+    {
+      "type": "cameraSetting_pirFuncCfgItem"
+    },
+    {
+      "type": "cameraSetting_powerCfgItem"
+    },
+    {
+      "type": "cameraSetting_bellCfgItem"
+    },
+    {
+      "type": "cameraSetting_sirenSettingCfgItem"
+    },
+    {
+      "type": "cameraSetting_videoLayoutCfgItem"
+    },
+    {
+      "type": "cameraSetting_presentPointCfgItem"
+    },
+    {
+      "type": "cameraSetting_onvifCfgItem"
+    },
+    {
+      "type": "CameraSetting_unlockItem"
+    },
+    {
+      "type": "cameraSetting_gatewaySectionHeaderCfgItem"
+    },
+    {
+      "type": "cameraSetting_gatewayCfgItem"
+    },
+    {
+      "type": "cameraSetting_storageSectionHeaderCfgItem"
+    },
+    {
+      "type": "cameraSetting_storageCfgItem"
+    },
+    {
+      "type": "cameraSetting_faceSectionHeaderCfgItem"
+    },
+    {
+      "type": "cameraSetting_faceCfgItem"
+    },
+    {
+      "type": "cameraSetting_valueAddedSectionHeaderCfgItem"
+    },
+    {
+      "type": "cameraSetting_valueAddedCfgItem"
+    },
+    {
+      "type": "cameraSetting_offlineSectionHeaderCfgItem"
+    },
+    {
+      "type": "cameraSetting_offlineCfgItem"
+    },
+    {
+      "type": "cameraSetting_otherSectionHeaderCfgItem"
+    },
+    {
+      "type": "cameraSetting_shareDeviceCfgItem"
+    },
+    {
+      "type": "cameraSetting_feedbackCfgItem"
+    },
+    {
+      "type": "cameraSetting_addToHomeCfgItem"
+    },
+    {
+      "type": "cameraSetting_firmwareCfgItem"
+    },
+    {
+      "type": "empty",
+      "height": 16,
+      "bindTypes": [
+        "CameraSetting_removeCfgItem"
+      ]
+    },
+    {
+      "type": "CameraSetting_removeCfgItem"
+    },
+    {
+      "type": "cameraSetting_restartCfgItem"
+    }
+  ],
+  "devBaseInfo": [
+    {
+      "type": "dev_icon"
+    },
+    {
+      "type": "set_icon"
+    },
+    {
+      "type": "set_name"
+    },
+    {
+      "type": "set_position"
+    }
+  ]
+}

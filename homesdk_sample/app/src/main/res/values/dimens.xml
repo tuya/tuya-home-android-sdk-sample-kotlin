@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <!--
+Automatically generated files, it should not be modified manually!!!
+-->
+    <dimen name="ty_theme_dimen_c1">32dp</dimen>
+    <dimen name="ty_theme_dimen_c1_1">24dp</dimen>
+    <dimen name="ty_theme_dimen_c1_2">20dp</dimen>
+    <dimen name="ty_theme_dimen_c1_3">15dp</dimen>
+    <dimen name="ty_theme_dimen_c2">16dp</dimen>
+    <dimen name="ty_theme_dimen_c3_1">16dp</dimen>
+    <dimen name="ty_theme_dimen_c3_2">12dp</dimen>
+    <dimen name="ty_theme_dimen_c3_3">8dp</dimen>
+    <dimen name="ty_theme_dimen_c3_4">4dp</dimen>
+</resources>

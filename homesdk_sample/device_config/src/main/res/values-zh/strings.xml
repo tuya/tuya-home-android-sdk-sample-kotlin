@@ -18,12 +18,14 @@
     <string name="device_config_zb_gateway_title">Zigbee 网关</string>
     <string name="device_config_zb_sub_device_title">Zigbee 子设备</string>
     <string name="device_config_choose_gateway_title">选择网关</string>
-    <string name="device_qr_code_service_title">QR 扫码</string>
-
+    <string name="device_qr_code_service_title">扫描二维码</string>
+    <string name="device_config_qr_code_title">二维码配网</string>
     <string name="device_config_wifi_ssid">WIFI 名称</string>
     <string name="device_config_wifi_password">WIFI 密码</string>
     <string name="device_config_search">搜索</string>
-
+    <string name="btn_save">保存</string>
+    <string name="hint_wifi_name">Wifi 名称</string>
+    <string name="hint_wifi_pwd">Wifi 密码</string>
     <string name="device_config_ble_hint">单点蓝牙设备是指通过蓝牙与手机终端进行一对一连接的设备，
         例如蓝牙手环，蓝牙耳机，蓝牙音响等。每个设备可以同时连接到手机 ，
         目前每个手机终端同时蓝牙连接数限制为6到7。\n\n点击搜索并与蓝牙设备配对。</string>

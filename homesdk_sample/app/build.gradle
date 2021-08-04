@@ -26,9 +26,13 @@ android {
             abiFilters "armeabi-v7a", "arm64-v8a"
         }
     }
+    lintOptions {
+        abortOnError false
+    }
 
     packagingOptions {
         pickFirst 'lib/*/libc++_shared.so' // 多个aar存在此so，需要选择第一个
+        pickFirst 'lib/*/libgnustl_shared.so'//业务包需要
     }
 
     buildTypes {
@@ -69,7 +73,7 @@ dependencies {
     implementation project(":home")
     implementation project(":device_config")
     implementation project(":device_management")
-
+    implementation project(":ipc")
     implementation 'cn.yipianfengye.android:zxing-library:2.2'
 
 
