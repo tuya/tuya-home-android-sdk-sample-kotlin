@@ -47,11 +47,10 @@ dependencies {
     implementation 'androidx.navigation:navigation-fragment-ktx:2.2.2'
     implementation 'androidx.navigation:navigation-ui-ktx:2.2.2'
     implementation 'com.alibaba:fastjson:1.1.67.android'
-    implementation "org.jetbrains.kotlin:kotlin-reflect:1.5.21"//可解决Fastjson反序列化kotlin data class对象，报default constructor not found.
+    implementation "org.jetbrains.kotlin:kotlin-reflect:1.5.21"
     implementation 'com.squareup.okhttp3:okhttp-urlconnection:3.14.9'
     implementation project(':base_res')
     implementation 'com.tuya.smart:tuyasmart-ipcsdk:3.27.5'
     //timeline view
     implementation 'com.tuya.smart:tuyasmart-ipc-camera-timeline:1.0.0'
-    api 'com.tuya.smart:tuyasmart-bizbundle-cloud_storage:3.27.5-3'//云存储服务业务包
 }

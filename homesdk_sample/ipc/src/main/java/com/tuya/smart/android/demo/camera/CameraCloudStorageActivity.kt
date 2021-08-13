@@ -2,18 +2,14 @@ package com.tuya.smart.android.demo.camera
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.tuya.appsdk.sample.resource.HomeModel
 import com.tuya.smart.android.camera.sdk.TuyaIPCSdk
 import com.tuya.smart.android.demo.camera.databinding.ActivityCameraCloudStorageBinding
 import com.tuya.smart.android.demo.camera.utils.Constants
 import com.tuya.smart.android.demo.camera.utils.ToastUtil
-import com.tuya.smart.api.service.MicroServiceManager
 import com.tuya.smart.camera.camerasdk.typlayer.callback.IRegistorIOTCListener
 import com.tuya.smart.camera.camerasdk.typlayer.callback.OnP2PCameraListener
 import com.tuya.smart.camera.camerasdk.typlayer.callback.OperationCallBack
 import com.tuya.smart.camera.camerasdk.typlayer.callback.OperationDelegateCallBack
-import com.tuya.smart.camera.cloud.purchase.AbsCameraCloudPurchaseService
-import com.tuya.smart.camera.cloud.purchase.AbsCloudCallback
 import com.tuya.smart.camera.ipccamerasdk.cloud.ITYCloudCamera
 import com.tuya.smart.camera.middleware.cloud.CameraCloudSDK
 import com.tuya.smart.camera.middleware.cloud.ICloudCacheManagerCallback
@@ -68,18 +64,8 @@ class CameraCloudStorageActivity:AppCompatActivity(), ICloudCacheManagerCallback
             cameraCloudSDK.getCameraCloudInfo(TuyaHomeSdk.getDataInstance().getDeviceBean(devId), this@CameraCloudStorageActivity)
         }
         viewBinding.buyBtn.setOnClickListener {
-            // TODO: 2021/7/29 购买云存储，接入方式可参考业务包接入文档 https://developer.tuya.com/cn/docs/app-development/cloudstorage?id=Ka8qhzjzay7fx
             //TODO use cloud service purchase component https://developer.tuya.com/cn/docs/app-development/cloudstorage?id=Ka8qhzjzay7fx
-//            val cameraCloudService: AbsCameraCloudPurchaseService = MicroServiceManager.getInstance().findServiceByInterface(AbsCameraCloudPurchaseService::class.java.name)
-//            cameraCloudService?.buyCloudStorage(
-//                this,
-//                TuyaHomeSdk.getDataInstance().getDeviceBean(devId),
-//                HomeModel.INSTANCE.getCurrentHome(this).toString(), object: AbsCloudCallback() {
-//                    override fun onError(errorCode: String?, errorMessage: String?) {
-//                        super.onError(errorCode, errorMessage)
-//                    }
-//                }
-//            )
+
         }
         viewBinding.queryBtn.setOnClickListener {
             cameraCloudSDK.getCloudMediaCount(devId, TimeZone.getDefault().id, this@CameraCloudStorageActivity)
