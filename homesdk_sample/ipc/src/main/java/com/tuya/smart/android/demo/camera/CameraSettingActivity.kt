@@ -3,8 +3,11 @@ package com.tuya.smart.android.demo.camera
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Button
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.alibaba.fastjson.JSONObject
+import com.tuya.smart.android.demo.camera.CameraSettingActivity.DPCallback
 import com.tuya.smart.android.demo.camera.databinding.ActivityCameraSettingBinding
 import com.tuya.smart.android.demo.camera.utils.Constants
 import com.tuya.smart.android.demo.camera.utils.DPConstants
@@ -14,22 +17,18 @@ import com.tuya.smart.sdk.api.IResultCallback
 import com.tuya.smart.sdk.api.ITuyaDevice
 
 /**
-
- * TODO feature
- *存储卡管理，水印管理
  * SdCard Setting and WaterMark Setting
  * @author houqing <a href="mailto:developer@tuya.com"/>
-
- * @since 2021/7/27 3:40 下午
-
+ * @since 2021/7/27 3:40 PM
  */
-class CameraSettingActivity :AppCompatActivity(){
-    companion object{
+class CameraSettingActivity : AppCompatActivity() {
+    companion object {
         private val TAG = CameraSettingActivity::class.java.simpleName
     }
+
     private var devId: String? = null
     private var iTuyaDevice: ITuyaDevice? = null
-    private lateinit var viewBinding:ActivityCameraSettingBinding
+    private lateinit var viewBinding: ActivityCameraSettingBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityCameraSettingBinding.inflate(layoutInflater)
@@ -37,18 +36,23 @@ class CameraSettingActivity :AppCompatActivity(){
         setSupportActionBar(viewBinding.toolbarView)
         viewBinding.toolbarView.setNavigationOnClickListener { onBackPressed() }
         devId = intent.getStringExtra(Constants.INTENT_DEV_ID)
-        sdStatus()//存储卡状态
-        sdCardFormat()//存储卡格式化
-        watermark()//水印开关
-        sdCardSave()//存储卡录像开关
-        sdCardSaveModel()//存储卡录像模式
+        sdStatus()//SD card status
+        sdCardFormat()//SD card format
+        watermark()//Watermark switch
+        sdCardSave()//SD card recording switch
+        sdCardSaveModel()//SD card recording mode
+        record()
     }
-    private fun sdCardSave(){
+
+    private fun sdCardSave() {
         viewBinding.tvSdSaveVideo.text = getString(R.string.not_support)
         queryValueByDPID("150")?.let {
             viewBinding.tvSdSaveVideo.text = it.toString()
-            viewBinding.openSdSaveVideo.setOnClickListener{
-                publishDps("150", !java.lang.Boolean.parseBoolean(viewBinding.tvSdSaveVideo.text.toString()))
+            viewBinding.openSdSaveVideo.setOnClickListener {
+                publishDps(
+                    "150",
+                    !java.lang.Boolean.parseBoolean(viewBinding.tvSdSaveVideo.text.toString())
+                )
             }
             listenDPUpdate("150", object : DPCallback {
                 override fun callback(obj: Any) {
@@ -57,8 +61,9 @@ class CameraSettingActivity :AppCompatActivity(){
             })
         }
     }
-    private fun sdCardSaveModel(){
-        viewBinding.tvSdSaveVideoModel.text=getString(R.string.not_support)
+
+    private fun sdCardSaveModel() {
+        viewBinding.tvSdSaveVideoModel.text = getString(R.string.not_support)
         queryValueByDPID("151")?.let {
             viewBinding.tvSdSaveVideoModel.text = it.toString()
             listenDPUpdate("151", object : DPCallback {
@@ -94,7 +99,8 @@ class CameraSettingActivity :AppCompatActivity(){
                         override fun callback(obj: Any) {
                             viewBinding.tvSdFormat.text = getString(R.string.format_status) + obj
                             if ("100" == obj.toString()) {
-                                viewBinding.tvSdFormat.text = queryValueByDPID(DPConstants.SD_STORAGE)?.toString()
+                                viewBinding.tvSdFormat.text =
+                                    queryValueByDPID(DPConstants.SD_STORAGE)?.toString()
                             }
                         }
                     })
@@ -109,7 +115,10 @@ class CameraSettingActivity :AppCompatActivity(){
             viewBinding.tvWatermark.text = it.toString()
             viewBinding.btnWatermark.visibility = View.VISIBLE
             viewBinding.btnWatermark.setOnClickListener {
-                publishDps(DPConstants.WATERMARK, !java.lang.Boolean.parseBoolean(viewBinding.tvWatermark.text.toString()))
+                publishDps(
+                    DPConstants.WATERMARK,
+                    !java.lang.Boolean.parseBoolean(viewBinding.tvWatermark.text.toString())
+                )
             }
             listenDPUpdate(DPConstants.WATERMARK, object : DPCallback {
                 override fun callback(obj: Any) {
@@ -119,18 +128,37 @@ class CameraSettingActivity :AppCompatActivity(){
         }
     }
 
+    private fun record() {
+        val dpId: String = DPConstants.SD_CARD_RECORD_SWITCH
+        val tv = findViewById<TextView>(R.id.tv_record)
+        val value = queryValueByDPID(dpId)
+        if (value != null) {
+            tv.text = value.toString()
+            val btn = findViewById<Button>(R.id.btn_record)
+            btn.visibility = View.VISIBLE
+            btn.setOnClickListener {
+                publishDps(
+                    DPConstants.SD_CARD_RECORD_SWITCH,
+                    !java.lang.Boolean.parseBoolean(tv.text.toString())
+                )
+            }
+            listenDPUpdate(dpId, object : DPCallback {
+                override fun callback(obj: Any) {
+                    tv.text = obj.toString()
+                }
+            })
+        } else {
+            tv.text = getString(R.string.not_support)
+        }
+    }
+
     private fun queryValueByDPID(dpId: String): Any? {
         TuyaHomeSdk.getDataInstance().getDeviceBean(devId)?.also {
-             return it.getDps()?.get(dpId)
+            return it.getDps()?.get(dpId)
         }
         return null
     }
 
-    /**
-     * 下发dp点
-     * @param dpId String
-     * @param value Any
-     */
     private fun publishDps(dpId: String, value: Any) {
         if (iTuyaDevice == null) {
             iTuyaDevice = TuyaHomeSdk.newDeviceInstance(devId)
@@ -153,7 +181,8 @@ class CameraSettingActivity :AppCompatActivity(){
         TuyaHomeSdk.newDeviceInstance(devId).registerDevListener(object : IDevListener {
             override fun onDpUpdate(devId: String, dpStr: String) {
                 callback?.let {
-                    val dps: Map<String, Any> = JSONObject.parseObject<Map<String, Any>>(dpStr, MutableMap::class.java)
+                    val dps: Map<String, Any> =
+                        JSONObject.parseObject<Map<String, Any>>(dpStr, MutableMap::class.java)
                     if (dps.containsKey(dpId)) {
                         dps[dpId]?.let { it1 -> callback.callback(it1) }
                     }
@@ -166,6 +195,7 @@ class CameraSettingActivity :AppCompatActivity(){
             override fun onDevInfoUpdate(devId: String) {}
         })
     }
+
     private interface DPCallback {
         fun callback(obj: Any)
     }

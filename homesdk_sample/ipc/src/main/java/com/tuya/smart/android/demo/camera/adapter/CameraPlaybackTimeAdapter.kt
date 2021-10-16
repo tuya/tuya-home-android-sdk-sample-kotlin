@@ -15,7 +15,7 @@ import java.util.*
  * TODO feature
  *
  * @author houqing <a href="mailto:developer@tuya.com"/>
- * @since 2021/7/27 8:28 下午
+ * @since 2021/7/27 8:28 PM
  */
 class CameraPlaybackTimeAdapter(beans:MutableList<TimePieceBean>) : RecyclerView.Adapter<CameraPlaybackTimeAdapter.MyViewHolder>() {
     private val timePieceBeans: MutableList<TimePieceBean>  = beans

@@ -1,15 +1,8 @@
 package com.tuya.smart.android.demo.camera.utils
 
 /**
-
- * TODO feature
-
- *
-
  * @author houqing <a href="mailto:developer@tuya.com"/>
-
- * @since 2021/7/26 3:37 下午
-
+ * @since 2021/7/26 3:37 PM
  */
 class DPConstants {
     companion object{
@@ -21,6 +14,9 @@ class DPConstants {
 
         //Data type: boolean
         const val WATERMARK = "104"
+
+        //Data type: boolean
+        const val SD_CARD_RECORD_SWITCH = "150"
 
         const val SD_STATUS = "110"
         const val SD_STORAGE = "109"

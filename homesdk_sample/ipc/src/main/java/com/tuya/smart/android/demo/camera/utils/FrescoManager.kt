@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit
 
  * @author houqing <a href="mailto:developer@tuya.com"/>
 
- * @since 2021/7/26 3:37 下午
+ * @since 2021/7/26 3:37 PM
 
  */
 class FrescoManager {

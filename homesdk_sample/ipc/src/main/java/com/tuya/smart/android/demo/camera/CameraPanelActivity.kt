@@ -1,6 +1,7 @@
 package com.tuya.smart.android.demo.camera
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
@@ -16,14 +17,10 @@ import android.widget.RelativeLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.alibaba.fastjson.JSONObject
+import com.tuya.appsdk.sample.resource.HomeModel
 import com.tuya.smart.android.camera.sdk.TuyaIPCSdk
-import com.tuya.smart.android.camera.sdk.api.ITuyaIPCCore
-import com.tuya.smart.android.camera.sdk.api.ITuyaIPCDoorbell
 import com.tuya.smart.android.demo.camera.databinding.ActivityCameraPanelBinding
-import com.tuya.smart.android.demo.camera.utils.Constants
-import com.tuya.smart.android.demo.camera.utils.DPConstants
-import com.tuya.smart.android.demo.camera.utils.MessageUtil
-import com.tuya.smart.android.demo.camera.utils.ToastUtil
+import com.tuya.smart.android.demo.camera.utils.*
 import com.tuya.smart.camera.camerasdk.typlayer.callback.AbsP2pCameraListener
 import com.tuya.smart.camera.camerasdk.typlayer.callback.OnRenderDirectionCallback
 import com.tuya.smart.camera.camerasdk.typlayer.callback.OperationDelegateCallBack
@@ -31,40 +28,35 @@ import com.tuya.smart.camera.ipccamerasdk.p2p.ICameraP2P
 import com.tuya.smart.camera.ipccamerasdk.utils.CameraConstant
 import com.tuya.smart.camera.middleware.p2p.ITuyaSmartCameraP2P
 import com.tuya.smart.camera.middleware.widget.AbsVideoViewCallback
-import com.tuya.smart.camera.utils.AudioUtils
 import com.tuya.smart.home.sdk.TuyaHomeSdk
+import com.tuya.smart.ipc.camera.autotesting.activity.AutoCameraTestingProgramListActivity
+import com.tuya.smart.ipc.camera.cloudtool.activity.CloudToolHomeActivity
 import com.tuya.smart.sdk.api.IResultCallback
 import com.tuya.smart.sdk.api.ITuyaDevice
 import java.io.File
 import java.nio.ByteBuffer
 
 /**
-
- * TODO feature
- *视频直播
  * @author houqing <a href="mailto:developer@tuya.com"/>
-
- * @since 2021/7/26 5:02 下午
-
+ * @since 2021/7/26 5:02 PM
  */
-class CameraPanelActivity : AppCompatActivity(),View.OnClickListener {
-    companion object{
+class CameraPanelActivity : AppCompatActivity(), View.OnClickListener {
+    companion object {
         private const val ASPECT_RATIO_WIDTH = 9
         private const val ASPECT_RATIO_HEIGHT = 16
         private const val TAG = "CameraPanelActivity"
     }
+
     private var isSpeaking = false
     private var isRecording = false
     private var isPlay = false
     private var previewMute = ICameraP2P.MUTE
     private var videoClarity = ICameraP2P.HD
     private var currVideoClarity: String? = null
-
-    private var p2pType:Int = 0
-
     private var devId: String? = null
     private lateinit var viewBinding: ActivityCameraPanelBinding
     private var mCameraP2P: ITuyaSmartCameraP2P<Any>? = null
+    @SuppressLint("HandlerLeak")
     private val mHandler: Handler = object : Handler() {
         override fun handleMessage(msg: Message) {
             when (msg.what) {
@@ -88,19 +80,33 @@ class CameraPanelActivity : AppCompatActivity(),View.OnClickListener {
             super.handleMessage(msg)
         }
     }
+    var cameraPTZHelper: CameraPTZHelper? = null
+
     private fun handleStopTalk(msg: Message) {
         if (msg.arg1 == Constants.ARG1_OPERATE_SUCCESS) {
-            ToastUtil.shortToast(this@CameraPanelActivity, "关闭对讲"+getString(R.string.operation_suc))
+            ToastUtil.shortToast(
+                this@CameraPanelActivity,
+                getString(R.string.ipc_stop_talk) + getString(R.string.operation_suc)
+            )
         } else {
-            ToastUtil.shortToast(this@CameraPanelActivity, "关闭对讲"+getString(R.string.operation_failed))
+            ToastUtil.shortToast(
+                this@CameraPanelActivity,
+                getString(R.string.ipc_stop_talk) + getString(R.string.operation_failed)
+            )
         }
     }
 
     private fun handleStartTalk(msg: Message) {
         if (msg.arg1 == Constants.ARG1_OPERATE_SUCCESS) {
-            ToastUtil.shortToast(this@CameraPanelActivity, "开启对讲"+getString(R.string.operation_suc))
+            ToastUtil.shortToast(
+                this@CameraPanelActivity,
+                getString(R.string.ipc_start_talk) + getString(R.string.operation_suc)
+            )
         } else {
-            ToastUtil.shortToast(this@CameraPanelActivity, "开启对讲"+getString(R.string.operation_failed))
+            ToastUtil.shortToast(
+                this@CameraPanelActivity,
+                getString(R.string.ipc_start_talk) + getString(R.string.operation_failed)
+            )
         }
     }
 
@@ -122,7 +128,7 @@ class CameraPanelActivity : AppCompatActivity(),View.OnClickListener {
 
     private fun handleMute(msg: Message) {
         if (msg.arg1 == Constants.ARG1_OPERATE_SUCCESS) {
-            viewBinding.cameraMute.isSelected =(previewMute == ICameraP2P.MUTE)
+            viewBinding.cameraMute.isSelected = (previewMute == ICameraP2P.MUTE)
         } else {
             ToastUtil.shortToast(this@CameraPanelActivity, getString(R.string.operation_failed))
         }
@@ -131,7 +137,8 @@ class CameraPanelActivity : AppCompatActivity(),View.OnClickListener {
 
     private fun handleClarity(msg: Message) {
         if (msg.arg1 == Constants.ARG1_OPERATE_SUCCESS) {
-            viewBinding.cameraQuality.text= if (videoClarity == ICameraP2P.HD) getString(R.string.hd) else getString(R.string.sd)
+            viewBinding.cameraQuality.text =
+                if (videoClarity == ICameraP2P.HD) getString(R.string.hd) else getString(R.string.sd)
         } else {
             ToastUtil.shortToast(this@CameraPanelActivity, getString(R.string.operation_failed))
         }
@@ -139,7 +146,7 @@ class CameraPanelActivity : AppCompatActivity(),View.OnClickListener {
 
     private fun handleConnect(msg: Message) {
         if (msg.arg1 == Constants.ARG1_OPERATE_SUCCESS) {
-            preview()//p2p通道建立成功，开启预览，播放直播视频
+            preview();
         } else {
             ToastUtil.shortToast(this@CameraPanelActivity, getString(R.string.connect_failed))
         }
@@ -153,7 +160,10 @@ class CameraPanelActivity : AppCompatActivity(),View.OnClickListener {
             } else if (currVideoClarity == ICameraP2P.STANDEND.toString()) {
                 info = getString(R.string.sd)
             }
-            ToastUtil.shortToast(this@CameraPanelActivity, getString(R.string.get_current_clarity) + info)
+            ToastUtil.shortToast(
+                this@CameraPanelActivity,
+                getString(R.string.get_current_clarity) + info
+            )
         } else {
             ToastUtil.shortToast(this@CameraPanelActivity, getString(R.string.operation_failed))
         }
@@ -161,7 +171,7 @@ class CameraPanelActivity : AppCompatActivity(),View.OnClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewBinding =  ActivityCameraPanelBinding.inflate(layoutInflater)
+        viewBinding = ActivityCameraPanelBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
         setSupportActionBar(viewBinding.toolbarView)
         val windowManager = this.getSystemService(WINDOW_SERVICE) as WindowManager
@@ -173,30 +183,33 @@ class CameraPanelActivity : AppCompatActivity(),View.OnClickListener {
         viewBinding.cameraMute.isSelected = true
         initData()
         initListener()
-        if (querySupportByDPID(DPConstants.PTZ_CONTROL)) {//云台控制(Cloud Station Control)
-            viewBinding.cameraVideoView.setOnRenderDirectionCallback(object : OnRenderDirectionCallback {
+        if (querySupportByDPID(DPConstants.PTZ_CONTROL)) {
+            //Cloud Station Control
+            viewBinding.cameraVideoView.setOnRenderDirectionCallback(object :
+                OnRenderDirectionCallback {
                 override fun onLeft() {
-                    publishDps(DPConstants.PTZ_CONTROL, DPConstants.PTZ_LEFT)
+                    cameraPTZHelper?.ptzControl(DPConstants.PTZ_LEFT)
                 }
 
                 override fun onRight() {
-                    publishDps(DPConstants.PTZ_CONTROL, DPConstants.PTZ_RIGHT)
+                    cameraPTZHelper?.ptzControl(DPConstants.PTZ_RIGHT)
                 }
 
                 override fun onUp() {
-                    publishDps(DPConstants.PTZ_CONTROL, DPConstants.PTZ_UP)
+                    cameraPTZHelper?.ptzControl(DPConstants.PTZ_UP)
                 }
 
                 override fun onDown() {
-                    publishDps(DPConstants.PTZ_CONTROL, DPConstants.PTZ_DOWN)
+                    cameraPTZHelper?.ptzControl(DPConstants.PTZ_DOWN)
                 }
 
                 override fun onCancel() {
-                    publishDps(DPConstants.PTZ_STOP, true)
+                    cameraPTZHelper?.ptzStop()
                 }
             })
         }
     }
+
     private var iTuyaDevice: ITuyaDevice? = null
     private fun publishDps(dpId: String, value: Any) {
         if (iTuyaDevice == null) {
@@ -215,11 +228,12 @@ class CameraPanelActivity : AppCompatActivity(),View.OnClickListener {
             }
         })
     }
+
     private fun querySupportByDPID(dpId: String): Boolean {
-      return TuyaHomeSdk.getDataInstance().getDeviceBean(devId)?.run {
-          val dps = this.getDps()
-          return (dps!=null && dps[dpId] != null)
-      } == true
+        return TuyaHomeSdk.getDataInstance().getDeviceBean(devId)?.run {
+            val dps = this.getDps()
+            return (dps != null && dps[dpId] != null)
+        } == true
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -238,6 +252,7 @@ class CameraPanelActivity : AppCompatActivity(),View.OnClickListener {
         }
         return super.onOptionsItemSelected(item)
     }
+
     private fun unBindDevice() {
         TuyaHomeSdk.newDeviceInstance(devId).removeDevice(object : IResultCallback {
             override fun onError(s: String, s1: String) {
@@ -250,11 +265,11 @@ class CameraPanelActivity : AppCompatActivity(),View.OnClickListener {
             }
         })
     }
-    private fun initData(){
+
+    private fun initData() {
         devId = intent.getStringExtra(Constants.INTENT_DEV_ID)
         TuyaIPCSdk.getCameraInstance()?.let {
             mCameraP2P = it.createCameraP2P(devId)
-            p2pType = it.getP2PType(devId)
         }
         viewBinding.cameraVideoView.setViewCallback(object : AbsVideoViewCallback() {
             override fun onCreated(o: Any) {
@@ -264,12 +279,18 @@ class CameraPanelActivity : AppCompatActivity(),View.OnClickListener {
         })
 //        viewBinding.cameraVideoView.createVideoView(p2pType)
         viewBinding.cameraVideoView.createVideoView(devId)
-        if(mCameraP2P == null)showNotSupportToast()
+        if (mCameraP2P == null) showNotSupportToast()
+        devId?.let {
+            cameraPTZHelper = CameraPTZHelper(it)
+        }
+        cameraPTZHelper?.bindPtzBoard(findViewById(R.id.sv_ptz_board))
     }
+
     private fun showNotSupportToast() {
         ToastUtil.shortToast(this@CameraPanelActivity, getString(R.string.not_support_device))
     }
-    private fun initListener(){
+
+    private fun initListener() {
         mCameraP2P?.let {
             viewBinding.cameraMute.setOnClickListener(this)
             viewBinding.cameraQuality.setOnClickListener(this)
@@ -279,6 +300,8 @@ class CameraPanelActivity : AppCompatActivity(),View.OnClickListener {
             viewBinding.cameraControlBoard.replayTxt.setOnClickListener(this)
             viewBinding.cameraControlBoard.cloudTxt.setOnClickListener(this)
             viewBinding.cameraControlBoard.messageCenterTxt.setOnClickListener(this)
+            viewBinding.cameraControlBoard.debugTxt.setOnClickListener(this)
+            viewBinding.cameraControlBoard.ptzTxt.setOnClickListener(this)
         }
         viewBinding.toolbarView.setNavigationOnClickListener {
             onBackPressed()
@@ -287,45 +310,41 @@ class CameraPanelActivity : AppCompatActivity(),View.OnClickListener {
         viewBinding.cameraControlBoard.infoTxt.setOnClickListener(this)
         viewBinding.cameraControlBoard.getClarityTxt.setOnClickListener(this)
     }
+
     override fun onClick(v: View?) {
-        when(v?.id){
-            R.id.camera_mute-> muteClick()
-            R.id.camera_quality-> setVideoClarity()
-            R.id.speak_Txt-> speakClick()
-            R.id.record_Txt->recordClick()
-            R.id.photo_Txt->snapShotClick()
-            R.id.replay_Txt->{
+        when (v?.id) {
+            R.id.camera_mute -> muteClick()
+            R.id.camera_quality -> setVideoClarity()
+            R.id.speak_Txt -> speakClick()
+            R.id.record_Txt -> recordClick()
+            R.id.photo_Txt -> snapShotClick()
+            R.id.replay_Txt -> {
                 val intent = Intent(this@CameraPanelActivity, CameraPlaybackActivity::class.java)
-                intent.putExtra(Constants.INTENT_P2P_TYPE, p2pType)
                 intent.putExtra(Constants.INTENT_DEV_ID, devId)
                 startActivity(intent)
             }
-            R.id.setting_Txt->{
+            R.id.setting_Txt -> {
                 val intent1 = Intent(this@CameraPanelActivity, CameraSettingActivity::class.java)
                 intent1.putExtra(Constants.INTENT_DEV_ID, devId)
                 startActivity(intent1)
             }
-            R.id.cloud_Txt->{
-                if (p2pType == CameraConstant.SDK_PROVIDER_V1) {
-                    showNotSupportToast()
-                    return
-                }
-            val intent2 = Intent(this@CameraPanelActivity, CameraCloudStorageActivity::class.java)
-            intent2.putExtra(Constants.INTENT_DEV_ID, devId)
-            intent2.putExtra(Constants.INTENT_P2P_TYPE, p2pType)
-            startActivity(intent2)
+            R.id.cloud_Txt -> {
+                val intent2 =
+                    Intent(this@CameraPanelActivity, CameraCloudStorageActivity::class.java)
+                intent2.putExtra(Constants.INTENT_DEV_ID, devId)
+                startActivity(intent2)
             }
-            R.id.message_center_Txt->{
+            R.id.message_center_Txt -> {
                 val intent3 = Intent(this@CameraPanelActivity, AlarmDetectionActivity::class.java)
                 intent3.putExtra(Constants.INTENT_DEV_ID, devId)
                 startActivity(intent3)
             }
-            R.id.info_Txt->{
+            R.id.info_Txt -> {
                 val intent4 = Intent(this@CameraPanelActivity, CameraInfoActivity::class.java)
                 intent4.putExtra(Constants.INTENT_DEV_ID, devId)
                 startActivity(intent4)
             }
-            R.id.get_clarity_Txt->{
+            R.id.get_clarity_Txt -> {
                 mCameraP2P?.getVideoClarity(object : OperationDelegateCallBack {
                     override fun onSuccess(i: Int, i1: Int, s: String) {
                         currVideoClarity = s
@@ -347,8 +366,42 @@ class CameraPanelActivity : AppCompatActivity(),View.OnClickListener {
                     }
                 })
             }
+            R.id.debug_Txt -> {
+                val items = arrayOf(
+                    getString(R.string.ipc_sdk_autotest_tools),
+                    getString(R.string.ipc_cloud_debug_tools)
+                )
+                val builder = AlertDialog.Builder(this)
+                builder.setItems(
+                    items
+                ) { _: DialogInterface?, which: Int ->
+                    if (which == 0) {
+                        val intent = Intent(
+                            this@CameraPanelActivity,
+                            AutoCameraTestingProgramListActivity::class.java
+                        )
+                        startActivity(intent)
+                    } else if (which == 1) {
+                        val intent =
+                            Intent(this@CameraPanelActivity, CloudToolHomeActivity::class.java)
+                        intent.putExtra(
+                            "extra_current_home_id",
+                            HomeModel.INSTANCE.getCurrentHome(this)
+                        )
+                        startActivity(intent)
+                    }
+                }
+                builder.setNegativeButton(
+                    getString(R.string.ipc_close)
+                ) { dialog: DialogInterface, _: Int -> dialog.dismiss() }
+                builder.create().show()
+            }
+            R.id.ptz_Txt -> {
+                cameraPTZHelper?.show()
+            }
         }
     }
+
     private fun preview() {
         mCameraP2P?.startPreview(videoClarity, object : OperationDelegateCallBack {
             override fun onSuccess(sessionId: Int, requestId: Int, data: String) {
@@ -362,6 +415,7 @@ class CameraPanelActivity : AppCompatActivity(),View.OnClickListener {
             }
         })
     }
+
     private fun recordClick() {
         if (!isRecording) {
             val picPath = getExternalFilesDir(null)!!.path + "/" + devId
@@ -370,7 +424,7 @@ class CameraPanelActivity : AppCompatActivity(),View.OnClickListener {
                 file.mkdirs()
             }
             val fileName = System.currentTimeMillis().toString() + ".mp4"
-            mCameraP2P!!.startRecordLocalMp4(
+            mCameraP2P?.startRecordLocalMp4(
                 picPath,
                 fileName,
                 this@CameraPanelActivity,
@@ -388,10 +442,11 @@ class CameraPanelActivity : AppCompatActivity(),View.OnClickListener {
                 })
             recordStatue(true)
         } else {
-            mCameraP2P!!.stopRecordLocalMp4(object : OperationDelegateCallBack {
+            mCameraP2P?.stopRecordLocalMp4(object : OperationDelegateCallBack {
                 override fun onSuccess(sessionId: Int, requestId: Int, data: String) {
                     isRecording = false
-                    mHandler.sendMessage(MessageUtil.getMessage(
+                    mHandler.sendMessage(
+                        MessageUtil.getMessage(
                             Constants.MSG_VIDEO_RECORD_OVER,
                             Constants.ARG1_OPERATE_SUCCESS
                         )
@@ -400,7 +455,8 @@ class CameraPanelActivity : AppCompatActivity(),View.OnClickListener {
 
                 override fun onFailure(sessionId: Int, requestId: Int, errCode: Int) {
                     isRecording = false
-                    mHandler.sendMessage(MessageUtil.getMessage(
+                    mHandler.sendMessage(
+                        MessageUtil.getMessage(
                             Constants.MSG_VIDEO_RECORD_OVER,
                             Constants.ARG1_OPERATE_FAIL
                         )
@@ -422,7 +478,8 @@ class CameraPanelActivity : AppCompatActivity(),View.OnClickListener {
             this@CameraPanelActivity,
             object : OperationDelegateCallBack {
                 override fun onSuccess(sessionId: Int, requestId: Int, data: String) {
-                    mHandler.sendMessage(MessageUtil.getMessage(
+                    mHandler.sendMessage(
+                        MessageUtil.getMessage(
                             Constants.MSG_SCREENSHOT,
                             Constants.ARG1_OPERATE_SUCCESS
                         )
@@ -431,7 +488,8 @@ class CameraPanelActivity : AppCompatActivity(),View.OnClickListener {
                 }
 
                 override fun onFailure(sessionId: Int, requestId: Int, errCode: Int) {
-                    mHandler.sendMessage(MessageUtil.getMessage(
+                    mHandler.sendMessage(
+                        MessageUtil.getMessage(
                             Constants.MSG_SCREENSHOT,
                             Constants.ARG1_OPERATE_FAIL
                         )
@@ -445,7 +503,8 @@ class CameraPanelActivity : AppCompatActivity(),View.OnClickListener {
         mCameraP2P?.setMute(mute, object : OperationDelegateCallBack {
             override fun onSuccess(sessionId: Int, requestId: Int, data: String) {
                 previewMute = Integer.valueOf(data)
-                mHandler.sendMessage(MessageUtil.getMessage(
+                mHandler.sendMessage(
+                    MessageUtil.getMessage(
                         Constants.MSG_MUTE,
                         Constants.ARG1_OPERATE_SUCCESS
                     )
@@ -453,7 +512,8 @@ class CameraPanelActivity : AppCompatActivity(),View.OnClickListener {
             }
 
             override fun onFailure(sessionId: Int, requestId: Int, errCode: Int) {
-                mHandler.sendMessage(MessageUtil.getMessage(
+                mHandler.sendMessage(
+                    MessageUtil.getMessage(
                         Constants.MSG_MUTE,
                         Constants.ARG1_OPERATE_FAIL
                     )
@@ -467,7 +527,8 @@ class CameraPanelActivity : AppCompatActivity(),View.OnClickListener {
             mCameraP2P?.stopAudioTalk(object : OperationDelegateCallBack {
                 override fun onSuccess(sessionId: Int, requestId: Int, data: String) {
                     isSpeaking = false
-                    mHandler.sendMessage(MessageUtil.getMessage(
+                    mHandler.sendMessage(
+                        MessageUtil.getMessage(
                             Constants.MSG_TALK_BACK_OVER,
                             Constants.ARG1_OPERATE_SUCCESS
                         )
@@ -489,22 +550,36 @@ class CameraPanelActivity : AppCompatActivity(),View.OnClickListener {
                 mCameraP2P?.startAudioTalk(object : OperationDelegateCallBack {
                     override fun onSuccess(sessionId: Int, requestId: Int, data: String) {
                         isSpeaking = true
-                        mHandler.sendMessage(MessageUtil.getMessage(Constants.MSG_TALK_BACK_BEGIN, Constants.ARG1_OPERATE_SUCCESS))
+                        mHandler.sendMessage(
+                            MessageUtil.getMessage(
+                                Constants.MSG_TALK_BACK_BEGIN,
+                                Constants.ARG1_OPERATE_SUCCESS
+                            )
+                        )
                     }
 
                     override fun onFailure(sessionId: Int, requestId: Int, errCode: Int) {
                         isSpeaking = false
-                        mHandler.sendMessage(MessageUtil.getMessage(Constants.MSG_TALK_BACK_BEGIN, Constants.ARG1_OPERATE_FAIL))
+                        mHandler.sendMessage(
+                            MessageUtil.getMessage(
+                                Constants.MSG_TALK_BACK_BEGIN,
+                                Constants.ARG1_OPERATE_FAIL
+                            )
+                        )
                     }
                 })
             } else {
-                Constants.requestPermission(this@CameraPanelActivity, Manifest.permission.RECORD_AUDIO, Constants.EXTERNAL_AUDIO_REQ_CODE, "open_recording")
+                Constants.requestPermission(
+                    this@CameraPanelActivity,
+                    Manifest.permission.RECORD_AUDIO,
+                    Constants.EXTERNAL_AUDIO_REQ_CODE,
+                    "open_recording"
+                )
             }
         }
     }
 
     /**
-     * 设置视频质量，高清 or 标清
      * Set video quality, HD or SD
      */
     private fun setVideoClarity() {
@@ -539,12 +614,12 @@ class CameraPanelActivity : AppCompatActivity(),View.OnClickListener {
         viewBinding.cameraControlBoard.recordTxt.isEnabled = true
         viewBinding.cameraControlBoard.recordTxt.isSelected = isRecording
     }
+
     override fun onResume() {
         super.onResume()
         viewBinding.cameraVideoView.onResume()
         //must register again,or can't callback
         mCameraP2P?.let {
-            AudioUtils.getModel(this@CameraPanelActivity)
             it.registerP2PCameraListener(p2pCameraListener)
             it.generateCameraView(viewBinding.cameraVideoView.createdView())
             if (it.isConnecting) {
@@ -557,11 +632,11 @@ class CameraPanelActivity : AppCompatActivity(),View.OnClickListener {
                         Log.d(TAG, "start preview onFailure, errCode: $errCode")
                     }
                 })
-            }else {
+            } else {
                 if (TuyaIPCSdk.getCameraInstance()?.isLowPowerDevice(devId) == true) {
                     TuyaIPCSdk.getDoorbell()?.wirelessWake(devId)
                 }
-                //建立p2p通道(Establishing a p2p channel)
+                //Establishing a p2p channel
                 it.connect(devId, object : OperationDelegateCallBack {
                     override fun onSuccess(i: Int, i1: Int, s: String) {
                         mHandler.sendMessage(
@@ -615,13 +690,12 @@ class CameraPanelActivity : AppCompatActivity(),View.OnClickListener {
                 override fun onFailure(i: Int, i1: Int, i2: Int) {}
             })
         }
-        AudioUtils.changeToNomal(this)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-            mHandler?.removeCallbacksAndMessages(null)
-            mCameraP2P?.destroyP2P()
+        mHandler.removeCallbacksAndMessages(null)
+        mCameraP2P?.destroyP2P()
     }
 
 }

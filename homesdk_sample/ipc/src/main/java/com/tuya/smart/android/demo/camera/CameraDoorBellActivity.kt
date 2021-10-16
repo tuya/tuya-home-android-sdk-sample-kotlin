@@ -10,26 +10,32 @@ import com.tuya.smart.android.camera.sdk.TuyaIPCSdk
 import com.tuya.smart.android.camera.sdk.bean.TYDoorBellCallModel
 import com.tuya.smart.android.camera.sdk.callback.TuyaSmartDoorBellObserver
 import com.tuya.smart.android.demo.camera.databinding.ActivityCameraDoorbellCallingBinding
-import com.tuya.smart.camera.utils.IntentUtils
+import com.tuya.smart.android.demo.camera.utils.Constants
 import com.tuya.smart.home.sdk.TuyaHomeSdk
 
 /**
- * TODO feature
- *门铃呼叫业务
  * DoorBell Call
  * @author hou qing <a href="mailto:developer@tuya.com"/>
- * @since 2021/7/28 11:22 上午
+ * @since 2021/7/28 11:22 AM
  */
-class CameraDoorBellActivity :AppCompatActivity(){
+class CameraDoorBellActivity : AppCompatActivity() {
     private var mMessageId: String? = null
     private val mDoorBellInstance = TuyaIPCSdk.getDoorbell().ipcDoorBellManagerInstance
     private lateinit var viewBinding: ActivityCameraDoorbellCallingBinding
     private val mObserver: TuyaSmartDoorBellObserver = object : TuyaSmartDoorBellObserver() {
         override fun doorBellCallDidCanceled(callModel: TYDoorBellCallModel, isTimeOut: Boolean) {
             if (isTimeOut) {
-                Toast.makeText(this@CameraDoorBellActivity, "Automatically hang up when the doorbell expires", Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    this@CameraDoorBellActivity,
+                    "Automatically hang up when the doorbell expires",
+                    Toast.LENGTH_LONG
+                ).show()
             } else {
-                Toast.makeText(this@CameraDoorBellActivity, "The doorbell was cancelled by the device", Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    this@CameraDoorBellActivity,
+                    "The doorbell was cancelled by the device",
+                    Toast.LENGTH_LONG
+                ).show()
             }
             finish()
         }
@@ -40,7 +46,11 @@ class CameraDoorBellActivity :AppCompatActivity(){
         }
 
         override fun doorBellCallDidAnsweredByOther(callModel: TYDoorBellCallModel) {
-            Toast.makeText(this@CameraDoorBellActivity, "The doorbell is answered by another user", Toast.LENGTH_LONG).show()
+            Toast.makeText(
+                this@CameraDoorBellActivity,
+                "The doorbell is answered by another user",
+                Toast.LENGTH_LONG
+            ).show()
             mDoorBellInstance.refuseDoorBellCall(callModel.messageId)
             finish()
         }
@@ -50,7 +60,7 @@ class CameraDoorBellActivity :AppCompatActivity(){
         super.onCreate(savedInstanceState)
         viewBinding = ActivityCameraDoorbellCallingBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
-        mMessageId = intent.getStringExtra(IntentUtils.INTENT_MSGID)
+        mMessageId = intent.getStringExtra(Constants.INTENT_MSGID)
         initData()
         initView()
     }

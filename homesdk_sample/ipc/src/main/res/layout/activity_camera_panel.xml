@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white">
@@ -17,7 +18,8 @@
         android:id="@+id/camera_video_view_Rl"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/toolbar_view">
+        android:layout_below="@id/toolbar_view"
+        tools:layout_height="250dp">
 
         <com.tuya.smart.camera.middleware.widget.TuyaCameraView
             android:id="@+id/camera_video_view"
@@ -50,11 +52,34 @@
             android:textSize="@dimen/ts_12" />
     </RelativeLayout>
 
-    <include
-        android:id="@+id/camera_control_board"
-        layout="@layout/camera_panel_control_layout"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/camera_video_view_Rl" />
+        android:layout_below="@+id/camera_video_view_Rl">
+
+        <include
+            android:id="@+id/camera_control_board"
+            layout="@layout/camera_panel_control_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </ScrollView>
+
+
+    <ScrollView
+        android:id="@+id/sv_ptz_board"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/camera_video_view_Rl"
+        android:visibility="invisible"
+        android:background="@color/white">
+
+        <include
+            android:id="@+id/camera_ptz_board"
+            layout="@layout/camera_ptz_control_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </ScrollView>
 
 </RelativeLayout>

@@ -11,7 +11,7 @@ import android.widget.Toast
 
  * @author houqing <a href="mailto:developer@tuya.com"/>
 
- * @since 2021/7/26 3:38 下午
+ * @since 2021/7/26 3:38 PM
 
  */
 class ToastUtil {
