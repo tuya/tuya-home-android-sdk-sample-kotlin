@@ -14,7 +14,7 @@ import com.tuya.smart.android.demo.camera.databinding.RecyclerCameraInfoBinding
 
  * @author houqing <a href="mailto:developer@tuya.com"/>
 
- * @since 2021/7/27 2:50 下午
+ * @since 2021/7/27 2:50 PM
 
  */
 class CameraInfoAdapter(data: MutableList<String>) : RecyclerView.Adapter<CameraInfoAdapter.ViewHolder>() {

@@ -3,29 +3,21 @@ package com.tuya.smart.android.demo.camera
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.tuya.smart.android.camera.sdk.TuyaIPCSdk
-import com.tuya.smart.android.camera.sdk.api.ICameraConfigInfo
-import com.tuya.smart.android.camera.sdk.api.ITuyaIPCCore
 import com.tuya.smart.android.demo.camera.adapter.CameraInfoAdapter
 import com.tuya.smart.android.demo.camera.databinding.ActivityCameraInfoBinding
 import com.tuya.smart.android.demo.camera.utils.Constants
-import java.lang.StringBuilder
-import java.util.ArrayList
 
 /**
- * TODO feature
- *设备信息
- *Camera Device Info
+ * Camera Device Info
  * @author houqing <a href="mailto:developer@tuya.com"/>
-
- * @since 2021/7/27 5:32 下午
+ * @since 2021/7/27 5:32 PM
 
  */
-class CameraInfoActivity :AppCompatActivity(){
+class CameraInfoActivity : AppCompatActivity() {
     private var mDevId: String? = null
     private lateinit var mData: MutableList<String>
-    private lateinit var viewBinding:ActivityCameraInfoBinding
+    private lateinit var viewBinding: ActivityCameraInfoBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityCameraInfoBinding.inflate(layoutInflater)

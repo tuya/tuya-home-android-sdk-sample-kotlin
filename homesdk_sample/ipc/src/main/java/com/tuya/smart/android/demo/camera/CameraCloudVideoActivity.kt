@@ -20,17 +20,11 @@ import com.tuya.smart.camera.ipccamerasdk.p2p.ICameraP2P
 import org.json.JSONObject
 
 /**
-
- * TODO feature
-
- *视频消息
- *Cloud Video Message
- * @author houqing <a href="mailto:developer@tuya.com"/>
-
- * @since 2021/7/27 5:50 下午
-
+ *  Cloud Video Message
+ *  @author houqing <a href="mailto:developer@tuya.com"/>
+ *  @since 2021/7/27 5:50 PM
  */
-class CameraCloudVideoActivity :AppCompatActivity(){
+class CameraCloudVideoActivity : AppCompatActivity() {
     private val OPERATE_SUCCESS = 1
     private val OPERATE_FAIL = 0
     private val MSG_CLOUD_VIDEO_DEVICE = 1000
@@ -79,9 +73,9 @@ class CameraCloudVideoActivity :AppCompatActivity(){
 
     override fun onDestroy() {
         super.onDestroy()
-            mCloudVideo?.stopVideo(null)
-            mCloudVideo?.removeOnDelegateP2PCameraListener()
-            mCloudVideo?.deinitCloudVideo()
+        mCloudVideo?.stopVideo(null)
+        mCloudVideo?.removeOnDelegateP2PCameraListener()
+        mCloudVideo?.deinitCloudVideo()
     }
 
     private fun initData() {
@@ -96,17 +90,30 @@ class CameraCloudVideoActivity :AppCompatActivity(){
         mCloudVideo = TuyaIPCSdk.getMessage()?.run { this.createVideoMessagePlayer() }
         mCloudVideo?.let {
             it.registerP2PCameraListener(object : AbsP2pCameraListener() {
-                override fun receiveFrameDataForMediaCodec(i: Int, bytes: ByteArray, i1: Int, i2: Int, bytes1: ByteArray, b: Boolean, i3: Int){
+                override fun receiveFrameDataForMediaCodec(
+                    i: Int,
+                    bytes: ByteArray,
+                    i1: Int,
+                    i2: Int,
+                    bytes1: ByteArray,
+                    b: Boolean,
+                    i3: Int
+                ) {
                     super.receiveFrameDataForMediaCodec(i, bytes, i1, i2, bytes1, b, i3)
                 }
             })
-            val listener :Any? = viewBinding.cameraCloudVideoView.createdView()
-            if(listener != null){
+            val listener: Any? = viewBinding.cameraCloudVideoView.createdView()
+            if (listener != null) {
                 it.generateCloudCameraView(listener as IRegistorIOTCListener)
             }
             it.createCloudDevice(cachePath, mDevId, object : OperationDelegateCallBack {
                 override fun onSuccess(sessionId: Int, requestId: Int, data: String?) {
-                    mHandler.sendMessage(MessageUtil.getMessage(MSG_CLOUD_VIDEO_DEVICE, OPERATE_SUCCESS))
+                    mHandler.sendMessage(
+                        MessageUtil.getMessage(
+                            MSG_CLOUD_VIDEO_DEVICE,
+                            OPERATE_SUCCESS
+                        )
+                    )
                 }
 
                 override fun onFailure(sessionId: Int, requestId: Int, errCode: Int) {}
@@ -115,36 +122,40 @@ class CameraCloudVideoActivity :AppCompatActivity(){
     }
 
     private fun initView() {
-        var p2PType = -1
-        val cameraInstance = TuyaIPCSdk.getCameraInstance()
-        if (cameraInstance != null) {
-            p2PType = cameraInstance.getP2PType(mDevId)
-        }
-//        viewBinding.cameraCloudVideoView.createVideoView(p2PType)
         viewBinding.cameraCloudVideoView.createVideoView(mDevId)
         viewBinding.btnPauseVideoMsg.setOnClickListener {
-                mCloudVideo?.pauseVideo(null)
+            mCloudVideo?.pauseVideo(null)
         }
         viewBinding.btnResumeVideoMsg.setOnClickListener {
-                mCloudVideo?.resumeVideo(null)
+            mCloudVideo?.resumeVideo(null)
         }
         viewBinding.cameraMute.setOnClickListener { muteClick() }
         viewBinding.cameraMute.isSelected = true
     }
 
     private fun muteClick() {
-       mCloudVideo?.let {
+        mCloudVideo?.let {
             val mute = if (previewMute == ICameraP2P.MUTE) ICameraP2P.UNMUTE else ICameraP2P.MUTE
             it.setCloudVideoMute(mute, object : OperationDelegateCallBack {
                 override fun onSuccess(sessionId: Int, requestId: Int, data: String?) {
                     val jsonObject = com.alibaba.fastjson.JSONObject.parseObject(data)
                     val value = jsonObject["mute"]
                     previewMute = Integer.valueOf(value.toString())
-                    mHandler.sendMessage(MessageUtil.getMessage(Constants.MSG_MUTE, Constants.ARG1_OPERATE_SUCCESS))
+                    mHandler.sendMessage(
+                        MessageUtil.getMessage(
+                            Constants.MSG_MUTE,
+                            Constants.ARG1_OPERATE_SUCCESS
+                        )
+                    )
                 }
 
                 override fun onFailure(sessionId: Int, requestId: Int, errCode: Int) {
-                    mHandler.sendMessage(MessageUtil.getMessage(Constants.MSG_MUTE, Constants.ARG1_OPERATE_FAIL))
+                    mHandler.sendMessage(
+                        MessageUtil.getMessage(
+                            Constants.MSG_MUTE,
+                            Constants.ARG1_OPERATE_FAIL
+                        )
+                    )
                 }
             })
         }
@@ -154,7 +165,10 @@ class CameraCloudVideoActivity :AppCompatActivity(){
         if (msg.arg1 == Constants.ARG1_OPERATE_SUCCESS) {
             viewBinding.cameraMute.isSelected = previewMute == ICameraP2P.MUTE
         } else {
-            ToastUtil.shortToast(this@CameraCloudVideoActivity, getString(R.string.operation_failed))
+            ToastUtil.shortToast(
+                this@CameraCloudVideoActivity,
+                getString(R.string.operation_failed)
+            )
         }
     }
 }

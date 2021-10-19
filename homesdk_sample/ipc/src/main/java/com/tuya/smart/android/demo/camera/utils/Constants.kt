@@ -1,5 +1,6 @@
 package com.tuya.smart.android.demo.camera.utils
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
@@ -12,18 +13,12 @@ import androidx.core.content.ContextCompat
 import java.lang.Exception
 
 /**
-
- * TODO feature
-
- *
-
  * @author houqing <a href="mailto:developer@tuya.com"/>
-
- * @since 2021/7/26 3:36 下午
-
+ * @since 2021/7/26 3:36 PM
  */
 class Constants {
     companion object {
+        const val INTENT_MSGID = "msgid"
         const val INTENT_DEV_ID = "intent_devId"
         const val INTENT_P2P_TYPE = "intent_p2p_type"
         const val EXTERNAL_STORAGE_REQ_CODE = 10
@@ -93,6 +88,7 @@ class Constants {
             }
         }
 
+        @SuppressLint("all")
         fun hasRecordPermission(): Boolean {
             val minBufferSize = AudioRecord.getMinBufferSize(
                 8000,

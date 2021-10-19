@@ -1,10 +1,10 @@
 package com.tuya.smart.android.demo.camera
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
 import android.text.TextUtils
-import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.widget.RelativeLayout
@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.alibaba.fastjson.JSON
 import com.alibaba.fastjson.JSONException
 import com.alibaba.fastjson.JSONObject
+import com.tuya.smart.android.camera.sdk.TuyaIPCSdk
 import com.tuya.smart.android.camera.timeline.OnBarMoveListener
 import com.tuya.smart.android.camera.timeline.TimeBean
 import com.tuya.smart.android.common.utils.L
@@ -29,24 +30,18 @@ import com.tuya.smart.camera.camerasdk.typlayer.callback.OperationDelegateCallBa
 import com.tuya.smart.camera.ipccamerasdk.bean.MonthDays
 import com.tuya.smart.camera.ipccamerasdk.p2p.ICameraP2P
 import com.tuya.smart.camera.middleware.p2p.ITuyaSmartCameraP2P
-import com.tuya.smart.camera.middleware.p2p.TuyaSmartCameraP2PFactory
 import com.tuya.smart.camera.middleware.widget.AbsVideoViewCallback
-import com.tuya.smart.camera.utils.AudioUtils
-import java.lang.Exception
 import java.nio.ByteBuffer
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 /**
- * TODO feature
- *存储卡回放
  * SdCard Video PlayBack
  * @author hou qing <a href="mailto:developer@tuya.com"/>
- * @since 2021/7/27 8:27 下午
+ * @since 2021/7/27 8:27 PM
  */
-class CameraPlaybackActivity :AppCompatActivity(),View.OnClickListener{
-    companion object{
+class CameraPlaybackActivity : AppCompatActivity(), View.OnClickListener {
+    companion object {
         private const val TAG = "CameraPlaybackActivity"
     }
 
@@ -63,17 +58,20 @@ class CameraPlaybackActivity :AppCompatActivity(),View.OnClickListener{
     var mBackDataMonthCache: MutableMap<String, MutableList<String>>? = null
     var mBackDataDayCache: MutableMap<String, MutableList<TimePieceBean>>? = null
     private var mPlaybackMute = ICameraP2P.MUTE
-    private var p2pType = 0
+    @SuppressLint("HandlerLeak")
     private val mHandler: Handler = object : Handler() {
         override fun handleMessage(msg: Message) {
             when (msg.what) {
                 Constants.MSG_MUTE -> handleMute(msg)
                 Constants.MSG_DATA_DATE -> handleDataDate(msg)
-                Constants.MSG_DATA_DATE_BY_DAY_SUCC, Constants.MSG_DATA_DATE_BY_DAY_FAIL -> handleDataDay(msg)
+                Constants.MSG_DATA_DATE_BY_DAY_SUCC, Constants.MSG_DATA_DATE_BY_DAY_FAIL -> handleDataDay(
+                    msg
+                )
             }
             super.handleMessage(msg)
         }
     }
+
     private fun handleDataDay(msg: Message) {
         if (msg.arg1 == Constants.ARG1_OPERATE_SUCCESS) {
             queryDateList?.clear()
@@ -93,9 +91,10 @@ class CameraPlaybackActivity :AppCompatActivity(),View.OnClickListener{
             } else {
                 showErrorToast()
             }
-            adapter!!.notifyDataSetChanged()
+            adapter?.notifyDataSetChanged()
         }
     }
+
     private fun handleMute(msg: Message) {
         if (msg.arg1 == Constants.ARG1_OPERATE_SUCCESS) {
             viewBinding.cameraMute.isSelected = mPlaybackMute == ICameraP2P.MUTE
@@ -103,11 +102,13 @@ class CameraPlaybackActivity :AppCompatActivity(),View.OnClickListener{
             ToastUtil.shortToast(this@CameraPlaybackActivity, getString(R.string.operation_failed))
         }
     }
+
     private fun showErrorToast() {
         runOnUiThread {
             ToastUtil.shortToast(this@CameraPlaybackActivity, getString(R.string.no_data))
         }
     }
+
     private fun handleDataDate(msg: Message) {
         if (msg.arg1 == Constants.ARG1_OPERATE_SUCCESS) {
             val days = mBackDataMonthCache?.get(mCameraP2P.monthKey)
@@ -122,11 +123,16 @@ class CameraPlaybackActivity :AppCompatActivity(),View.OnClickListener{
                     val year = substring[0].toInt()
                     val mouth = substring[1].toInt()
                     val day = substring[2].toInt()
-                    mCameraP2P.queryRecordTimeSliceByDay(year, mouth, day, object : OperationDelegateCallBack {
+                    mCameraP2P.queryRecordTimeSliceByDay(
+                        year,
+                        mouth,
+                        day,
+                        object : OperationDelegateCallBack {
                             override fun onSuccess(sessionId: Int, requestId: Int, data: String) {
                                 L.e(TAG, "$inputStr --- $data")
                                 parsePlaybackData(data)
                             }
+
                             override fun onFailure(sessionId: Int, requestId: Int, errCode: Int) {
                                 mHandler.sendEmptyMessage(Constants.MSG_DATA_DATE_BY_DAY_FAIL)
                             }
@@ -141,14 +147,25 @@ class CameraPlaybackActivity :AppCompatActivity(),View.OnClickListener{
     private fun parsePlaybackData(obj: Any) {
         val parseObject = JSON.parseObject(obj.toString(), RecordInfoBean::class.java)
         if (parseObject.count != 0) {
-            if (parseObject.items?.isNotEmpty()) {
-                mBackDataDayCache?.put(mCameraP2P.dayKey,parseObject.items)
+            if (parseObject.items.isNotEmpty()) {
+                mBackDataDayCache?.put(mCameraP2P.dayKey, parseObject.items)
             }
-            mHandler.sendMessage(MessageUtil.getMessage(Constants.MSG_DATA_DATE_BY_DAY_SUCC, Constants.ARG1_OPERATE_SUCCESS))
+            mHandler.sendMessage(
+                MessageUtil.getMessage(
+                    Constants.MSG_DATA_DATE_BY_DAY_SUCC,
+                    Constants.ARG1_OPERATE_SUCCESS
+                )
+            )
         } else {
-            mHandler.sendMessage(MessageUtil.getMessage(Constants.MSG_DATA_DATE_BY_DAY_FAIL, Constants.ARG1_OPERATE_FAIL))
+            mHandler.sendMessage(
+                MessageUtil.getMessage(
+                    Constants.MSG_DATA_DATE_BY_DAY_FAIL,
+                    Constants.ARG1_OPERATE_FAIL
+                )
+            )
         }
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityCameraPlaybackBinding.inflate(layoutInflater)
@@ -157,35 +174,62 @@ class CameraPlaybackActivity :AppCompatActivity(),View.OnClickListener{
         initData()
         initListener()
     }
+
     override fun onPause() {
         super.onPause()
         viewBinding.cameraVideoView.onPause()
         if (isPlayback) {
             mCameraP2P.stopPlayBack(null)
         }
-            mCameraP2P?.removeOnP2PCameraListener()
-            if (isFinishing) {
-                mCameraP2P?.disconnect(object : OperationDelegateCallBack {
-                    override fun onSuccess(i: Int, i1: Int, s: String) {}
-                    override fun onFailure(i: Int, i1: Int, i2: Int) {}
-                })
-            }
-        AudioUtils.changeToNomal(this)
+        mCameraP2P.removeOnP2PCameraListener()
+        if (isFinishing) {
+            mCameraP2P.disconnect(object : OperationDelegateCallBack {
+                override fun onSuccess(i: Int, i1: Int, s: String) {}
+                override fun onFailure(i: Int, i1: Int, i2: Int) {}
+            })
+        }
     }
+
     override fun onResume() {
         super.onResume()
         viewBinding.cameraVideoView.onResume()
-        AudioUtils.getModel(this)
-        mCameraP2P?.registerP2PCameraListener(p2pCameraListener)
-        mCameraP2P?.generateCameraView(viewBinding.cameraVideoView.createdView())
+        mCameraP2P.registerP2PCameraListener(p2pCameraListener)
+        mCameraP2P.generateCameraView(viewBinding.cameraVideoView.createdView())
     }
 
     private val p2pCameraListener: AbsP2pCameraListener = object : AbsP2pCameraListener() {
-        override fun onReceiveFrameYUVData(i: Int, byteBuffer: ByteBuffer, byteBuffer1: ByteBuffer, byteBuffer2: ByteBuffer, i1: Int, i2: Int, i3: Int, i4: Int, l: Long, l1: Long, l2: Long, o: Any) {
-            super.onReceiveFrameYUVData(i, byteBuffer, byteBuffer1, byteBuffer2, i1, i2, i3, i4, l, l1, l2, o)
+        override fun onReceiveFrameYUVData(
+            i: Int,
+            byteBuffer: ByteBuffer,
+            byteBuffer1: ByteBuffer,
+            byteBuffer2: ByteBuffer,
+            i1: Int,
+            i2: Int,
+            i3: Int,
+            i4: Int,
+            l: Long,
+            l1: Long,
+            l2: Long,
+            o: Any
+        ) {
+            super.onReceiveFrameYUVData(
+                i,
+                byteBuffer,
+                byteBuffer1,
+                byteBuffer2,
+                i1,
+                i2,
+                i3,
+                i4,
+                l,
+                l1,
+                l2,
+                o
+            )
             viewBinding.timeline.setCurrentTimeInMillisecond(l * 1000L)
         }
     }
+
     private fun initListener() {
         viewBinding.cameraMute.setOnClickListener(this)
         viewBinding.queryBtn.setOnClickListener(this)
@@ -193,37 +237,52 @@ class CameraPlaybackActivity :AppCompatActivity(),View.OnClickListener{
         viewBinding.pauseBtn.setOnClickListener(this)
         viewBinding.resumeBtn.setOnClickListener(this)
         viewBinding.stopBtn.setOnClickListener(this)
-        adapter?.setListener(object : CameraPlaybackTimeAdapter.OnTimeItemListener{
+        adapter?.setListener(object : CameraPlaybackTimeAdapter.OnTimeItemListener {
             override fun onClick(timePieceBean: TimePieceBean) {
                 playback(timePieceBean.startTime, timePieceBean.endTime, timePieceBean.startTime)
             }
         })
     }
+
     private fun initData() {
         mBackDataMonthCache = HashMap()
         mBackDataDayCache = HashMap()
-        p2pType = intent.getIntExtra(Constants.INTENT_P2P_TYPE, 1)
         devId = intent.getStringExtra(Constants.INTENT_DEV_ID)
-        viewBinding.queryList.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        viewBinding.queryList.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
+        viewBinding.queryList.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        viewBinding.queryList.addItemDecoration(
+            DividerItemDecoration(
+                this,
+                DividerItemDecoration.VERTICAL
+            )
+        )
         queryDateList = arrayListOf()
         adapter = CameraPlaybackTimeAdapter(queryDateList as ArrayList<TimePieceBean>)
         viewBinding.queryList.adapter = adapter
 
-        mCameraP2P = TuyaSmartCameraP2PFactory.createCameraP2P(p2pType, devId)
+        val cameraInstance = TuyaIPCSdk.getCameraInstance()
+        if (cameraInstance != null) {
+            mCameraP2P = cameraInstance.createCameraP2P(devId)
+        }
         viewBinding.cameraVideoView.setViewCallback(object : AbsVideoViewCallback() {
             override fun onCreated(o: Any) {
                 super.onCreated(o)
-                    mCameraP2P?.generateCameraView(viewBinding.cameraVideoView.createdView())
+                mCameraP2P.generateCameraView(viewBinding.cameraVideoView.createdView())
             }
         })
-        viewBinding.cameraVideoView.createVideoView(p2pType)
+        viewBinding.cameraVideoView.createVideoView(devId)
         if (!mCameraP2P.isConnecting) {
             mCameraP2P.connect(devId, object : OperationDelegateCallBack {
                 override fun onSuccess(i: Int, i1: Int, s: String) {
                 }
+
                 override fun onFailure(i: Int, i1: Int, i2: Int) {
-                    mHandler.post{ToastUtil.shortToast(this@CameraPlaybackActivity,"p2p connect failed ")}
+                    mHandler.post {
+                        ToastUtil.shortToast(
+                            this@CameraPlaybackActivity,
+                            "p2p connect failed "
+                        )
+                    }
                 }
             })
         }
@@ -252,37 +311,40 @@ class CameraPlaybackActivity :AppCompatActivity(),View.OnClickListener{
                     playback(startTime.toInt(), endTime.toInt(), currentTime.toInt())
                 }
             }
+
             override fun onBarActionDown() {}
         })
         viewBinding.timeline.setOnSelectedTimeListener { _, _ -> }
     }
+
     private fun playback(startTime: Int, endTime: Int, playTime: Int) {
-        mCameraP2P?.startPlayBack(startTime, endTime, playTime, object : OperationDelegateCallBack {
-                override fun onSuccess(sessionId: Int, requestId: Int, data: String?) {
-                    isPlayback = true
-                }
+        mCameraP2P.startPlayBack(startTime, endTime, playTime, object : OperationDelegateCallBack {
+            override fun onSuccess(sessionId: Int, requestId: Int, data: String?) {
+                isPlayback = true
+            }
 
-                override fun onFailure(sessionId: Int, requestId: Int, errCode: Int) {
-                    isPlayback = false
-                }
-            }, object : OperationDelegateCallBack {
-                override fun onSuccess(sessionId: Int, requestId: Int, data: String?) {
-                    isPlayback = false
-                }
+            override fun onFailure(sessionId: Int, requestId: Int, errCode: Int) {
+                isPlayback = false
+            }
+        }, object : OperationDelegateCallBack {
+            override fun onSuccess(sessionId: Int, requestId: Int, data: String?) {
+                isPlayback = false
+            }
 
-                override fun onFailure(sessionId: Int, requestId: Int, errCode: Int) {
-                    isPlayback = false
-                }
-            })
+            override fun onFailure(sessionId: Int, requestId: Int, errCode: Int) {
+                isPlayback = false
+            }
+        })
     }
+
     override fun onClick(v: View) {
-        when(v.id){
-            R.id.camera_mute-> muteClick()
+        when (v.id) {
+            R.id.camera_mute -> muteClick()
             R.id.query_btn -> queryDayByMonthClick()
-            R.id.start_btn->startPlayback()
-            R.id.pause_btn->pauseClick()
-            R.id.resume_btn->resumeClick()
-            R.id.stop_btn->stopClick()
+            R.id.start_btn -> startPlayback()
+            R.id.pause_btn -> pauseClick()
+            R.id.resume_btn -> resumeClick()
+            R.id.stop_btn -> stopClick()
         }
     }
 
@@ -295,7 +357,7 @@ class CameraPlaybackActivity :AppCompatActivity(),View.OnClickListener{
     }
 
     private fun resumeClick() {
-        mCameraP2P!!.resumePlayBack(object : OperationDelegateCallBack {
+        mCameraP2P.resumePlayBack(object : OperationDelegateCallBack {
             override fun onSuccess(sessionId: Int, requestId: Int, data: String) {
                 isPlayback = true
             }
@@ -305,7 +367,7 @@ class CameraPlaybackActivity :AppCompatActivity(),View.OnClickListener{
     }
 
     private fun pauseClick() {
-        mCameraP2P!!.pausePlayBack(object : OperationDelegateCallBack {
+        mCameraP2P.pausePlayBack(object : OperationDelegateCallBack {
             override fun onSuccess(sessionId: Int, requestId: Int, data: String) {
                 isPlayback = false
             }
@@ -317,15 +379,22 @@ class CameraPlaybackActivity :AppCompatActivity(),View.OnClickListener{
     private fun startPlayback() {
         if (!queryDateList.isNullOrEmpty()) {
             queryDateList!![0].let {
-                mCameraP2P!!.startPlayBack(it.startTime, it.endTime, it.startTime, object : OperationDelegateCallBack {
+                mCameraP2P.startPlayBack(
+                    it.startTime,
+                    it.endTime,
+                    it.startTime,
+                    object : OperationDelegateCallBack {
                         override fun onSuccess(sessionId: Int, requestId: Int, data: String) {
                             isPlayback = true
                         }
+
                         override fun onFailure(sessionId: Int, requestId: Int, errCode: Int) {}
-                    }, object : OperationDelegateCallBack {
+                    },
+                    object : OperationDelegateCallBack {
                         override fun onSuccess(sessionId: Int, requestId: Int, data: String) {
                             isPlayback = false
                         }
+
                         override fun onFailure(sessionId: Int, requestId: Int, errCode: Int) {}
                     })
             }
@@ -335,7 +404,7 @@ class CameraPlaybackActivity :AppCompatActivity(),View.OnClickListener{
     }
 
     private fun queryDayByMonthClick() {
-        if (!mCameraP2P!!.isConnecting) {
+        if (!mCameraP2P.isConnecting) {
             ToastUtil.shortToast(this@CameraPlaybackActivity, getString(R.string.connect_first))
             return
         }
@@ -349,16 +418,29 @@ class CameraPlaybackActivity :AppCompatActivity(),View.OnClickListener{
                 try {
                     val year = substring[0].toInt()
                     val mouth = substring[1].toInt()
-                    mCameraP2P!!.queryRecordDaysByMonth(year, mouth, object : OperationDelegateCallBack {
+                    mCameraP2P.queryRecordDaysByMonth(
+                        year,
+                        mouth,
+                        object : OperationDelegateCallBack {
                             override fun onSuccess(sessionId: Int, requestId: Int, data: String) {
                                 val monthDays = JSONObject.parseObject(data, MonthDays::class.java)
-                                mBackDataMonthCache!![mCameraP2P!!.monthKey] = monthDays.dataDays
+                                mBackDataMonthCache!![mCameraP2P.monthKey] = monthDays.dataDays
                                 L.e(TAG, "MonthDays --- $data")
-                                mHandler.sendMessage(MessageUtil.getMessage(Constants.MSG_DATA_DATE, Constants.ARG1_OPERATE_SUCCESS))
+                                mHandler.sendMessage(
+                                    MessageUtil.getMessage(
+                                        Constants.MSG_DATA_DATE,
+                                        Constants.ARG1_OPERATE_SUCCESS
+                                    )
+                                )
                             }
 
                             override fun onFailure(sessionId: Int, requestId: Int, errCode: Int) {
-                                mHandler.sendMessage(MessageUtil.getMessage(Constants.MSG_DATA_DATE, Constants.ARG1_OPERATE_FAIL))
+                                mHandler.sendMessage(
+                                    MessageUtil.getMessage(
+                                        Constants.MSG_DATA_DATE,
+                                        Constants.ARG1_OPERATE_FAIL
+                                    )
+                                )
                             }
                         })
                 } catch (e: Exception) {
@@ -370,14 +452,24 @@ class CameraPlaybackActivity :AppCompatActivity(),View.OnClickListener{
 
     private fun muteClick() {
         val mute: Int = if (mPlaybackMute == ICameraP2P.MUTE) ICameraP2P.UNMUTE else ICameraP2P.MUTE
-        mCameraP2P!!.setMute(mute, object : OperationDelegateCallBack {
+        mCameraP2P.setMute(mute, object : OperationDelegateCallBack {
             override fun onSuccess(sessionId: Int, requestId: Int, data: String) {
                 mPlaybackMute = Integer.valueOf(data)
-                mHandler.sendMessage(MessageUtil.getMessage(Constants.MSG_MUTE, Constants.ARG1_OPERATE_SUCCESS))
+                mHandler.sendMessage(
+                    MessageUtil.getMessage(
+                        Constants.MSG_MUTE,
+                        Constants.ARG1_OPERATE_SUCCESS
+                    )
+                )
             }
 
             override fun onFailure(sessionId: Int, requestId: Int, errCode: Int) {
-                mHandler.sendMessage(MessageUtil.getMessage(Constants.MSG_MUTE, Constants.ARG1_OPERATE_FAIL))
+                mHandler.sendMessage(
+                    MessageUtil.getMessage(
+                        Constants.MSG_MUTE,
+                        Constants.ARG1_OPERATE_FAIL
+                    )
+                )
             }
         })
     }

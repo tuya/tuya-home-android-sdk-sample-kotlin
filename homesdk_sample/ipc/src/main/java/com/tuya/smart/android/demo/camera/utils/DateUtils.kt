@@ -5,15 +5,8 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 /**
-
- * TODO feature
-
- *
-
  * @author houqing <a href="mailto:developer@tuya.com"/>
-
- * @since 2021/7/26 3:37 下午
-
+ * @since 2021/7/26 3:37 PM
  */
 class DateUtils {
     companion object{
@@ -23,13 +16,14 @@ class DateUtils {
          * @param currentTime
          * @return
          */
-        fun getTodayStart(currentTime: Long): Long {
+        fun getTodayStart(currentTime: Long): Int {
             val calendar: Calendar = GregorianCalendar()
             calendar.timeInMillis = currentTime
             calendar[Calendar.HOUR_OF_DAY] = 0
             calendar[Calendar.MINUTE] = 0
             calendar[Calendar.SECOND] = 0
-            return calendar.timeInMillis / 1000L
+            val value = calendar.timeInMillis / 1000L
+            return value.toInt()
         }
 
         /**
@@ -38,14 +32,15 @@ class DateUtils {
          * @param currentTime
          * @return
          */
-        fun getTodayEnd(currentTime: Long): Long {
+        fun getTodayEnd(currentTime: Long): Int {
             val calendar = Calendar.getInstance()
             calendar.time = Date(currentTime)
             calendar[Calendar.HOUR_OF_DAY] = 0
             calendar[Calendar.MINUTE] = 0
             calendar[Calendar.SECOND] = 0
             calendar.add(Calendar.DAY_OF_MONTH, 1)
-            return calendar.timeInMillis / 1000L
+            val value = calendar.timeInMillis / 1000L
+            return value.toInt()
         }
 
         /**
