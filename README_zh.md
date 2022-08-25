@@ -25,7 +25,8 @@ signingConfigs {
 
 App 图片
 ---
-<img src="https://images.tuyacn.com/app/liya/tuya-app-sdk-sample/app_sdk_sample_zh.jpg" alt="main_page"/>
+
+![app_sdk_sample1_zh](https://user-images.githubusercontent.com/907831/186591451-c7bf62d7-48d0-4914-86c7-e91d2af1f891.jpeg)
 
 问题反馈
 ---
