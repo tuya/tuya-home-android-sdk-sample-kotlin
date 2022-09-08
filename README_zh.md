@@ -2,8 +2,11 @@ Tuya Android Smart Life App SDK Sample
 ===
 [中文版](README_zh.md) | [English](README.md)
 
-开始
----
+## 收费标准
+
+Tuya Self-Developed Smart Life App 是涂鸦 IoT App 解决方案的一种，以 App 云端连接服务为主，该服务包含智能生活App SDK 涉及收费标准详见[产品定价](https://developer.tuya.com/cn/docs/app-development/app-sdk-price?id=Kbu0tcr2cbx3o)
+
+## 开始
 
 [准备工作](https://developer.tuya.com/zh/docs/app-development/android-app-sdk/preparation?id=Ka7mqlxh7vgi9)
 
@@ -23,20 +26,15 @@ signingConfigs {
 
 [SDK功能](https://developer.tuya.com/zh/docs/app-development/android-app-sdk/featureoverview?id=Ka69nt97vtsfu)
 
-App 图片
----
+## App 图片
 
 ![app_sdk_sample1_zh](https://user-images.githubusercontent.com/907831/186591451-c7bf62d7-48d0-4914-86c7-e91d2af1f891.jpeg)
 
-问题反馈
----
+## 问题反馈
 
 您可以通过**Github Issue** 或通过[**工单**](https://service.console.tuya.com)来进行反馈您所碰到的问题
 
-## 收费标准
 
-Tuya Self-Developed Smart Life App 是涂鸦 IoT App 解决方案的一种，以 App 云端连接服务为主，该服务包含智能生活App SDK 涉及收费标准详见[产品定价](https://developer.tuya.com/cn/docs/app-development/app-sdk-price?id=Kbu0tcr2cbx3o)
+## LICENSE
 
-LICENSE
----
 Tuya Android Smart Life App SDK Sample是在MIT许可下提供的。更多信息请参考[LICENSE](LICENSE)文件
