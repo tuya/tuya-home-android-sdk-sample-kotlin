@@ -7,6 +7,7 @@ import com.tuya.smart.android.camera.sdk.bean.CloudStatusBean
 import com.tuya.smart.android.demo.camera.databinding.ActivityCameraCloudStorageBinding
 import com.tuya.smart.android.demo.camera.utils.Constants
 import com.tuya.smart.android.demo.camera.utils.ToastUtil
+import com.tuya.smart.camera.camerasdk.bean.TuyaVideoFrameInfo
 import com.tuya.smart.camera.camerasdk.typlayer.callback.IRegistorIOTCListener
 import com.tuya.smart.camera.camerasdk.typlayer.callback.OnP2PCameraListener
 import com.tuya.smart.camera.camerasdk.typlayer.callback.OperationCallBack
@@ -172,6 +173,17 @@ class CameraCloudStorageActivity : AppCompatActivity() {
                     l2: Long,
                     o: Any
                 ) {
+                }
+
+                override fun onReceiveFrameYUVData(
+                    sessionId: Int,
+                    y: ByteBuffer?,
+                    u: ByteBuffer?,
+                    v: ByteBuffer?,
+                    videoFrameInfo: TuyaVideoFrameInfo?,
+                    camera: Any?
+                ) {
+                    TODO("Not yet implemented")
                 }
 
                 override fun onSessionStatusChanged(o: Any, i: Int, i1: Int) {}
