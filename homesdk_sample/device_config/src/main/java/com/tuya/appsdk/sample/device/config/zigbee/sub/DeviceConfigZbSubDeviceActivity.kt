@@ -12,10 +12,10 @@ import androidx.appcompat.widget.Toolbar
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.tuya.appsdk.sample.device.config.R
 import com.tuya.appsdk.sample.device.config.util.sp.Preference
-import com.tuya.smart.home.sdk.TuyaHomeSdk
-import com.tuya.smart.home.sdk.builder.TuyaGwSubDevActivatorBuilder
-import com.tuya.smart.sdk.api.ITuyaSmartActivatorListener
-import com.tuya.smart.sdk.bean.DeviceBean
+import com.thingclips.smart.home.sdk.ThingHomeSdk
+import com.thingclips.smart.home.sdk.builder.ThingGwSubDevActivatorBuilder
+import com.thingclips.smart.sdk.api.IThingSmartActivatorListener
+import com.thingclips.smart.sdk.bean.DeviceBean
 
 /**
  * Device Configuration ZigBee sub device Mode Sample
@@ -80,10 +80,10 @@ class DeviceConfigZbSubDeviceActivity : AppCompatActivity() {
 
         Log.i(TAG, "subDeviceConfiguration: currentGatewayId=${currentGatewayId}")
         setPbViewVisible(true)
-        val builder = TuyaGwSubDevActivatorBuilder()
+        val builder = ThingGwSubDevActivatorBuilder()
                 .setDevId(currentGatewayId)
                 .setTimeOut(100)
-                .setListener(object : ITuyaSmartActivatorListener {
+                .setListener(object : IThingSmartActivatorListener {
                     override fun onError(errorCode: String?, errorMsg: String?) {
 
                         setPbViewVisible(false)
@@ -109,7 +109,7 @@ class DeviceConfigZbSubDeviceActivity : AppCompatActivity() {
                     }
                 })
 
-        val tuyaGWSubActivator = TuyaHomeSdk.getActivatorInstance().newGwSubDevActivator(builder)
+        val tuyaGWSubActivator = ThingHomeSdk.getActivatorInstance().newGwSubDevActivator(builder)
 
         // Start network configuration
         tuyaGWSubActivator.start()

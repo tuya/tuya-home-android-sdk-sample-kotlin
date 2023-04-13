@@ -22,9 +22,9 @@ import com.tuya.appsdk.sample.home.list.enum.HomeListPageType
 import com.tuya.appsdk.sample.home.newHome.NewHomeActivity
 import com.tuya.appsdk.sample.resource.HomeModel
 import com.tuya.appsdk.sample.user.R
-import com.tuya.smart.home.sdk.TuyaHomeSdk
-import com.tuya.smart.home.sdk.bean.HomeBean
-import com.tuya.smart.home.sdk.callback.ITuyaHomeResultCallback
+import com.thingclips.smart.home.sdk.ThingHomeSdk
+import com.thingclips.smart.home.sdk.bean.HomeBean
+import com.thingclips.smart.home.sdk.callback.IThingHomeResultCallback
 
 /**
  * Home Management Widget
@@ -71,8 +71,8 @@ class HomeFuncWidget {
     fun refresh() {
         val currentHomeId = HomeModel.INSTANCE.getCurrentHome(tvCurrentHomeName.context)
         if (currentHomeId != 0L) {
-            TuyaHomeSdk.newHomeInstance(currentHomeId)
-                    .getHomeDetail(object : ITuyaHomeResultCallback {
+            ThingHomeSdk.newHomeInstance(currentHomeId)
+                    .getHomeDetail(object : IThingHomeResultCallback {
                         override fun onSuccess(bean: HomeBean?) {
                             bean?.let {
                                 tvCurrentHomeName.text = it.name

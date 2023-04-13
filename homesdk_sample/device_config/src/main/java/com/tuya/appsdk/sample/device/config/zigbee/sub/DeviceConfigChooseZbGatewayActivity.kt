@@ -9,10 +9,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.tuya.appsdk.sample.device.config.R
 import com.tuya.appsdk.sample.device.config.zigbee.adapter.ZigBeeGatewayListAdapter
 import com.tuya.appsdk.sample.resource.HomeModel
-import com.tuya.smart.home.sdk.TuyaHomeSdk
-import com.tuya.smart.home.sdk.bean.HomeBean
-import com.tuya.smart.home.sdk.callback.ITuyaHomeResultCallback
-import com.tuya.smart.sdk.bean.DeviceBean
+import com.thingclips.smart.home.sdk.ThingHomeSdk
+import com.thingclips.smart.home.sdk.bean.HomeBean
+import com.thingclips.smart.home.sdk.callback.IThingHomeResultCallback
+import com.thingclips.smart.sdk.bean.DeviceBean
 
 /**
  * Choose Gateway
@@ -47,7 +47,7 @@ class DeviceConfigChooseZbGatewayActivity : AppCompatActivity() {
     // Get ZigBee Gateway List
     private fun getZigBeeGatewayList() {
         val currentHomeId = HomeModel.INSTANCE.getCurrentHome(this)
-        TuyaHomeSdk.newHomeInstance(currentHomeId).getHomeDetail(object : ITuyaHomeResultCallback {
+        ThingHomeSdk.newHomeInstance(currentHomeId).getHomeDetail(object : IThingHomeResultCallback {
             override fun onSuccess(bean: HomeBean?) {
                 val deviceList = bean?.deviceList as ArrayList<DeviceBean>
                 val zigBeeGatewayList = deviceList.filter {

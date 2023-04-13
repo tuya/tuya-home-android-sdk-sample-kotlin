@@ -21,9 +21,9 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.tuya.appsdk.sample.home.list.adapter.HomeListAdapter
 import com.tuya.appsdk.sample.home.list.enum.HomeListPageType
 import com.tuya.appsdk.sample.user.R
-import com.tuya.smart.home.sdk.TuyaHomeSdk
-import com.tuya.smart.home.sdk.bean.HomeBean
-import com.tuya.smart.home.sdk.callback.ITuyaGetHomeListCallback
+import com.thingclips.smart.home.sdk.ThingHomeSdk
+import com.thingclips.smart.home.sdk.bean.HomeBean
+import com.thingclips.smart.home.sdk.callback.IThingGetHomeListCallback
 
 /**
  * Home List Example
@@ -62,7 +62,7 @@ class HomeListActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         // Query home list from server
-        TuyaHomeSdk.getHomeManagerInstance().queryHomeList(object : ITuyaGetHomeListCallback {
+        ThingHomeSdk.getHomeManagerInstance().queryHomeList(object : IThingGetHomeListCallback {
             override fun onSuccess(homeBeans: MutableList<HomeBean>?) {
                 adapter.data = homeBeans as ArrayList<HomeBean>
                 adapter.notifyDataSetChanged()

@@ -10,9 +10,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.tuya.appsdk.sample.device.mgt.R
 import com.tuya.appsdk.sample.device.mgt.list.adapter.DeviceMgtAdapter
 import com.tuya.appsdk.sample.device.mgt.list.enum.DeviceListTypePage
-import com.tuya.smart.home.sdk.TuyaHomeSdk
-import com.tuya.smart.sdk.api.ITuyaDataCallback
-import com.tuya.smart.sdk.bean.DeviceBean
+import com.thingclips.smart.home.sdk.ThingHomeSdk
+import com.thingclips.smart.sdk.api.IThingDataCallback
+import com.thingclips.smart.sdk.bean.DeviceBean
 
 
 /**
@@ -50,8 +50,8 @@ class DeviceSubZigbeeActivity : AppCompatActivity() {
 
     // Get Sub-devices
     private fun getZbSubDeviceList() {
-        TuyaHomeSdk.newGatewayInstance(deviceId)
-                .getSubDevList(object : ITuyaDataCallback<List<DeviceBean>> {
+        ThingHomeSdk.newGatewayInstance(deviceId)
+                .getSubDevList(object : IThingDataCallback<List<DeviceBean>> {
                     override fun onSuccess(result: List<DeviceBean>?) {
                         result?.let {
                             adapter.data = it as ArrayList<DeviceBean>

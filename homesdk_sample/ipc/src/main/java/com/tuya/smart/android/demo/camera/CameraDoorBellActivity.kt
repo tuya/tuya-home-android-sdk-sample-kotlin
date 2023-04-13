@@ -6,12 +6,12 @@ import android.text.TextUtils
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.tuya.smart.android.camera.sdk.TuyaIPCSdk
-import com.tuya.smart.android.camera.sdk.bean.TYDoorBellCallModel
-import com.tuya.smart.android.camera.sdk.callback.TuyaSmartDoorBellObserver
+import com.thingclips.smart.android.camera.sdk.ThingIPCSdk
+import com.thingclips.smart.android.camera.sdk.bean.ThingDoorBellCallModel
+import com.thingclips.smart.android.camera.sdk.callback.ThingSmartDoorBellObserver
 import com.tuya.smart.android.demo.camera.databinding.ActivityCameraDoorbellCallingBinding
 import com.tuya.smart.android.demo.camera.utils.Constants
-import com.tuya.smart.home.sdk.TuyaHomeSdk
+import com.thingclips.smart.home.sdk.ThingHomeSdk
 
 /**
  * DoorBell Call
@@ -20,10 +20,10 @@ import com.tuya.smart.home.sdk.TuyaHomeSdk
  */
 class CameraDoorBellActivity : AppCompatActivity() {
     private var mMessageId: String? = null
-    private val mDoorBellInstance = TuyaIPCSdk.getDoorbell().ipcDoorBellManagerInstance
+    private val mDoorBellInstance = ThingIPCSdk.getDoorbell().ipcDoorBellManagerInstance
     private lateinit var viewBinding: ActivityCameraDoorbellCallingBinding
-    private val mObserver: TuyaSmartDoorBellObserver = object : TuyaSmartDoorBellObserver() {
-        override fun doorBellCallDidCanceled(callModel: TYDoorBellCallModel, isTimeOut: Boolean) {
+    private val mObserver: ThingSmartDoorBellObserver = object : ThingSmartDoorBellObserver() {
+        override fun doorBellCallDidCanceled(callModel: ThingDoorBellCallModel, isTimeOut: Boolean) {
             if (isTimeOut) {
                 Toast.makeText(
                     this@CameraDoorBellActivity,
@@ -40,12 +40,12 @@ class CameraDoorBellActivity : AppCompatActivity() {
             finish()
         }
 
-        override fun doorBellCallDidHangUp(callModel: TYDoorBellCallModel) {
+        override fun doorBellCallDidHangUp(callModel: ThingDoorBellCallModel) {
             Toast.makeText(this@CameraDoorBellActivity, "Hung up", Toast.LENGTH_LONG).show()
             finish()
         }
 
-        override fun doorBellCallDidAnsweredByOther(callModel: TYDoorBellCallModel) {
+        override fun doorBellCallDidAnsweredByOther(callModel: ThingDoorBellCallModel) {
             Toast.makeText(
                 this@CameraDoorBellActivity,
                 "The doorbell is answered by another user",
@@ -76,7 +76,7 @@ class CameraDoorBellActivity : AppCompatActivity() {
     @SuppressLint("SetTextI18n")
     private fun initView() {
         val model = mDoorBellInstance.getCallModelByMessageId(mMessageId)
-        val deviceBean = TuyaHomeSdk.getDataInstance().getDeviceBean(model.devId)
+        val deviceBean = ThingHomeSdk.getDataInstance().getDeviceBean(model.devId)
         viewBinding.tvState.text = """${deviceBean!!.getName()} call, waiting to be answered.."""
         viewBinding.btnRefuse.setOnClickListener {
             if (isAnsweredBySelf()) {

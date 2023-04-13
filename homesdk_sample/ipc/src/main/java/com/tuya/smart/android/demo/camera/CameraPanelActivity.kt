@@ -17,22 +17,21 @@ import android.widget.RelativeLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.alibaba.fastjson.JSONObject
+import com.thingclips.smart.android.camera.sdk.ThingIPCSdk
+import com.thingclips.smart.camera.camerasdk.thingplayer.callback.AbsP2pCameraListener
+import com.thingclips.smart.camera.camerasdk.thingplayer.callback.OnRenderDirectionCallback
+import com.thingclips.smart.camera.camerasdk.thingplayer.callback.OperationDelegateCallBack
+import com.thingclips.smart.camera.ipccamerasdk.p2p.ICameraP2P
+import com.thingclips.smart.camera.middleware.p2p.IThingSmartCameraP2P
+import com.thingclips.smart.camera.middleware.widget.AbsVideoViewCallback
+import com.thingclips.smart.home.sdk.ThingHomeSdk
+import com.thingclips.smart.ipc.camera.autotesting.activity.AutoCameraTestingProgramListActivity
+import com.thingclips.smart.ipc.camera.cloudtool.activity.CloudToolHomeActivity
+import com.thingclips.smart.sdk.api.IResultCallback
+import com.thingclips.smart.sdk.api.IThingDevice
 import com.tuya.appsdk.sample.resource.HomeModel
-import com.tuya.smart.android.camera.sdk.TuyaIPCSdk
 import com.tuya.smart.android.demo.camera.databinding.ActivityCameraPanelBinding
 import com.tuya.smart.android.demo.camera.utils.*
-import com.tuya.smart.camera.camerasdk.typlayer.callback.AbsP2pCameraListener
-import com.tuya.smart.camera.camerasdk.typlayer.callback.OnRenderDirectionCallback
-import com.tuya.smart.camera.camerasdk.typlayer.callback.OperationDelegateCallBack
-import com.tuya.smart.camera.ipccamerasdk.p2p.ICameraP2P
-import com.tuya.smart.camera.ipccamerasdk.utils.CameraConstant
-import com.tuya.smart.camera.middleware.p2p.ITuyaSmartCameraP2P
-import com.tuya.smart.camera.middleware.widget.AbsVideoViewCallback
-import com.tuya.smart.home.sdk.TuyaHomeSdk
-import com.tuya.smart.ipc.camera.autotesting.activity.AutoCameraTestingProgramListActivity
-import com.tuya.smart.ipc.camera.cloudtool.activity.CloudToolHomeActivity
-import com.tuya.smart.sdk.api.IResultCallback
-import com.tuya.smart.sdk.api.ITuyaDevice
 import java.io.File
 import java.nio.ByteBuffer
 
@@ -55,7 +54,8 @@ class CameraPanelActivity : AppCompatActivity(), View.OnClickListener {
     private var currVideoClarity: String? = null
     private var devId: String? = null
     private lateinit var viewBinding: ActivityCameraPanelBinding
-    private var mCameraP2P: ITuyaSmartCameraP2P<Any>? = null
+    private var mCameraP2P: IThingSmartCameraP2P<Any>? = null
+
     @SuppressLint("HandlerLeak")
     private val mHandler: Handler = object : Handler() {
         override fun handleMessage(msg: Message) {
@@ -210,10 +210,10 @@ class CameraPanelActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    private var iTuyaDevice: ITuyaDevice? = null
+    private var iTuyaDevice: IThingDevice? = null
     private fun publishDps(dpId: String, value: Any) {
         if (iTuyaDevice == null) {
-            iTuyaDevice = TuyaHomeSdk.newDeviceInstance(devId)
+            iTuyaDevice = ThingHomeSdk.newDeviceInstance(devId)
         }
         val jsonObject = JSONObject()
         jsonObject[dpId] = value
@@ -230,7 +230,7 @@ class CameraPanelActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun querySupportByDPID(dpId: String): Boolean {
-        return TuyaHomeSdk.getDataInstance().getDeviceBean(devId)?.run {
+        return ThingHomeSdk.getDataInstance().getDeviceBean(devId)?.run {
             val dps = this.getDps()
             return (dps != null && dps[dpId] != null)
         } == true
@@ -254,7 +254,7 @@ class CameraPanelActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun unBindDevice() {
-        TuyaHomeSdk.newDeviceInstance(devId).removeDevice(object : IResultCallback {
+        ThingHomeSdk.newDeviceInstance(devId).removeDevice(object : IResultCallback {
             override fun onError(s: String, s1: String) {
                 ToastUtil.shortToast(this@CameraPanelActivity, s1)
             }
@@ -268,7 +268,7 @@ class CameraPanelActivity : AppCompatActivity(), View.OnClickListener {
 
     private fun initData() {
         devId = intent.getStringExtra(Constants.INTENT_DEV_ID)
-        TuyaIPCSdk.getCameraInstance()?.let {
+        ThingIPCSdk.getCameraInstance()?.let {
             mCameraP2P = it.createCameraP2P(devId)
         }
         viewBinding.cameraVideoView.setViewCallback(object : AbsVideoViewCallback() {
@@ -329,6 +329,13 @@ class CameraPanelActivity : AppCompatActivity(), View.OnClickListener {
                 startActivity(intent1)
             }
             R.id.cloud_Txt -> {
+                // 判断设备是否支持云存储
+                val isSupportCloudStorage =
+                    ThingIPCSdk.getCloud()?.isSupportCloudStorage(devId) == true
+                if (!isSupportCloudStorage) {
+                    ToastUtil.shortToast(this@CameraPanelActivity, getString(R.string.not_support))
+                    return
+                }
                 val intent2 =
                     Intent(this@CameraPanelActivity, CameraCloudStorageActivity::class.java)
                 intent2.putExtra(Constants.INTENT_DEV_ID, devId)
@@ -633,8 +640,8 @@ class CameraPanelActivity : AppCompatActivity(), View.OnClickListener {
                     }
                 })
             } else {
-                if (TuyaIPCSdk.getCameraInstance()?.isLowPowerDevice(devId) == true) {
-                    TuyaIPCSdk.getDoorbell()?.wirelessWake(devId)
+                if (ThingIPCSdk.getCameraInstance()?.isLowPowerDevice(devId) == true) {
+                    ThingIPCSdk.getDoorbell()?.wirelessWake(devId)
                 }
                 //Establishing a p2p channel
                 it.connect(devId, object : OperationDelegateCallBack {
@@ -660,6 +667,8 @@ class CameraPanelActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
+    var reConnect = false
+
     private val p2pCameraListener: AbsP2pCameraListener = object : AbsP2pCameraListener() {
         override fun onReceiveSpeakerEchoData(pcm: ByteBuffer, sampleRate: Int) {
             mCameraP2P?.let {
@@ -668,6 +677,27 @@ class CameraPanelActivity : AppCompatActivity(), View.OnClickListener {
                 val pcmData = ByteArray(length)
                 pcm[pcmData, 0, length]
                 it.sendAudioTalkData(pcmData, length)
+            }
+        }
+
+        override fun onSessionStatusChanged(camera: Any?, sessionId: Int, sessionStatus: Int) {
+            super.onSessionStatusChanged(camera, sessionId, sessionStatus)
+            if (sessionStatus == -3 || sessionStatus == -105) {
+                // 遇到超时/鉴权失败，建议重连一次，避免循环调用
+                if (!reConnect) {
+                    reConnect = true
+                    mCameraP2P?.connect(devId, object : OperationDelegateCallBack {
+                        override fun onSuccess(i: Int, i1: Int, s: String) {
+                            mHandler.sendMessage(MessageUtil.getMessage(Constants.MSG_CONNECT,
+                                Constants.ARG1_OPERATE_SUCCESS))
+                        }
+
+                        override fun onFailure(i: Int, i1: Int, i2: Int) {
+                            mHandler.sendMessage(MessageUtil.getMessage(Constants.MSG_CONNECT,
+                                Constants.ARG1_OPERATE_FAIL))
+                        }
+                    })
+                }
             }
         }
     }

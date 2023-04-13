@@ -20,10 +20,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.google.android.material.appbar.MaterialToolbar
 import com.tuya.appsdk.sample.user.R
-import com.tuya.smart.home.sdk.TuyaHomeSdk
-import com.tuya.smart.home.sdk.bean.HomeBean
-import com.tuya.smart.home.sdk.callback.ITuyaHomeResultCallback
-import com.tuya.smart.sdk.api.IResultCallback
+import com.thingclips.smart.home.sdk.ThingHomeSdk
+import com.thingclips.smart.home.sdk.bean.HomeBean
+import com.thingclips.smart.home.sdk.callback.IThingHomeResultCallback
+import com.thingclips.smart.sdk.api.IResultCallback
 
 /**
  * Home Edit Sample
@@ -47,7 +47,7 @@ class HomeEditActivity : AppCompatActivity() {
         val homeId = intent.getLongExtra("homeId", 0)
 
         // Get home info
-        TuyaHomeSdk.newHomeInstance(homeId).getHomeDetail(object : ITuyaHomeResultCallback {
+        ThingHomeSdk.newHomeInstance(homeId).getHomeDetail(object : IThingHomeResultCallback {
             override fun onSuccess(bean: HomeBean?) {
                 bean?.let {
                     findViewById<EditText>(R.id.etHomeName).setText(bean.name)
@@ -67,7 +67,7 @@ class HomeEditActivity : AppCompatActivity() {
 
             val strHomeName = findViewById<EditText>(R.id.etHomeName).text.toString()
             val strCity = findViewById<EditText>(R.id.etCity).text.toString()
-            TuyaHomeSdk.newHomeInstance(homeId).updateHome(
+            ThingHomeSdk.newHomeInstance(homeId).updateHome(
                     strHomeName,
                     // Get location by yourself, here just sample as Shanghai's location
                     120.52,

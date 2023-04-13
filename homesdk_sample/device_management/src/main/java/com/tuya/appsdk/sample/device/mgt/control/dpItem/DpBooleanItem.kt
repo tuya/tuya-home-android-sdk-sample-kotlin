@@ -20,9 +20,9 @@ import android.widget.Switch
 import android.widget.TextView
 import com.alibaba.fastjson.JSONObject
 import com.tuya.appsdk.sample.device.mgt.R
-import com.tuya.smart.android.device.bean.SchemaBean
-import com.tuya.smart.sdk.api.IResultCallback
-import com.tuya.smart.sdk.api.ITuyaDevice
+import com.thingclips.smart.android.device.bean.SchemaBean
+import com.thingclips.smart.sdk.api.IResultCallback
+import com.thingclips.smart.sdk.api.IThingDevice
 
 /**
  * Data point(DP) Boolean type item
@@ -36,7 +36,7 @@ class DpBooleanItem @JvmOverloads constructor(
         defStyle: Int = 0,
         schemaBean: SchemaBean,
         value: Boolean,
-        device: ITuyaDevice
+        device: IThingDevice
 ) : FrameLayout(context, attrs, defStyle) {
 
     init {

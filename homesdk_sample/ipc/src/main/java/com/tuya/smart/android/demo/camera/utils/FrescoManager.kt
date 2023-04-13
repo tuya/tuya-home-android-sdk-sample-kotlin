@@ -7,14 +7,15 @@ import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.imagepipeline.core.ExecutorSupplier
 import com.facebook.imagepipeline.core.ImagePipelineConfig
 import com.facebook.imagepipeline.listener.RequestListener
-import com.tuya.imagepipeline.okhttp3.OkHttpImagePipelineConfigFactory
-import com.tuya.smart.android.common.task.TuyaExecutor
+import com.thingclips.imagepipeline.okhttp3.OkHttpImagePipelineConfigFactory
+import com.thingclips.smart.android.common.task.ThingExecutor
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import java.io.File
 import java.lang.IllegalArgumentException
 import java.util.HashSet
 import java.util.concurrent.Executor
+import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 
 /**
@@ -56,27 +57,31 @@ class FrescoManager {
             }
             builder.setExecutorSupplier(object : ExecutorSupplier {
                 override fun forLocalStorageRead(): Executor {
-                    return TuyaExecutor.getInstance().tuyaExecutorService
+                    return ThingExecutor.getInstance().thingExecutorService
                 }
 
                 override fun forLocalStorageWrite(): Executor {
-                    return TuyaExecutor.getInstance().tuyaExecutorService
+                    return ThingExecutor.getInstance().thingExecutorService
                 }
 
                 override fun forDecode(): Executor {
-                    return TuyaExecutor.getInstance().tuyaExecutorService
+                    return ThingExecutor.getInstance().thingExecutorService
                 }
 
                 override fun forBackgroundTasks(): Executor {
-                    return TuyaExecutor.getInstance().tuyaExecutorService
+                    return ThingExecutor.getInstance().thingExecutorService
+                }
+
+                override fun scheduledExecutorServiceForBackgroundTasks(): ScheduledExecutorService? {
+                    return ThingExecutor.getInstance().thingBackupService as ScheduledExecutorService?
                 }
 
                 override fun forLightweightBackgroundTasks(): Executor {
-                    return TuyaExecutor.getInstance().tuyaExecutorService
+                    return ThingExecutor.getInstance().thingExecutorService
                 }
 
                 override fun forThumbnailProducer(): Executor {
-                    return TuyaExecutor.getInstance().tuyaExecutorService
+                    return ThingExecutor.getInstance().thingExecutorService
                 }
             })
             return builder.build()
