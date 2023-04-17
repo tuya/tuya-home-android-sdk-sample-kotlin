@@ -2,13 +2,13 @@ package com.tuya.smart.android.demo.camera.utils
 
 import android.app.Application
 import android.content.Intent
-import com.thingclips.smart.android.camera.sdk.ThingIPCSdk
-import com.thingclips.smart.android.camera.sdk.api.IThingIPCDoorBellManager
-import com.thingclips.smart.android.camera.sdk.bean.ThingDoorBellCallModel
-import com.thingclips.smart.android.camera.sdk.callback.ThingSmartDoorBellObserver
-import com.thingclips.smart.android.common.utils.L
+import com.tuya.smart.android.camera.sdk.TuyaIPCSdk
+import com.tuya.smart.android.camera.sdk.api.ITuyaIPCDoorBellManager
+import com.tuya.smart.android.camera.sdk.bean.TYDoorBellCallModel
+import com.tuya.smart.android.camera.sdk.callback.TuyaSmartDoorBellObserver
+import com.tuya.smart.android.common.utils.L
 import com.tuya.smart.android.demo.camera.CameraDoorBellActivity
-import com.thingclips.smart.sdk.bean.DeviceBean
+import com.tuya.smart.sdk.bean.DeviceBean
 
 /**
  * @author houqing <a href="mailto:developer@tuya.com"/>
@@ -24,12 +24,12 @@ class CameraDoorbellManager {
         }
     }
 
-    private val doorBellInstance: IThingIPCDoorBellManager by lazy { ThingIPCSdk.getDoorbell().ipcDoorBellManagerInstance }
+    private val doorBellInstance: ITuyaIPCDoorBellManager by lazy { TuyaIPCSdk.getDoorbell().ipcDoorBellManagerInstance }
 
     fun init(application: Application) {
-        doorBellInstance.addObserver(object : ThingSmartDoorBellObserver() {
+        doorBellInstance.addObserver(object : TuyaSmartDoorBellObserver() {
             override fun doorBellCallDidReceivedFromDevice(
-                callModel: ThingDoorBellCallModel?,
+                callModel: TYDoorBellCallModel?,
                 deviceModel: DeviceBean?
             ) {
                 L.d(TAG, "Receiving a doorbell call")

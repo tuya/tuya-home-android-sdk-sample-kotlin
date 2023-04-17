@@ -22,10 +22,10 @@ import android.widget.TextView
 import androidx.appcompat.widget.ListPopupWindow
 import com.alibaba.fastjson.JSONObject
 import com.tuya.appsdk.sample.device.mgt.R
-import com.thingclips.smart.android.device.bean.SchemaBean
-import com.thingclips.smart.home.sdk.utils.SchemaMapper
-import com.thingclips.smart.sdk.api.IResultCallback
-import com.thingclips.smart.sdk.api.IThingDevice
+import com.tuya.smart.android.device.bean.SchemaBean
+import com.tuya.smart.home.sdk.utils.SchemaMapper
+import com.tuya.smart.sdk.api.IResultCallback
+import com.tuya.smart.sdk.api.ITuyaDevice
 
 /**
  * Data point(DP) Enum type item
@@ -39,7 +39,7 @@ class DpEnumItem @JvmOverloads constructor(
         defStyle: Int = 0,
         schemaBean: SchemaBean,
         value: String,
-        device: IThingDevice
+        device: ITuyaDevice
 ) : FrameLayout(context, attrs, defStyle) {
 
     init {

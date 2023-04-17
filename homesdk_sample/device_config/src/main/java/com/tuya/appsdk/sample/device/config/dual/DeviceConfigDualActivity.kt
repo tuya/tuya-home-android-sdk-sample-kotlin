@@ -16,12 +16,12 @@ import com.google.android.material.textfield.TextInputEditText
 import com.tuya.appsdk.sample.device.config.R
 import com.tuya.appsdk.sample.device.config.ble.DeviceConfigBleActivity
 import com.tuya.appsdk.sample.resource.HomeModel
-import com.thingclips.smart.android.ble.api.BleConfigType
-import com.thingclips.smart.android.ble.api.IThingBleConfigListener
-import com.thingclips.smart.android.ble.api.ScanType
-import com.thingclips.smart.home.sdk.ThingHomeSdk
-import com.thingclips.smart.sdk.api.IThingActivatorGetToken
-import com.thingclips.smart.sdk.bean.DeviceBean
+import com.tuya.smart.android.ble.api.BleConfigType
+import com.tuya.smart.android.ble.api.ITuyaBleConfigListener
+import com.tuya.smart.android.ble.api.ScanType
+import com.tuya.smart.home.sdk.TuyaHomeSdk
+import com.tuya.smart.sdk.api.ITuyaActivatorGetToken
+import com.tuya.smart.sdk.bean.DeviceBean
 
 /**
  * Device Configuration Dual Device Sample
@@ -70,7 +70,7 @@ class DeviceConfigDualActivity : AppCompatActivity() {
             if (strSsid.isEmpty() || strPassword.isEmpty()) {
                 return@setOnClickListener
             }
-            if (!ThingHomeSdk.getBleOperator().isBluetoothOpened) {
+            if (!TuyaHomeSdk.getBleOperator().isBluetoothOpened) {
                 Toast.makeText(this, "Please turn on bluetooth", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
@@ -123,14 +123,14 @@ class DeviceConfigDualActivity : AppCompatActivity() {
     // Scan Ble Device
     private fun scanDualBleDevice() {
         setPbViewVisible(true)
-        ThingHomeSdk.getBleOperator().startLeScan(60 * 1000, ScanType.SINGLE) { bean ->
+        TuyaHomeSdk.getBleOperator().startLeScan(60 * 1000, ScanType.SINGLE) { bean ->
             Log.i(TAG, "scanDualBleDevice: beanType=${bean.configType},uuid=${bean.uuid}")
             // Start configuration -- Dual Device
             if (bean.configType == BleConfigType.CONFIG_TYPE_WIFI.type) {
 
                 //  Get Network Configuration Token
-                ThingHomeSdk.getActivatorInstance().getActivatorToken(homeId,
-                        object : IThingActivatorGetToken {
+                TuyaHomeSdk.getActivatorInstance().getActivatorToken(homeId,
+                        object : ITuyaActivatorGetToken {
                             override fun onSuccess(token: String) {
 
                                 // Start configuration -- Dual Ble Device
@@ -138,9 +138,9 @@ class DeviceConfigDualActivity : AppCompatActivity() {
                                 param["ssid"] = etSsid.text.toString()
                                 param["password"] = etPassword.text.toString()
                                 param["token"] = token
-                                ThingHomeSdk.getBleManager()
+                                TuyaHomeSdk.getBleManager()
                                         .startBleConfig(homeId, bean.uuid, param as Map<String, String>,
-                                                object : IThingBleConfigListener {
+                                                object : ITuyaBleConfigListener {
                                                     override fun onSuccess(bean: DeviceBean?) {
                                                         setPbViewVisible(false)
                                                         Toast.makeText(

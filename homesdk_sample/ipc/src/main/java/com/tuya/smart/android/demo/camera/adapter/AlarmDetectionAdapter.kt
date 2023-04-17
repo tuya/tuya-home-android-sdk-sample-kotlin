@@ -12,14 +12,14 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.drawee.backends.pipeline.Fresco
-import com.thingclips.drawee.view.DecryptImageView
-import com.thingclips.smart.android.camera.sdk.ThingIPCSdk
+import com.tuya.drawee.view.DecryptImageView
+import com.tuya.smart.android.camera.sdk.TuyaIPCSdk
 import com.tuya.smart.android.demo.camera.R
 import com.tuya.smart.android.demo.camera.databinding.CameraNewuiMoreMotionRecycleItemBinding
 import com.tuya.smart.android.demo.camera.utils.ToastUtil
 import com.tuya.smart.android.demo.camera.utils.BitmapUtils
-import com.thingclips.smart.home.sdk.callback.IThingResultCallback
-import com.thingclips.smart.ipc.messagecenter.bean.CameraMessageBean
+import com.tuya.smart.home.sdk.callback.ITuyaResultCallback
+import com.tuya.smart.ipc.messagecenter.bean.CameraMessageBean
 import java.io.File
 import java.lang.Exception
 import java.util.*
@@ -84,7 +84,7 @@ class AlarmDetectionAdapter(context: Context, cameraMessageBeans: MutableList<Ca
                     //show download encryptedImg button
                     mBtn.visibility = View.VISIBLE
                     mBtn.setOnClickListener {
-                        ThingIPCSdk.getTool()?.downloadEncryptedImg(imageUrl, decryption, object : IThingResultCallback<Bitmap?> {
+                        TuyaIPCSdk.getTool()?.downloadEncryptedImg(imageUrl, decryption, object : ITuyaResultCallback<Bitmap?> {
                                 override fun onSuccess(result: Bitmap?) {
                                     //                                        String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Camera/";
                                     val path = Objects.requireNonNull<File>(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)).path + "/Camera"

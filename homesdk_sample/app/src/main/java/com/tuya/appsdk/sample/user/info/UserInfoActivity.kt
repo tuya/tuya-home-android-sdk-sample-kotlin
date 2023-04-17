@@ -30,10 +30,10 @@ import androidx.appcompat.widget.Toolbar
 import com.tuya.appsdk.sample.R
 import com.tuya.appsdk.sample.resource.HomeModel
 import com.tuya.appsdk.sample.user.main.UserFuncActivity
-import com.thingclips.smart.home.sdk.ThingHomeSdk
-import com.thingclips.smart.sdk.ThingSdk
-import com.thingclips.smart.sdk.api.IResultCallback
-import com.thingclips.smart.sdk.enums.TempUnitEnum
+import com.tuya.smart.home.sdk.TuyaHomeSdk
+import com.tuya.smart.sdk.TuyaSdk
+import com.tuya.smart.sdk.api.IResultCallback
+import com.tuya.smart.sdk.enums.TempUnitEnum
 import java.time.ZoneId
 
 
@@ -58,7 +58,7 @@ class UserInfoActivity : AppCompatActivity() {
             finish()
         }
 
-        val user = ThingHomeSdk.getUserInstance().user
+        val user = TuyaHomeSdk.getUserInstance().user
 
         findViewById<TextView>(R.id.tvName).text = user?.nickName
         findViewById<TextView>(R.id.tvPhone).text = user?.mobile
@@ -82,7 +82,7 @@ class UserInfoActivity : AppCompatActivity() {
             listPopupWindow.setAdapter(adapter)
 
             listPopupWindow.setOnItemClickListener { parent, view, position, id ->
-                ThingHomeSdk.getUserInstance().setTempUnit(
+                TuyaHomeSdk.getUserInstance().setTempUnit(
                         if (items[position] == "°C") TempUnitEnum.Celsius else TempUnitEnum.Fahrenheit, object : IResultCallback {
 
                     override fun onSuccess() {
@@ -142,7 +142,7 @@ class UserInfoActivity : AppCompatActivity() {
                             }
                         }
 
-                        ThingSdk.setLatAndLong(lat, lon)
+                        TuyaSdk.setLatAndLong(lat, lon)
 
                         Toast.makeText(
                                 this@UserInfoActivity,
@@ -155,7 +155,7 @@ class UserInfoActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.deactive).setOnClickListener {
-            ThingHomeSdk.getUserInstance().cancelAccount(
+            TuyaHomeSdk.getUserInstance().cancelAccount(
                     object : IResultCallback {
                         override fun onSuccess() {
                             // Clear cache
@@ -201,7 +201,7 @@ class UserInfoActivity : AppCompatActivity() {
         listPopupWindow.setAdapter(arrayAdapter)
         listPopupWindow.setOnItemClickListener { parent, view, position, id ->
             val timezoneId = items[position]
-            ThingHomeSdk.getUserInstance().updateTimeZone(
+            TuyaHomeSdk.getUserInstance().updateTimeZone(
                     timezoneId,
                     object : IResultCallback {
                         override fun onSuccess() {

@@ -20,10 +20,10 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.tuya.appsdk.sample.R
-import com.thingclips.smart.android.user.api.IResetPasswordCallback
-import com.thingclips.smart.android.user.api.IValidateCallback
-import com.thingclips.smart.home.sdk.ThingHomeSdk
-import com.thingclips.smart.sdk.api.IResultCallback
+import com.tuya.smart.android.user.api.IResetPasswordCallback
+import com.tuya.smart.android.user.api.IValidateCallback
+import com.tuya.smart.home.sdk.TuyaHomeSdk
+import com.tuya.smart.sdk.api.IResultCallback
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
@@ -85,7 +85,7 @@ class UserResetPasswordActivity : AppCompatActivity(), View.OnClickListener {
 
                 if (!isEmail) {
                     // Reset phone password
-                    ThingHomeSdk.getUserInstance().resetPhonePassword(
+                    TuyaHomeSdk.getUserInstance().resetPhonePassword(
                         strCountryCode,
                         strAccount,
                         strCode,
@@ -94,7 +94,7 @@ class UserResetPasswordActivity : AppCompatActivity(), View.OnClickListener {
                     )
                 } else {
                     // Reset email password
-                    ThingHomeSdk.getUserInstance().resetEmailPassword(
+                    TuyaHomeSdk.getUserInstance().resetEmailPassword(
                         strCountryCode,
                         strAccount,
                         strCode,
@@ -105,7 +105,7 @@ class UserResetPasswordActivity : AppCompatActivity(), View.OnClickListener {
 
             } else if (it == R.id.btnCode) {
                 // Get verification code code
-                ThingHomeSdk.getUserInstance().sendVerifyCodeWithUserName(
+                TuyaHomeSdk.getUserInstance().sendVerifyCodeWithUserName(
                     strAccount,
                     "",
                     strCountryCode,

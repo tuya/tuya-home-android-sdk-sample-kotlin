@@ -7,7 +7,7 @@
     tools:context=".CameraCloudVideoActivity">
 
 
-    <com.thingclips.smart.camera.middleware.widget.ThingCameraView
+    <com.tuya.smart.camera.middleware.widget.TuyaCameraView
         android:id="@+id/camera_cloud_video_view"
         android:layout_width="match_parent"
         android:layout_height="200dp" />

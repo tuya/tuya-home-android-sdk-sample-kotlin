@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.tuya.appsdk.sample.device.config.R
 import com.tuya.appsdk.sample.device.config.util.sp.Preference
 import com.tuya.appsdk.sample.device.config.zigbee.sub.DeviceConfigZbSubDeviceActivity
-import com.thingclips.smart.sdk.bean.DeviceBean
+import com.tuya.smart.sdk.bean.DeviceBean
 
 /**
  * Zigbee Gateway List

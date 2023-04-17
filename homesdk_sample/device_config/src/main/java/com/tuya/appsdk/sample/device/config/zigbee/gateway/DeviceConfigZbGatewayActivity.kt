@@ -11,12 +11,12 @@ import androidx.appcompat.widget.Toolbar
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.tuya.appsdk.sample.device.config.R
 import com.tuya.appsdk.sample.resource.HomeModel
-import com.thingclips.smart.android.hardware.bean.HgwBean
-import com.thingclips.smart.home.sdk.ThingHomeSdk.getActivatorInstance
-import com.thingclips.smart.home.sdk.builder.ThingGwActivatorBuilder
-import com.thingclips.smart.sdk.api.IThingActivatorGetToken
-import com.thingclips.smart.sdk.api.IThingSmartActivatorListener
-import com.thingclips.smart.sdk.bean.DeviceBean
+import com.tuya.smart.android.hardware.bean.HgwBean
+import com.tuya.smart.home.sdk.TuyaHomeSdk.getActivatorInstance
+import com.tuya.smart.home.sdk.builder.TuyaGwActivatorBuilder
+import com.tuya.smart.sdk.api.ITuyaActivatorGetToken
+import com.tuya.smart.sdk.api.ITuyaSmartActivatorListener
+import com.tuya.smart.sdk.bean.DeviceBean
 
 /**
  * Device Configuration ZigBee Gateway Sample
@@ -69,7 +69,7 @@ class DeviceConfigZbGatewayActivity : AppCompatActivity() {
     // Search ZigBee Gateway Device
     private fun searchGatewayDevice() {
         setPbViewVisible(true)
-        val newSearcher = getActivatorInstance().newThingGwActivator().newSearcher()
+        val newSearcher = getActivatorInstance().newTuyaGwActivator().newSearcher()
         newSearcher.registerGwSearchListener {
             getNetworkConfigToken(it)
         }
@@ -82,7 +82,7 @@ class DeviceConfigZbGatewayActivity : AppCompatActivity() {
         Log.i(TAG, "getNetworkConfigToken: GwId->${hgwBean.getGwId()}")
 
         getActivatorInstance().getActivatorToken(homeId,
-                object : IThingActivatorGetToken {
+                object : ITuyaActivatorGetToken {
                     override fun onSuccess(token: String) {
                         Log.i(TAG, "getNetworkConfigToken: onSuccess->${token}")
                         startNetworkConfig(token, hgwBean)
@@ -103,12 +103,12 @@ class DeviceConfigZbGatewayActivity : AppCompatActivity() {
     // Start network configuration -- ZigBee Gateway
     private fun startNetworkConfig(token: String, hgwBean: HgwBean) {
         val activatorBuilder = getActivatorInstance().newGwActivator(
-                ThingGwActivatorBuilder()
+                TuyaGwActivatorBuilder()
                         .setContext(this@DeviceConfigZbGatewayActivity)
                         .setTimeOut(100)
                         .setToken(token)
                         .setHgwBean(hgwBean)
-                        .setListener(object : IThingSmartActivatorListener {
+                        .setListener(object : ITuyaSmartActivatorListener {
                             override fun onError(errorCode: String?, errorMsg: String?) {
                                 Log.i(TAG, "Activate error->$errorMsg")
                                 setPbViewVisible(false)

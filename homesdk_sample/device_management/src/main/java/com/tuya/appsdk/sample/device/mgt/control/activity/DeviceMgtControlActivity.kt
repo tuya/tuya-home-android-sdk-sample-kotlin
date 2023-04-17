@@ -19,12 +19,12 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import com.thingclips.smart.android.device.bean.*
 import com.tuya.appsdk.sample.device.mgt.R
 import com.tuya.appsdk.sample.device.mgt.control.dpItem.*
-import com.thingclips.smart.android.device.enums.DataTypeEnum
-import com.thingclips.smart.home.sdk.ThingHomeSdk
-import com.thingclips.smart.sdk.api.IResultCallback
+import com.tuya.smart.android.device.bean.*
+import com.tuya.smart.android.device.enums.DataTypeEnum
+import com.tuya.smart.home.sdk.TuyaHomeSdk
+import com.tuya.smart.sdk.api.IResultCallback
 
 /**
  * Device control sample
@@ -48,8 +48,8 @@ class DeviceMgtControlActivity : AppCompatActivity() {
 
         val deviceId = intent.getStringExtra("deviceId")
         deviceId?.let {
-            val mDevice = ThingHomeSdk.newDeviceInstance(it)
-            val deviceBean = ThingHomeSdk.getDataInstance().getDeviceBean(it)
+            val mDevice = TuyaHomeSdk.newDeviceInstance(it)
+            val deviceBean = TuyaHomeSdk.getDataInstance().getDeviceBean(it)
 
             findViewById<Button>(R.id.btnReset).setOnClickListener {
                 // device reset factory
@@ -80,7 +80,7 @@ class DeviceMgtControlActivity : AppCompatActivity() {
 
             findViewById<TextView>(R.id.tvDeviceName).text = deviceBean?.name
 
-            ThingHomeSdk.getDataInstance().getSchema(it)?.let { map ->
+            TuyaHomeSdk.getDataInstance().getSchema(it)?.let { map ->
                 for (bean in map.values) {
                     val value = deviceBean?.dps?.get(bean.id)
 
