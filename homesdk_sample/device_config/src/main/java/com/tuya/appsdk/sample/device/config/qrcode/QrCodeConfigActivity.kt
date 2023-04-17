@@ -13,12 +13,12 @@ import com.tuya.appsdk.sample.device.config.R
 import com.tuya.appsdk.sample.device.config.util.qrcode.DensityUtil
 import com.tuya.appsdk.sample.device.config.util.qrcode.QRCodeUtil
 import com.tuya.appsdk.sample.resource.HomeModel
-import com.tuya.smart.home.sdk.TuyaHomeSdk
-import com.tuya.smart.home.sdk.builder.TuyaCameraActivatorBuilder
-import com.tuya.smart.sdk.api.ITuyaActivatorGetToken
-import com.tuya.smart.sdk.api.ITuyaCameraDevActivator
-import com.tuya.smart.sdk.api.ITuyaSmartCameraActivatorListener
-import com.tuya.smart.sdk.bean.DeviceBean
+import com.thingclips.smart.home.sdk.ThingHomeSdk
+import com.thingclips.smart.home.sdk.builder.ThingCameraActivatorBuilder
+import com.thingclips.smart.sdk.api.IThingActivatorGetToken
+import com.thingclips.smart.sdk.api.IThingCameraDevActivator
+import com.thingclips.smart.sdk.api.IThingSmartCameraActivatorListener
+import com.thingclips.smart.sdk.bean.DeviceBean
 
 /**
  * TODO feature
@@ -35,7 +35,7 @@ class QrCodeConfigActivity : AppCompatActivity(),View.OnClickListener{
     private lateinit var mEtInputWifiSSid: EditText
     private lateinit var mEtInputWifiPwd: EditText
     private lateinit var mBtnSave: Button
-    private var mTuyaActivator: ITuyaCameraDevActivator? = null
+    private var mTuyaActivator: IThingCameraDevActivator? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,17 +63,17 @@ class QrCodeConfigActivity : AppCompatActivity(),View.OnClickListener{
             val homeId: Long = HomeModel.INSTANCE.getCurrentHome(this)
 
             // Get Network Configuration Token
-            TuyaHomeSdk.getActivatorInstance().getActivatorToken(homeId,
-                object : ITuyaActivatorGetToken {
+            ThingHomeSdk.getActivatorInstance().getActivatorToken(homeId,
+                object : IThingActivatorGetToken {
                     override fun onSuccess(token: String) {
                         //Create and show qrCode
-                        val builder = TuyaCameraActivatorBuilder()
+                        val builder = ThingCameraActivatorBuilder()
                             .setToken(token)
                             .setPassword(wifiPwd)
                             .setTimeOut(100)
                             .setContext(this@QrCodeConfigActivity)
                             .setSsid(wifiSSId)
-                            .setListener(object : ITuyaSmartCameraActivatorListener {
+                            .setListener(object : IThingSmartCameraActivatorListener {
                                 override fun onQRCodeSuccess(qrcodeUrl: String) {
                                     val bitmap: Bitmap
                                     try {
@@ -95,7 +95,7 @@ class QrCodeConfigActivity : AppCompatActivity(),View.OnClickListener{
                                     Toast.makeText(this@QrCodeConfigActivity, "config success!", Toast.LENGTH_LONG).show()
                                 }
                             })
-                        mTuyaActivator = TuyaHomeSdk.getActivatorInstance().newCameraDevActivator(builder)
+                        mTuyaActivator = ThingHomeSdk.getActivatorInstance().newCameraDevActivator(builder)
                         mTuyaActivator?.createQRCode()
                         mTuyaActivator?.start()
                     }

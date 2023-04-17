@@ -15,11 +15,11 @@ import androidx.core.content.ContextCompat
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.tuya.appsdk.sample.device.config.R
 import com.tuya.appsdk.sample.resource.HomeModel
-import com.tuya.smart.android.ble.api.BleConfigType
-import com.tuya.smart.android.ble.api.ITuyaBleConfigListener
-import com.tuya.smart.android.ble.api.ScanType
-import com.tuya.smart.home.sdk.TuyaHomeSdk
-import com.tuya.smart.sdk.bean.DeviceBean
+import com.thingclips.smart.android.ble.api.BleConfigType
+import com.thingclips.smart.android.ble.api.IThingBleConfigListener
+import com.thingclips.smart.android.ble.api.ScanType
+import com.thingclips.smart.home.sdk.ThingHomeSdk
+import com.thingclips.smart.sdk.bean.DeviceBean
 
 /**
  * Device Configuration Ble Low Energy Sample
@@ -74,7 +74,7 @@ class DeviceConfigBleActivity : AppCompatActivity() {
 
         searchButton.setOnClickListener {
             // Check Bluetooth is Opened
-            if (!TuyaHomeSdk.getBleOperator().isBluetoothOpened) {
+            if (!ThingHomeSdk.getBleOperator().isBluetoothOpened) {
                 Toast.makeText(this, "Please turn on bluetooth", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
@@ -88,12 +88,12 @@ class DeviceConfigBleActivity : AppCompatActivity() {
         setPbViewVisible(true)
 
         // Scan Single Ble Device
-        TuyaHomeSdk.getBleOperator().startLeScan(60 * 1000, ScanType.SINGLE) { bean ->
+        ThingHomeSdk.getBleOperator().startLeScan(60 * 1000, ScanType.SINGLE) { bean ->
             Log.i(TAG, "scanSingleBleDevice: deviceUUID=${bean.uuid}")
             // Start configuration -- Single Ble Device
             if (bean?.configType == BleConfigType.CONFIG_TYPE_SINGLE.type) {
-                TuyaHomeSdk.getBleManager().startBleConfig(currentHomeId, bean.uuid, null,
-                        object : ITuyaBleConfigListener {
+                ThingHomeSdk.getBleManager().startBleConfig(currentHomeId, bean.uuid, null,
+                        object : IThingBleConfigListener {
                             override fun onSuccess(bean: DeviceBean?) {
                                 setPbViewVisible(false)
                                 Toast.makeText(

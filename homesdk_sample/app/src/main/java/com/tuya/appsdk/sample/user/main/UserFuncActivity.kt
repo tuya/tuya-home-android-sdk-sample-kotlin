@@ -24,7 +24,7 @@ import com.tuya.appsdk.sample.R
 import com.tuya.appsdk.sample.main.MainSampleListActivity
 import com.tuya.appsdk.sample.user.login.UserLoginActivity
 import com.tuya.appsdk.sample.user.register.UserRegisterActivity
-import com.tuya.smart.home.sdk.TuyaHomeSdk
+import com.thingclips.smart.home.sdk.ThingHomeSdk
 
 
 /**
@@ -38,7 +38,7 @@ class UserFuncActivity : AppCompatActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
 
         // If login, then navigate to MainSampleList
-        if (TuyaHomeSdk.getUserInstance().isLogin) {
+        if (ThingHomeSdk.getUserInstance().isLogin) {
             startActivity(Intent(this, MainSampleListActivity::class.java))
             finish()
         }

@@ -91,4 +91,7 @@
     <string name="ipc_sdk_autotest_tools">IPC SDK 自动化测试工具</string>
     <string name="ipc_stop_talk">关闭对讲</string>
     <string name="ipc_start_talk">开启对讲</string>
+    <string name="ipc_sdk_service_running">正常</string>
+    <string name="ipc_sdk_service_expired">已过期</string>
+    <string name="ipc_sdk_no_service">无服务</string>
 </resources>

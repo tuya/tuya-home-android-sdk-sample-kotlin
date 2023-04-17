@@ -3,7 +3,7 @@ package com.tuya.smart.android.demo.camera
 import android.app.Application
 import android.content.Context
 import android.content.Intent
-import com.tuya.smart.android.camera.sdk.TuyaIPCSdk
+import com.thingclips.smart.android.camera.sdk.ThingIPCSdk
 import com.tuya.smart.android.demo.camera.utils.CameraDoorbellManager
 import com.tuya.smart.android.demo.camera.utils.Constants
 import com.tuya.smart.android.demo.camera.utils.FrescoManager
@@ -20,7 +20,7 @@ class CameraUtils {
         }
 
         fun ipcProcess(context: Context, devId: String?): Boolean {
-            val cameraInstance = TuyaIPCSdk.getCameraInstance()
+            val cameraInstance = ThingIPCSdk.getCameraInstance()
             if (cameraInstance?.isIPCDevice(devId) == true) {
                 val intent = Intent(context, CameraPanelActivity::class.java)
                 intent.putExtra(Constants.INTENT_DEV_ID, devId)

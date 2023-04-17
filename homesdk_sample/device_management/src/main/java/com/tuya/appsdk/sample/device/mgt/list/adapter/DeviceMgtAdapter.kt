@@ -18,12 +18,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.thing.smart.sweeper.SweeperActivity
+import com.thingclips.smart.sdk.bean.DeviceBean
 import com.tuya.appsdk.sample.device.mgt.R
 import com.tuya.appsdk.sample.device.mgt.control.activity.DeviceMgtControlActivity
 import com.tuya.appsdk.sample.device.mgt.list.activity.DeviceSubZigbeeActivity
 import com.tuya.appsdk.sample.device.mgt.list.enum.DeviceListTypePage
 import com.tuya.smart.android.demo.camera.CameraUtils
-import com.tuya.smart.sdk.bean.DeviceBean
 
 /**
  * Device list adapter
@@ -39,7 +40,18 @@ class DeviceMgtAdapter(val type: Int) : RecyclerView.Adapter<DeviceMgtAdapter.Vi
                 LayoutInflater.from(parent.context).inflate(R.layout.device_mgt_item, parent, false)
         )
         holder.itemView.setOnClickListener {
-            if (CameraUtils.ipcProcess(it.context, data[holder.adapterPosition].devId)) {
+            val deviceBean = data[holder.adapterPosition]
+            if (CameraUtils.ipcProcess(it.context, deviceBean.devId)) {
+                return@setOnClickListener
+            }
+
+            if(deviceBean.productBean.category.contains("sd")){
+                val intent = Intent(
+                    it.context,
+                    SweeperActivity::class.java
+                )
+                intent.putExtra("deviceId", deviceBean.getDevId())
+                it.context.startActivity(intent)
                 return@setOnClickListener
             }
             when (type) {
