@@ -16,11 +16,6 @@ buildscript {
 
 allprojects {
     repositories {
-        // 预发maven仓库
-        maven {
-            url "https://maven.tuya-inc.top/repository/maven-android-pre/"
-        }
-
         google()
         jcenter()
         maven { url 'https://jitpack.io' }

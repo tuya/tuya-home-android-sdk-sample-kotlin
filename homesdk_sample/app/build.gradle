@@ -2,7 +2,6 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
 }
-apply from : "thingMapping.gradle"
 
 android {
     compileSdkVersion 30
@@ -34,8 +33,6 @@ android {
     packagingOptions {
         pickFirst 'lib/*/libc++_shared.so' // 多个aar存在此so，需要选择第一个
         pickFirst 'lib/*/libgnustl_shared.so'//业务包需要
-        pickFirst 'lib/*/liblog.so'
-        pickFirst 'lib/*/libopenh264.so'
     }
 
     buildTypes {
@@ -77,7 +74,6 @@ dependencies {
     implementation project(":device_config")
     implementation project(":device_management")
     implementation project(":ipc")
-    implementation project(":sweeper")
     implementation 'cn.yipianfengye.android:zxing-library:2.2'
 
 

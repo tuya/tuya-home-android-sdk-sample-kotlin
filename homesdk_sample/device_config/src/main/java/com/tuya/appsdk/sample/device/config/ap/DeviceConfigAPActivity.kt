@@ -26,13 +26,13 @@ import androidx.appcompat.widget.Toolbar
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.tuya.appsdk.sample.device.config.R
 import com.tuya.appsdk.sample.resource.HomeModel
-import com.thingclips.smart.home.sdk.ThingHomeSdk
-import com.thingclips.smart.home.sdk.builder.ActivatorBuilder
-import com.thingclips.smart.sdk.api.IThingActivator
-import com.thingclips.smart.sdk.api.IThingActivatorGetToken
-import com.thingclips.smart.sdk.api.IThingSmartActivatorListener
-import com.thingclips.smart.sdk.bean.DeviceBean
-import com.thingclips.smart.sdk.enums.ActivatorModelEnum
+import com.tuya.smart.home.sdk.TuyaHomeSdk
+import com.tuya.smart.home.sdk.builder.ActivatorBuilder
+import com.tuya.smart.sdk.api.ITuyaActivator
+import com.tuya.smart.sdk.api.ITuyaActivatorGetToken
+import com.tuya.smart.sdk.api.ITuyaSmartActivatorListener
+import com.tuya.smart.sdk.bean.DeviceBean
+import com.tuya.smart.sdk.enums.ActivatorModelEnum
 
 
 /**
@@ -50,7 +50,7 @@ class DeviceConfigAPActivity : AppCompatActivity(), View.OnClickListener {
     lateinit var cpiLoading: CircularProgressIndicator
     lateinit var btnSearch: Button
     lateinit var mToken: String
-    private var mTuyaActivator: IThingActivator? = null
+    private var mTuyaActivator: ITuyaActivator? = null
     lateinit var strSsid: String
     lateinit var strPassword: String
     lateinit var mContentTv: TextView
@@ -81,8 +81,8 @@ class DeviceConfigAPActivity : AppCompatActivity(), View.OnClickListener {
             if (it == R.id.btnSearch) {
                 val homeId = HomeModel.INSTANCE.getCurrentHome(this)
                 // Get Network Configuration Token
-                ThingHomeSdk.getActivatorInstance().getActivatorToken(homeId,
-                        object : IThingActivatorGetToken {
+                TuyaHomeSdk.getActivatorInstance().getActivatorToken(homeId,
+                        object : ITuyaActivatorGetToken {
                             override fun onSuccess(token: String) {
                                 mToken = token
                                 // Start network configuration -- AP mode
@@ -116,10 +116,10 @@ class DeviceConfigAPActivity : AppCompatActivity(), View.OnClickListener {
                 .setSsid(strSsid)
                 .setContext(this)
                 .setPassword(strPassword)
-                .setActivatorModel(ActivatorModelEnum.THING_AP)
+                .setActivatorModel(ActivatorModelEnum.TY_AP)
                 .setTimeOut(100)
                 .setToken(mToken)
-                .setListener(object : IThingSmartActivatorListener {
+                .setListener(object : ITuyaSmartActivatorListener {
 
                     @Override
                     override fun onStep(step: String?, data: Any?) {
@@ -155,7 +155,7 @@ class DeviceConfigAPActivity : AppCompatActivity(), View.OnClickListener {
                 }
                 )
         mTuyaActivator =
-            ThingHomeSdk.getActivatorInstance().newActivator(builder)
+            TuyaHomeSdk.getActivatorInstance().newActivator(builder)
         //Start configuration
         mTuyaActivator?.start()
 

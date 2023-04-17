@@ -24,12 +24,12 @@ import androidx.appcompat.widget.Toolbar
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.tuya.appsdk.sample.device.config.R
 import com.tuya.appsdk.sample.resource.HomeModel
-import com.thingclips.smart.home.sdk.ThingHomeSdk
-import com.thingclips.smart.home.sdk.builder.ActivatorBuilder
-import com.thingclips.smart.sdk.api.IThingActivatorGetToken
-import com.thingclips.smart.sdk.api.IThingSmartActivatorListener
-import com.thingclips.smart.sdk.bean.DeviceBean
-import com.thingclips.smart.sdk.enums.ActivatorModelEnum
+import com.tuya.smart.home.sdk.TuyaHomeSdk
+import com.tuya.smart.home.sdk.builder.ActivatorBuilder
+import com.tuya.smart.sdk.api.ITuyaActivatorGetToken
+import com.tuya.smart.sdk.api.ITuyaSmartActivatorListener
+import com.tuya.smart.sdk.bean.DeviceBean
+import com.tuya.smart.sdk.enums.ActivatorModelEnum
 
 
 /**
@@ -72,18 +72,18 @@ class DeviceConfigEZActivity : AppCompatActivity(), View.OnClickListener {
             if (it == R.id.btnSearch) {
                 val homeId = HomeModel.INSTANCE.getCurrentHome(this)
                 // Get Network Configuration Token
-                ThingHomeSdk.getActivatorInstance().getActivatorToken(homeId,
-                        object : IThingActivatorGetToken {
+                TuyaHomeSdk.getActivatorInstance().getActivatorToken(homeId,
+                        object : ITuyaActivatorGetToken {
                             override fun onSuccess(token: String) {
                                 // Start network configuration -- EZ mode
                                 val builder = ActivatorBuilder()
                                         .setSsid(strSsid)
                                         .setContext(v.context)
                                         .setPassword(strPassword)
-                                        .setActivatorModel(ActivatorModelEnum.THING_EZ)
+                                        .setActivatorModel(ActivatorModelEnum.TY_EZ)
                                         .setTimeOut(100)
                                         .setToken(token)
-                                        .setListener(object : IThingSmartActivatorListener {
+                                        .setListener(object : ITuyaSmartActivatorListener {
 
                                             @Override
                                             override fun onStep(step: String?, data: Any?) {
@@ -120,7 +120,7 @@ class DeviceConfigEZActivity : AppCompatActivity(), View.OnClickListener {
                                         )
 
                                 val mTuyaActivator =
-                                        ThingHomeSdk.getActivatorInstance().newMultiActivator(builder)
+                                        TuyaHomeSdk.getActivatorInstance().newMultiActivator(builder)
 
 
                                 //Start configuration

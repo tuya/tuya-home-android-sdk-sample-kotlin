@@ -21,12 +21,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.tuya.appsdk.sample.home.edit.HomeEditActivity
 import com.tuya.appsdk.sample.user.R
-import com.thingclips.smart.home.sdk.ThingHomeSdk
-import com.thingclips.smart.home.sdk.bean.HomeBean
-import com.thingclips.smart.home.sdk.bean.WeatherBean
-import com.thingclips.smart.home.sdk.callback.IIGetHomeWetherSketchCallBack
-import com.thingclips.smart.home.sdk.callback.IThingHomeResultCallback
-import com.thingclips.smart.sdk.api.IResultCallback
+import com.tuya.smart.home.sdk.TuyaHomeSdk
+import com.tuya.smart.home.sdk.bean.HomeBean
+import com.tuya.smart.home.sdk.bean.WeatherBean
+import com.tuya.smart.home.sdk.callback.IIGetHomeWetherSketchCallBack
+import com.tuya.smart.home.sdk.callback.ITuyaHomeResultCallback
+import com.tuya.smart.sdk.api.IResultCallback
 
 /**
  * Home Detail Sample
@@ -47,7 +47,7 @@ class HomeDetailActivity : AppCompatActivity() {
         val homeId = intent.getLongExtra("homeId", 0)
 
         // Get home info
-        ThingHomeSdk.newHomeInstance(homeId).getHomeDetail(object : IThingHomeResultCallback {
+        TuyaHomeSdk.newHomeInstance(homeId).getHomeDetail(object : ITuyaHomeResultCallback {
             override fun onSuccess(bean: HomeBean?) {
                 bean?.let {
                     findViewById<TextView>(R.id.tvHomeId).text = bean.homeId.toString()
@@ -55,7 +55,7 @@ class HomeDetailActivity : AppCompatActivity() {
                     findViewById<TextView>(R.id.tvHomeCity).text = bean.geoName
 
                     // Get home weather info
-                    ThingHomeSdk.newHomeInstance(homeId).getHomeWeatherSketch(bean.lon,
+                    TuyaHomeSdk.newHomeInstance(homeId).getHomeWeatherSketch(bean.lon,
                             bean.lat,
                             object : IIGetHomeWetherSketchCallBack {
                                 override fun onSuccess(result: WeatherBean?) {
@@ -93,7 +93,7 @@ class HomeDetailActivity : AppCompatActivity() {
 
         // Dismiss home
         findViewById<Button>(R.id.btnDismiss).setOnClickListener {
-            ThingHomeSdk.newHomeInstance(homeId).dismissHome(object : IResultCallback {
+            TuyaHomeSdk.newHomeInstance(homeId).dismissHome(object : IResultCallback {
                 override fun onSuccess() {
                     finish()
                 }

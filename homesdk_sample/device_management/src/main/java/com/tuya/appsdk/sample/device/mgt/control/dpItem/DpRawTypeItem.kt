@@ -20,10 +20,10 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import com.alibaba.fastjson.JSONObject
 import com.tuya.appsdk.sample.device.mgt.R
-import com.thingclips.smart.android.common.utils.HexUtil
-import com.thingclips.smart.android.device.bean.SchemaBean
-import com.thingclips.smart.sdk.api.IResultCallback
-import com.thingclips.smart.sdk.api.IThingDevice
+import com.tuya.smart.android.common.utils.HexUtil
+import com.tuya.smart.android.device.bean.SchemaBean
+import com.tuya.smart.sdk.api.IResultCallback
+import com.tuya.smart.sdk.api.ITuyaDevice
 
 /**
  * Data point(DP) Raw Type type item
@@ -37,7 +37,7 @@ class DpRawTypeItem @JvmOverloads constructor(
         defStyle: Int = 0,
         schemaBean: SchemaBean,
         value: String,
-        device: IThingDevice
+        device: ITuyaDevice
 ) : FrameLayout(context, attrs, defStyle) {
 
     init {

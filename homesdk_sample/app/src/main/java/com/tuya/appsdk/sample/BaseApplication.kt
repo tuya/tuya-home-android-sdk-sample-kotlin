@@ -14,8 +14,7 @@ package com.tuya.appsdk.sample
 
 import android.app.Application
 import com.tuya.smart.android.demo.camera.CameraUtils
-import com.thingclips.smart.home.sdk.ThingHomeSdk
-import com.thingclips.smart.optimus.sdk.ThingOptimusSdk
+import com.tuya.smart.home.sdk.TuyaHomeSdk
 import com.uuzuche.lib_zxing.activity.ZXingLibrary
 
 
@@ -34,9 +33,8 @@ class BaseApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        ThingHomeSdk.init(this)
-        ThingHomeSdk.setDebugMode(true)
-        ThingOptimusSdk.init(this)
+        TuyaHomeSdk.init(this)
+        TuyaHomeSdk.setDebugMode(true)
         ZXingLibrary.initDisplayOpinion(this)
         CameraUtils.init(this)
     }

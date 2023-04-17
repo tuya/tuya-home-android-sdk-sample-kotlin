@@ -24,8 +24,8 @@ import com.tuya.appsdk.sample.home.main.HomeFuncWidget
 import com.tuya.appsdk.sample.resource.HomeModel
 import com.tuya.appsdk.sample.user.info.UserInfoActivity
 import com.tuya.appsdk.sample.user.main.UserFuncActivity
-import com.thingclips.smart.android.user.api.ILogoutCallback
-import com.thingclips.smart.home.sdk.ThingHomeSdk
+import com.tuya.smart.android.user.api.ILogoutCallback
+import com.tuya.smart.home.sdk.TuyaHomeSdk
 
 /**
  * Sample Main List Page
@@ -47,7 +47,7 @@ class MainSampleListActivity : AppCompatActivity() {
 
         findViewById<TextView>(R.id.tvLogout).setOnClickListener {
             // Logout
-            ThingHomeSdk.getUserInstance().logout(object : ILogoutCallback {
+            TuyaHomeSdk.getUserInstance().logout(object : ILogoutCallback {
                 override fun onSuccess() {
                     // Clear cache
                     HomeModel.INSTANCE.clear(this@MainSampleListActivity)

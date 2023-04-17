@@ -23,8 +23,8 @@ import com.tuya.appsdk.sample.home.detail.HomeDetailActivity
 import com.tuya.appsdk.sample.home.list.enum.HomeListPageType
 import com.tuya.appsdk.sample.resource.HomeModel
 import com.tuya.appsdk.sample.user.R
-import com.thingclips.smart.home.sdk.ThingHomeSdk
-import com.thingclips.smart.home.sdk.bean.HomeBean
+import com.tuya.smart.home.sdk.TuyaHomeSdk
+import com.tuya.smart.home.sdk.bean.HomeBean
 
 /**
  * Home List Adapter
@@ -53,7 +53,7 @@ class HomeListAdapter(val type: Int) : RecyclerView.Adapter<HomeListAdapter.View
             holder.itemView.setOnClickListener {
                 // Switch Home
                 val bean = data[holder.adapterPosition]
-                ThingHomeSdk.newHomeInstance(bean.homeId)
+                TuyaHomeSdk.newHomeInstance(bean.homeId)
                 HomeModel.INSTANCE.setCurrentHome(it.context, bean.homeId)
                 notifyDataSetChanged()
             }

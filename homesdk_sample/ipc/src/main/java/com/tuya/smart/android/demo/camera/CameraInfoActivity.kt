@@ -3,7 +3,7 @@ package com.tuya.smart.android.demo.camera
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.thingclips.smart.android.camera.sdk.ThingIPCSdk
+import com.tuya.smart.android.camera.sdk.TuyaIPCSdk
 import com.tuya.smart.android.demo.camera.adapter.CameraInfoAdapter
 import com.tuya.smart.android.demo.camera.databinding.ActivityCameraInfoBinding
 import com.tuya.smart.android.demo.camera.utils.Constants
@@ -29,7 +29,7 @@ class CameraInfoActivity : AppCompatActivity() {
 
     private fun initData() {
         mData = arrayListOf()
-        ThingIPCSdk.getCameraInstance()?.let {
+        TuyaIPCSdk.getCameraInstance()?.let {
             mData.add(getString(R.string.low_power) + it.isLowPowerDevice(mDevId))
             it.getCameraConfig(mDevId)?.run {
                 mData.add(getString(R.string.video_num) + this.videoNum)

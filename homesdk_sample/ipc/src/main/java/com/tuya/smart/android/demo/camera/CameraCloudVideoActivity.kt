@@ -6,17 +6,17 @@ import android.os.Message
 import android.util.Log
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
-import com.thingclips.smart.android.camera.sdk.ThingIPCSdk
+import com.tuya.smart.android.camera.sdk.TuyaIPCSdk
 import com.tuya.smart.android.demo.camera.databinding.ActivityCameraCloudVideoBinding
 import com.tuya.smart.android.demo.camera.utils.Constants
 import com.tuya.smart.android.demo.camera.utils.MessageUtil
 import com.tuya.smart.android.demo.camera.utils.ToastUtil
-import com.thingclips.smart.camera.camerasdk.thingplayer.callback.AbsP2pCameraListener
-import com.thingclips.smart.camera.camerasdk.thingplayer.callback.IRegistorIOTCListener
-import com.thingclips.smart.camera.camerasdk.thingplayer.callback.OperationCallBack
-import com.thingclips.smart.camera.camerasdk.thingplayer.callback.OperationDelegateCallBack
-import com.thingclips.smart.camera.ipccamerasdk.msgvideo.IThingCloudVideo
-import com.thingclips.smart.camera.ipccamerasdk.p2p.ICameraP2P
+import com.tuya.smart.camera.camerasdk.typlayer.callback.AbsP2pCameraListener
+import com.tuya.smart.camera.camerasdk.typlayer.callback.IRegistorIOTCListener
+import com.tuya.smart.camera.camerasdk.typlayer.callback.OperationCallBack
+import com.tuya.smart.camera.camerasdk.typlayer.callback.OperationDelegateCallBack
+import com.tuya.smart.camera.ipccamerasdk.msgvideo.ITYCloudVideo
+import com.tuya.smart.camera.ipccamerasdk.p2p.ICameraP2P
 import org.json.JSONObject
 
 /**
@@ -28,7 +28,7 @@ class CameraCloudVideoActivity : AppCompatActivity() {
     private val OPERATE_SUCCESS = 1
     private val OPERATE_FAIL = 0
     private val MSG_CLOUD_VIDEO_DEVICE = 1000
-    private var mCloudVideo: IThingCloudVideo? = null
+    private var mCloudVideo: ITYCloudVideo? = null
     private var playUrl: String? = null
     private var encryptKey: String? = null
     private var playDuration = 0
@@ -87,7 +87,7 @@ class CameraCloudVideoActivity : AppCompatActivity() {
     }
 
     private fun initCloudCamera() {
-        mCloudVideo = ThingIPCSdk.getMessage()?.run { this.createVideoMessagePlayer() }
+        mCloudVideo = TuyaIPCSdk.getMessage()?.run { this.createVideoMessagePlayer() }
         mCloudVideo?.let {
             it.registerP2PCameraListener(object : AbsP2pCameraListener() {
                 override fun receiveFrameDataForMediaCodec(

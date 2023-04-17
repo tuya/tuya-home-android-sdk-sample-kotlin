@@ -11,10 +11,10 @@ import com.tuya.smart.android.demo.camera.CameraSettingActivity.DPCallback
 import com.tuya.smart.android.demo.camera.databinding.ActivityCameraSettingBinding
 import com.tuya.smart.android.demo.camera.utils.Constants
 import com.tuya.smart.android.demo.camera.utils.DPConstants
-import com.thingclips.smart.home.sdk.ThingHomeSdk
-import com.thingclips.smart.sdk.api.IDevListener
-import com.thingclips.smart.sdk.api.IResultCallback
-import com.thingclips.smart.sdk.api.IThingDevice
+import com.tuya.smart.home.sdk.TuyaHomeSdk
+import com.tuya.smart.sdk.api.IDevListener
+import com.tuya.smart.sdk.api.IResultCallback
+import com.tuya.smart.sdk.api.ITuyaDevice
 
 /**
  * SdCard Setting and WaterMark Setting
@@ -27,7 +27,7 @@ class CameraSettingActivity : AppCompatActivity() {
     }
 
     private var devId: String? = null
-    private var iTuyaDevice: IThingDevice? = null
+    private var iTuyaDevice: ITuyaDevice? = null
     private lateinit var viewBinding: ActivityCameraSettingBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -153,7 +153,7 @@ class CameraSettingActivity : AppCompatActivity() {
     }
 
     private fun queryValueByDPID(dpId: String): Any? {
-        ThingHomeSdk.getDataInstance().getDeviceBean(devId)?.also {
+        TuyaHomeSdk.getDataInstance().getDeviceBean(devId)?.also {
             return it.getDps()?.get(dpId)
         }
         return null
@@ -161,7 +161,7 @@ class CameraSettingActivity : AppCompatActivity() {
 
     private fun publishDps(dpId: String, value: Any) {
         if (iTuyaDevice == null) {
-            iTuyaDevice = ThingHomeSdk.newDeviceInstance(devId)
+            iTuyaDevice = TuyaHomeSdk.newDeviceInstance(devId)
         }
         val jsonObject = JSONObject()
         jsonObject[dpId] = value
@@ -178,7 +178,7 @@ class CameraSettingActivity : AppCompatActivity() {
     }
 
     private fun listenDPUpdate(dpId: String, callback: DPCallback?) {
-        ThingHomeSdk.newDeviceInstance(devId).registerDevListener(object : IDevListener {
+        TuyaHomeSdk.newDeviceInstance(devId).registerDevListener(object : IDevListener {
             override fun onDpUpdate(devId: String, dpStr: String) {
                 callback?.let {
                     val dps: Map<String, Any> =

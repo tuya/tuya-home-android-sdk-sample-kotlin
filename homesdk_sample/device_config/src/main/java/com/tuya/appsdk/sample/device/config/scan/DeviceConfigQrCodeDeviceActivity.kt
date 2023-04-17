@@ -13,11 +13,11 @@ import androidx.core.content.ContextCompat
 import com.google.android.material.appbar.MaterialToolbar
 import com.tuya.appsdk.sample.device.config.R
 import com.tuya.appsdk.sample.resource.HomeModel
-import com.thingclips.smart.home.sdk.ThingHomeSdk
-import com.thingclips.smart.home.sdk.builder.ThingQRCodeActivatorBuilder
-import com.thingclips.smart.sdk.api.IThingDataCallback
-import com.thingclips.smart.sdk.api.IThingSmartActivatorListener
-import com.thingclips.smart.sdk.bean.DeviceBean
+import com.tuya.smart.home.sdk.TuyaHomeSdk
+import com.tuya.smart.home.sdk.builder.TuyaQRCodeActivatorBuilder
+import com.tuya.smart.sdk.api.ITuyaDataCallback
+import com.tuya.smart.sdk.api.ITuyaSmartActivatorListener
+import com.tuya.smart.sdk.bean.DeviceBean
 import com.uuzuche.lib_zxing.activity.CaptureActivity
 import com.uuzuche.lib_zxing.activity.CodeUtils
 import org.json.JSONObject
@@ -102,12 +102,12 @@ class DeviceConfigQrCodeDeviceActivity : AppCompatActivity(), View.OnClickListen
     private fun deviceQrCode(result: String?) {
         val postData = HashMap<String, Any?>()
         postData["code"] = result
-        ThingHomeSdk.getRequestInstance().requestWithApiNameWithoutSession(
+        TuyaHomeSdk.getRequestInstance().requestWithApiNameWithoutSession(
             "tuya.m.qrcode.parse",
             "4.0",
             postData,
             String::class.java,
-            object : IThingDataCallback<String> {
+            object : ITuyaDataCallback<String> {
                 override fun onSuccess(result: String) {
                     initQrCode(result)
                 }
@@ -123,12 +123,12 @@ class DeviceConfigQrCodeDeviceActivity : AppCompatActivity(), View.OnClickListen
         val actionObj = obj.optJSONObject("actionData")
         if (null != actionObj) {
             mUuid = actionObj.optString("uuid")
-            val builder = ThingQRCodeActivatorBuilder()
+            val builder = TuyaQRCodeActivatorBuilder()
                 .setUuid(mUuid)
                 .setHomeId(homeId)
                 .setContext(this)
                 .setTimeOut(100)
-                .setListener(object : IThingSmartActivatorListener {
+                .setListener(object : ITuyaSmartActivatorListener {
                     override fun onError(errorCode: String, errorMsg: String) {}
                     override fun onActiveSuccess(devResp: DeviceBean) {
                         Toast.makeText(
@@ -140,7 +140,7 @@ class DeviceConfigQrCodeDeviceActivity : AppCompatActivity(), View.OnClickListen
 
                     override fun onStep(step: String, data: Any) {}
                 })
-            val iTuyaActivator = ThingHomeSdk.getActivatorInstance().newQRCodeDevActivator(builder)
+            val iTuyaActivator = TuyaHomeSdk.getActivatorInstance().newQRCodeDevActivator(builder)
             iTuyaActivator.start()
         }
     }
