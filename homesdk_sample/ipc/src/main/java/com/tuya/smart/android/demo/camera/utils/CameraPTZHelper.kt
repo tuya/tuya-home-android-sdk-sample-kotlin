@@ -12,14 +12,14 @@ import android.view.View.OnTouchListener
 import android.widget.TextView
 import android.widget.Toast
 import com.alibaba.fastjson.JSONObject
-import com.tuya.drawee.view.DecryptImageView
-import com.tuya.smart.android.camera.sdk.TuyaIPCSdk
-import com.tuya.smart.android.camera.sdk.bean.CollectionPointBean
-import com.tuya.smart.android.camera.sdk.constant.PTZDPModel
+import com.thingclips.drawee.view.DecryptImageView
+import com.thingclips.smart.android.camera.sdk.ThingIPCSdk
+import com.thingclips.smart.android.camera.sdk.bean.CollectionPointBean
+import com.thingclips.smart.android.camera.sdk.constant.PTZDPModel
 import com.tuya.smart.android.demo.camera.R
-import com.tuya.smart.android.device.bean.EnumSchemaBean
-import com.tuya.smart.home.sdk.callback.ITuyaResultCallback
-import com.tuya.smart.sdk.api.IResultCallback
+import com.thingclips.smart.android.device.bean.EnumSchemaBean
+import com.thingclips.smart.home.sdk.callback.IThingResultCallback
+import com.thingclips.smart.sdk.api.IResultCallback
 import java.util.*
 
 /**
@@ -27,7 +27,7 @@ import java.util.*
  */
 @Suppress("DEPRECATION")
 class CameraPTZHelper(devId: String) : View.OnClickListener, OnLongClickListener {
-    private val tuyaIPCPTZ = TuyaIPCSdk.getPTZInstance(devId)
+    private val thingIPCPTZ = ThingIPCSdk.getPTZInstance(devId)
     private var ptzBoard: View? = null
     private lateinit var context: Context
     private var progressDialog: android.app.ProgressDialog? = null
@@ -48,7 +48,7 @@ class CameraPTZHelper(devId: String) : View.OnClickListener, OnLongClickListener
             .setOnTouchListener(PTZControlTouchListener("2"))
         ptzBoard.findViewById<View>(R.id.tv_ptz_bottom)
             .setOnTouchListener(PTZControlTouchListener("4"))
-        val isPTZControl = tuyaIPCPTZ.querySupportByDPCode(PTZDPModel.DP_PTZ_CONTROL)
+        val isPTZControl = thingIPCPTZ.querySupportByDPCode(PTZDPModel.DP_PTZ_CONTROL)
         ptzBoard.findViewById<View>(R.id.group_ptz_control).visibility =
             if (isPTZControl) View.VISIBLE else View.GONE
         //Focal
@@ -56,7 +56,7 @@ class CameraPTZHelper(devId: String) : View.OnClickListener, OnLongClickListener
             .setOnTouchListener(FocalTouchListener("1"))
         ptzBoard.findViewById<View>(R.id.tv_focal_reduce)
             .setOnTouchListener(FocalTouchListener("0"))
-        val isSupportZoom = tuyaIPCPTZ.querySupportByDPCode(PTZDPModel.DP_ZOOM_CONTROL)
+        val isSupportZoom = thingIPCPTZ.querySupportByDPCode(PTZDPModel.DP_ZOOM_CONTROL)
         ptzBoard.findViewById<View>(R.id.group_focal).visibility =
             if (isSupportZoom) View.VISIBLE else View.GONE
         //Collection Point
@@ -64,32 +64,32 @@ class CameraPTZHelper(devId: String) : View.OnClickListener, OnLongClickListener
         ptzBoard.findViewById<View>(R.id.tv_collection_delete).setOnClickListener(this)
         ptzBoard.findViewById<View>(R.id.tv_collection_item).setOnClickListener(this)
         ptzBoard.findViewById<View>(R.id.tv_collection_item).setOnLongClickListener(this)
-        val isSupportCollection = tuyaIPCPTZ.querySupportByDPCode(PTZDPModel.DP_MEMORY_POINT_SET)
+        val isSupportCollection = thingIPCPTZ.querySupportByDPCode(PTZDPModel.DP_MEMORY_POINT_SET)
         ptzBoard.findViewById<View>(R.id.group_collection).visibility =
             if (isSupportCollection) View.VISIBLE else View.GONE
         //Cruise
         val tvCruiseSwitch = ptzBoard.findViewById<TextView>(R.id.tv_cruise_switch)
         tvCruiseSwitch.setOnClickListener(this)
         val isCruiseOpen =
-            tuyaIPCPTZ.getCurrentValue(PTZDPModel.DP_CRUISE_SWITCH, Boolean::class.java) == true
+            thingIPCPTZ.getCurrentValue(PTZDPModel.DP_CRUISE_SWITCH, Boolean::class.java) == true
         tvCruiseSwitch.text = if (isCruiseOpen) "Opened" else "closed"
         ptzBoard.findViewById<View>(R.id.tv_cruise_mode).setOnClickListener(this)
         ptzBoard.findViewById<View>(R.id.tv_cruise_time).setOnClickListener(this)
-        val isSupportCruise = tuyaIPCPTZ.querySupportByDPCode(PTZDPModel.DP_CRUISE_SWITCH)
+        val isSupportCruise = thingIPCPTZ.querySupportByDPCode(PTZDPModel.DP_CRUISE_SWITCH)
         ptzBoard.findViewById<View>(R.id.group_cruise).visibility =
             if (isSupportCruise) View.VISIBLE else View.GONE
         //Tracking
         val tTrackingSwitch = ptzBoard.findViewById<TextView>(R.id.tv_tracking_switch)
         tTrackingSwitch.setOnClickListener(this)
         val isTrackingOpen =
-            tuyaIPCPTZ.getCurrentValue(PTZDPModel.DP_MOTION_TRACKING, Boolean::class.java) == true
+            thingIPCPTZ.getCurrentValue(PTZDPModel.DP_MOTION_TRACKING, Boolean::class.java) == true
         tTrackingSwitch.text = if (isTrackingOpen) "Opened" else "closed"
-        val isSupportTracking = tuyaIPCPTZ.querySupportByDPCode(PTZDPModel.DP_MOTION_TRACKING)
+        val isSupportTracking = thingIPCPTZ.querySupportByDPCode(PTZDPModel.DP_MOTION_TRACKING)
         ptzBoard.findViewById<View>(R.id.group_tracking).visibility =
             if (isSupportTracking) View.VISIBLE else View.GONE
         //Preset Point
         ptzBoard.findViewById<View>(R.id.tv_preset_select).setOnClickListener(this)
-        val isSupportPreset = tuyaIPCPTZ.querySupportByDPCode(PTZDPModel.DP_PRESET_POINT)
+        val isSupportPreset = thingIPCPTZ.querySupportByDPCode(PTZDPModel.DP_PRESET_POINT)
         ptzBoard.findViewById<View>(R.id.group_preset).visibility =
             if (isSupportPreset) View.VISIBLE else View.GONE
         val tvPtzEmpty = ptzBoard.findViewById<View>(R.id.tv_ptz_empty)
@@ -124,21 +124,21 @@ class CameraPTZHelper(devId: String) : View.OnClickListener, OnLongClickListener
             deleteCollectionPoint()
         } else if (v.id == R.id.tv_collection_item) {
             if (v.tag is CollectionPointBean) {
-                tuyaIPCPTZ.viewCollectionPoint(
+                thingIPCPTZ.viewCollectionPoint(
                     (v.tag as CollectionPointBean),
                     ResultCallback("viewCollectionPoint")
                 )
             }
         } else if (v.id == R.id.tv_cruise_switch) {
             val isOpen =
-                tuyaIPCPTZ.getCurrentValue(PTZDPModel.DP_CRUISE_SWITCH, Boolean::class.java) == true
-            tuyaIPCPTZ.publishDps(
+                thingIPCPTZ.getCurrentValue(PTZDPModel.DP_CRUISE_SWITCH, Boolean::class.java) == true
+            thingIPCPTZ.publishDps(
                 PTZDPModel.DP_CRUISE_SWITCH,
                 !isOpen,
                 object : ResultCallback("cruise_switch") {
                     override fun onSuccess() {
                         super.onSuccess()
-                        val value = tuyaIPCPTZ.getCurrentValue(
+                        val value = thingIPCPTZ.getCurrentValue(
                             PTZDPModel.DP_CRUISE_SWITCH,
                             Boolean::class.java
                         ) == true
@@ -151,7 +151,7 @@ class CameraPTZHelper(devId: String) : View.OnClickListener, OnLongClickListener
                 "1" to context.getString(R.string.ipc_collection_point_cruise)
             )
             val items = mutableListOf<String>()
-            tuyaIPCPTZ.getSchemaProperty(
+            thingIPCPTZ.getSchemaProperty(
                 PTZDPModel.DP_CRUISE_MODE,
                 EnumSchemaBean::class.java
             )?.range?.forEach {
@@ -161,7 +161,7 @@ class CameraPTZHelper(devId: String) : View.OnClickListener, OnLongClickListener
             }
             showSelectDialog(items.toTypedArray()) { _: DialogInterface?, which: Int ->
                 itemMap.entries.find { it.value == items[which] }?.key?.let { mode ->
-                    tuyaIPCPTZ.setCruiseMode(mode, ResultCallback("setCruiseMode $mode"))
+                    thingIPCPTZ.setCruiseMode(mode, ResultCallback("setCruiseMode $mode"))
                 }
             }
         } else if (v.id == R.id.tv_cruise_time) {
@@ -172,13 +172,13 @@ class CameraPTZHelper(devId: String) : View.OnClickListener, OnLongClickListener
             )
             showSelectDialog(items) { _: DialogInterface?, which: Int ->
                 if (which == 0) {
-                    tuyaIPCPTZ.publishDps(
+                    thingIPCPTZ.publishDps(
                         PTZDPModel.DP_CRUISE_TIME_MODE,
                         "0",
                         ResultCallback("cruise_time_mode 0")
                     )
                 } else if (which == 1) {
-                    tuyaIPCPTZ.setCruiseTiming(
+                    thingIPCPTZ.setCruiseTiming(
                         "09:00",
                         "16:00",
                         ResultCallback("cruise_time_mode 1")
@@ -194,17 +194,17 @@ class CameraPTZHelper(devId: String) : View.OnClickListener, OnLongClickListener
 
     private fun onClickTracking(textView: TextView) {
         progressDialog?.show()
-        val isOpen = true == tuyaIPCPTZ.getCurrentValue(
+        val isOpen = true == thingIPCPTZ.getCurrentValue(
             PTZDPModel.DP_MOTION_TRACKING,
             Boolean::class.java
         )
-        tuyaIPCPTZ.publishDps(
+        thingIPCPTZ.publishDps(
             PTZDPModel.DP_MOTION_TRACKING,
             !isOpen,
             object : ResultCallback("motion_tracking") {
                 override fun onSuccess() {
                     super.onSuccess()
-                    val value = true == tuyaIPCPTZ.getCurrentValue(
+                    val value = true == thingIPCPTZ.getCurrentValue(
                         PTZDPModel.DP_MOTION_TRACKING,
                         Boolean::class.java
                     )
@@ -221,10 +221,10 @@ class CameraPTZHelper(devId: String) : View.OnClickListener, OnLongClickListener
 
     private fun onClickPreset() {
         val enumSchemaBean =
-            tuyaIPCPTZ.getSchemaProperty(PTZDPModel.DP_PRESET_POINT, EnumSchemaBean::class.java)
+            thingIPCPTZ.getSchemaProperty(PTZDPModel.DP_PRESET_POINT, EnumSchemaBean::class.java)
         val items = enumSchemaBean.getRange().toTypedArray()
         showSelectDialog(items) { _: DialogInterface?, which: Int ->
-            tuyaIPCPTZ.publishDps(
+            thingIPCPTZ.publishDps(
                 PTZDPModel.DP_PRESET_POINT,
                 items[which],
                 ResultCallback("ipc_preset_set " + items[which])
@@ -233,16 +233,16 @@ class CameraPTZHelper(devId: String) : View.OnClickListener, OnLongClickListener
     }
 
     fun ptzControl(direction: String?) {
-        tuyaIPCPTZ.publishDps(PTZDPModel.DP_PTZ_CONTROL, direction!!, ResultCallback("ptzControl"))
+        thingIPCPTZ.publishDps(PTZDPModel.DP_PTZ_CONTROL, direction!!, ResultCallback("ptzControl"))
     }
 
     fun ptzStop() {
-        tuyaIPCPTZ.publishDps(PTZDPModel.DP_PTZ_STOP, true, ResultCallback("ptzStop"))
+        thingIPCPTZ.publishDps(PTZDPModel.DP_PTZ_STOP, true, ResultCallback("ptzStop"))
     }
 
     private fun requestCollectionPointList() {
-        tuyaIPCPTZ.requestCollectionPointList(object :
-            ITuyaResultCallback<List<CollectionPointBean>?> {
+        thingIPCPTZ.requestCollectionPointList(object :
+            IThingResultCallback<List<CollectionPointBean>?> {
             override fun onSuccess(result: List<CollectionPointBean>?) {
                 val decryptImageView: DecryptImageView =
                     ptzBoard?.findViewById(R.id.iv_collection) ?: return
@@ -290,7 +290,7 @@ class CameraPTZHelper(devId: String) : View.OnClickListener, OnLongClickListener
 
     private fun addCollectionPoint() {
         progressDialog?.show()
-        tuyaIPCPTZ.addCollectionPoint(
+        thingIPCPTZ.addCollectionPoint(
             "Collection" + collectionPointSize++,
             object : IResultCallback {
                 override fun onError(code: String, error: String) {
@@ -317,7 +317,7 @@ class CameraPTZHelper(devId: String) : View.OnClickListener, OnLongClickListener
         val items: MutableList<CollectionPointBean> = ArrayList()
         val item = tvCollectionItem.tag as CollectionPointBean
         items.add(item)
-        tuyaIPCPTZ.deleteCollectionPoints(items, object : IResultCallback {
+        thingIPCPTZ.deleteCollectionPoints(items, object : IResultCallback {
             override fun onError(code: String, error: String) {
                 Log.d(TAG, "deleteCollectionPoint invoke error")
                 progressDialog?.dismiss()
@@ -336,7 +336,7 @@ class CameraPTZHelper(devId: String) : View.OnClickListener, OnLongClickListener
             if (tvCollectionItem?.tag is CollectionPointBean) {
                 val item = tvCollectionItem.tag as CollectionPointBean
                 val nameNew = item.name + " New"
-                tuyaIPCPTZ.modifyCollectionPoint(item, nameNew, object : IResultCallback {
+                thingIPCPTZ.modifyCollectionPoint(item, nameNew, object : IResultCallback {
                     override fun onError(code: String, error: String) {
                         Toast.makeText(context, "Operation failed", Toast.LENGTH_SHORT).show()
                     }
@@ -391,12 +391,12 @@ class CameraPTZHelper(devId: String) : View.OnClickListener, OnLongClickListener
         @SuppressLint("ClickableViewAccessibility")
         override fun onTouch(v: View, event: MotionEvent): Boolean {
             when (event.action) {
-                MotionEvent.ACTION_DOWN -> tuyaIPCPTZ.publishDps(
+                MotionEvent.ACTION_DOWN -> thingIPCPTZ.publishDps(
                     PTZDPModel.DP_ZOOM_CONTROL, zoom, ResultCallback(
                         "zoom_control$zoom"
                     )
                 )
-                MotionEvent.ACTION_UP -> tuyaIPCPTZ.publishDps(
+                MotionEvent.ACTION_UP -> thingIPCPTZ.publishDps(
                     PTZDPModel.DP_ZOOM_STOP,
                     true,
                     ResultCallback("zoom_stop")

@@ -22,10 +22,10 @@ import com.tuya.appsdk.sample.device.mgt.R
 import com.tuya.appsdk.sample.device.mgt.list.adapter.DeviceMgtAdapter
 import com.tuya.appsdk.sample.device.mgt.list.enum.DeviceListTypePage
 import com.tuya.appsdk.sample.resource.HomeModel
-import com.tuya.smart.home.sdk.TuyaHomeSdk
-import com.tuya.smart.home.sdk.bean.HomeBean
-import com.tuya.smart.home.sdk.callback.ITuyaHomeResultCallback
-import com.tuya.smart.sdk.bean.DeviceBean
+import com.thingclips.smart.home.sdk.ThingHomeSdk
+import com.thingclips.smart.home.sdk.bean.HomeBean
+import com.thingclips.smart.home.sdk.callback.IThingHomeResultCallback
+import com.thingclips.smart.sdk.bean.DeviceBean
 
 /**
  * Device Management initial device data sample
@@ -77,7 +77,7 @@ class DeviceMgtListActivity : AppCompatActivity() {
          * and call the following method to get the device information in the home.
          * initialization only need when the begin of app lifecycle and switch home.
          */
-        TuyaHomeSdk.newHomeInstance(homeId).getHomeDetail(object : ITuyaHomeResultCallback {
+        ThingHomeSdk.newHomeInstance(homeId).getHomeDetail(object : IThingHomeResultCallback {
             override fun onSuccess(bean: HomeBean?) {
                 bean?.let { it ->
                     if (type == DeviceListTypePage.NORMAL_DEVICE_LIST) {

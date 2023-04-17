@@ -20,7 +20,7 @@
         android:layout_height="240dp"
         android:layout_below="@id/toolbar_view">
 
-        <com.tuya.smart.camera.middleware.widget.TuyaCameraView
+        <com.thingclips.smart.camera.middleware.widget.ThingCameraView
             android:id="@+id/camera_video_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
@@ -43,7 +43,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
-        <com.tuya.smart.android.camera.timeline.TuyaTimelineView
+        <com.thingclips.smart.android.camera.timeline.ThingTimelineView
             android:id="@+id/timeline"
             android:layout_width="match_parent"
             android:layout_height="60dp"
@@ -52,7 +52,7 @@
             app:bubbleTextColor="@color/white"
             app:linesColor="@color/black"
             app:timeScaleColor="@color/black"
-            app:topTextMargin="10dp"></com.tuya.smart.android.camera.timeline.TuyaTimelineView>
+            app:topTextMargin="10dp" />
 
     </RelativeLayout>
 
@@ -75,16 +75,15 @@
             android:id="@+id/date_input_edt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="2019/3/2"
+            android:layout_weight="1"
+            android:hint="2019/3"
             android:textColor="@color/black"
             android:textColorHint="@color/gray"
             android:textSize="15sp" />
-    </LinearLayout>
-
 
     <Button
         android:id="@+id/query_btn"
-        android:layout_width="match_parent"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:layout_below="@+id/query_ll"
         android:layout_marginLeft="@dimen/mg_10"
@@ -92,15 +91,23 @@
         android:text="@string/query"
         android:textColor="@color/white"
         android:textSize="15sp" />
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_month"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/query_ll"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/query_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/query_btn"
+        android:layout_below="@+id/rv_month"
         android:layout_above="@+id/ll_btn"
-        android:layout_marginLeft="@dimen/mg_10"
-        android:layout_marginRight="@dimen/mg_10" />
+        android:layout_margin="@dimen/mg_10" />
 
     <LinearLayout
         android:id="@+id/ll_btn"
@@ -109,19 +116,6 @@
         android:layout_alignParentBottom="true"
         android:orientation="horizontal"
         android:padding="@dimen/mg_10">
-
-        <Button
-            android:id="@+id/start_btn"
-            android:layout_width="match_parent"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="@string/start"
-            android:textColor="@color/white"
-            android:textSize="15sp" />
-
-        <Space
-            android:layout_width="5dp"
-            android:layout_height="wrap_content"/>
 
         <Button
             android:id="@+id/pause_btn"

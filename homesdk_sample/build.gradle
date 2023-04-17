@@ -16,16 +16,11 @@ buildscript {
 
 allprojects {
     repositories {
+        maven { url "https://maven-other.tuya.com/repository/maven-commercial-releases/" }
         google()
         jcenter()
         maven { url 'https://jitpack.io' }
         maven {url'https : //dl.bintray.com/jenly/maven ' }
-        maven {
-            url "https://maven-other.tuya.com/repository/maven-releases/"
-            mavenContent {
-                releasesOnly()
-            }
-        }
     }
 }
 

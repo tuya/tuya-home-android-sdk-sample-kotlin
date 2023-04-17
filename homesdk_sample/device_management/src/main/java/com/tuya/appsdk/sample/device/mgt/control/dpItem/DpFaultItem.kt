@@ -17,7 +17,7 @@ import android.util.AttributeSet
 import android.widget.FrameLayout
 import android.widget.TextView
 import com.tuya.appsdk.sample.device.mgt.R
-import com.tuya.smart.android.device.bean.SchemaBean
+import com.thingclips.smart.android.device.bean.SchemaBean
 
 /**
  * Data point(DP) Fault type item

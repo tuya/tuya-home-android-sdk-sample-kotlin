@@ -20,9 +20,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.tuya.appsdk.sample.resource.HomeModel
 import com.tuya.appsdk.sample.user.R
-import com.tuya.smart.home.sdk.TuyaHomeSdk
-import com.tuya.smart.home.sdk.bean.HomeBean
-import com.tuya.smart.home.sdk.callback.ITuyaHomeResultCallback
+import com.thingclips.smart.home.sdk.ThingHomeSdk
+import com.thingclips.smart.home.sdk.bean.HomeBean
+import com.thingclips.smart.home.sdk.callback.IThingHomeResultCallback
 
 
 /**
@@ -46,14 +46,14 @@ class NewHomeActivity : AppCompatActivity() {
             val strHomeName = findViewById<EditText>(R.id.etHomeName).text.toString()
             val strCity = findViewById<EditText>(R.id.etCity).text.toString()
 
-            TuyaHomeSdk.getHomeManagerInstance().createHome(
+            ThingHomeSdk.getHomeManagerInstance().createHome(
                     strHomeName,
                     // Get location by yourself, here just sample as Shanghai's location
                     120.52,
                     30.40,
                     strCity,
                     arrayListOf(),
-                    object : ITuyaHomeResultCallback {
+                    object : IThingHomeResultCallback {
                         override fun onSuccess(bean: HomeBean?) {
                             HomeModel.INSTANCE.setCurrentHome(this@NewHomeActivity, bean?.homeId
                                     ?: 0)

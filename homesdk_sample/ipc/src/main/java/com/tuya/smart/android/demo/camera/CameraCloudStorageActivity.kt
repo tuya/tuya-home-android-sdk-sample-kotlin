@@ -1,23 +1,33 @@
 package com.tuya.smart.android.demo.camera
 
+import android.Manifest
 import android.os.Bundle
+import android.text.TextUtils
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import com.tuya.smart.android.camera.sdk.TuyaIPCSdk
-import com.tuya.smart.android.camera.sdk.bean.CloudStatusBean
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.alibaba.fastjson.JSONObject
+import com.thingclips.smart.android.camera.sdk.ThingIPCSdk
+import com.thingclips.smart.android.camera.sdk.bean.CloudStatusBean
+import com.thingclips.smart.camera.annotation.CloudPlaySpeed
+import com.thingclips.smart.camera.camerasdk.bean.ThingVideoFrameInfo
+import com.thingclips.smart.camera.camerasdk.thingplayer.callback.AbsP2pCameraListener
+import com.thingclips.smart.camera.camerasdk.thingplayer.callback.IRegistorIOTCListener
+import com.thingclips.smart.camera.camerasdk.thingplayer.callback.OperationCallBack
+import com.thingclips.smart.camera.camerasdk.thingplayer.callback.OperationDelegateCallBack
+import com.thingclips.smart.camera.ipccamerasdk.cloud.IThingCloudCamera
+import com.thingclips.smart.camera.middleware.cloud.bean.CloudDayBean
+import com.thingclips.smart.camera.middleware.cloud.bean.TimePieceBean
+import com.thingclips.smart.camera.middleware.cloud.bean.TimeRangeBean
+import com.thingclips.smart.camera.middleware.widget.AbsVideoViewCallback
+import com.thingclips.smart.home.sdk.callback.IThingResultCallback
+import com.tuya.smart.android.demo.camera.adapter.CameraCloudVideoDateAdapter
+import com.tuya.smart.android.demo.camera.adapter.CameraVideoTimeAdapter
 import com.tuya.smart.android.demo.camera.databinding.ActivityCameraCloudStorageBinding
 import com.tuya.smart.android.demo.camera.utils.Constants
+import com.tuya.smart.android.demo.camera.utils.IPCSavePathUtils
 import com.tuya.smart.android.demo.camera.utils.ToastUtil
-import com.tuya.smart.camera.camerasdk.bean.TuyaVideoFrameInfo
-import com.tuya.smart.camera.camerasdk.typlayer.callback.IRegistorIOTCListener
-import com.tuya.smart.camera.camerasdk.typlayer.callback.OnP2PCameraListener
-import com.tuya.smart.camera.camerasdk.typlayer.callback.OperationCallBack
-import com.tuya.smart.camera.camerasdk.typlayer.callback.OperationDelegateCallBack
-import com.tuya.smart.camera.ipccamerasdk.cloud.ITYCloudCamera
-import com.tuya.smart.camera.middleware.cloud.bean.CloudDayBean
-import com.tuya.smart.camera.middleware.cloud.bean.TimePieceBean
-import com.tuya.smart.camera.middleware.cloud.bean.TimeRangeBean
-import com.tuya.smart.camera.middleware.widget.AbsVideoViewCallback
-import com.tuya.smart.home.sdk.callback.ITuyaResultCallback
 import java.io.File
 import java.nio.ByteBuffer
 import java.util.*
@@ -29,19 +39,26 @@ import java.util.*
  */
 class CameraCloudStorageActivity : AppCompatActivity() {
 
-    private var cloudCamera: ITYCloudCamera? = null
+    private var cloudCamera: IThingCloudCamera? = null
     private val dayBeanList: MutableList<CloudDayBean> = ArrayList()
     private val timePieceBeans = ArrayList<TimePieceBean>()
     private var soundState = 0
     private var devId: String? = null
     private lateinit var viewBinding: ActivityCameraCloudStorageBinding
 
+    private var timeAdapter: CameraVideoTimeAdapter? = null
+    private var dateAdapter: CameraCloudVideoDateAdapter? = null
+
+    private val SERVICE_RUNNING = 10010
+    private val SERVICE_EXPIRED = 10011
+    private val NO_SERVICE = 10001
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityCameraCloudStorageBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
         devId = intent.getStringExtra(Constants.INTENT_DEV_ID)
-        cloudCamera = TuyaIPCSdk.getCloud()?.createCloudCamera()
+        cloudCamera = ThingIPCSdk.getCloud()?.createCloudCamera()
         viewBinding.cameraCloudVideoView.setViewCallback(object : AbsVideoViewCallback() {
             override fun onCreated(o: Any) {
                 super.onCreated(o)
@@ -53,46 +70,16 @@ class CameraCloudStorageActivity : AppCompatActivity() {
         viewBinding.cameraCloudVideoView.createVideoView(devId)
         cloudCamera?.createCloudDevice(application.cacheDir.path, devId)
         viewBinding.toolbarView.setNavigationOnClickListener { onBackPressed() }
-        viewBinding.statusBtn.setOnClickListener {
-            cloudCamera?.queryCloudServiceStatus(
-                devId,
-                object : ITuyaResultCallback<CloudStatusBean> {
-                    override fun onSuccess(result: CloudStatusBean) {
-                        //Get cloud storage status
-                        ToastUtil.shortToast(
-                            this@CameraCloudStorageActivity,
-                            getString(R.string.current_state) + result.status
-                        )
-                    }
-
-                    override fun onError(errorCode: String, errorMessage: String) {
-                        ToastUtil.shortToast(
-                            this@CameraCloudStorageActivity,
-                            getString(R.string.err_code) + errorCode
-                        )
-                    }
-                })
-        }
-        viewBinding.buyBtn.setOnClickListener {
-            //TODO use cloud service purchase component https://developer.tuya.com/cn/docs/app-development/cloudstorage?id=Ka8qhzjzay7fx
-
-        }
-        viewBinding.queryBtn.setOnClickListener {
-            //1. Get device cloud storage-related data
-            cloudCamera?.getCloudDays(devId, object : ITuyaResultCallback<List<CloudDayBean>?> {
-                override fun onSuccess(result: List<CloudDayBean>?) {
-                    if (result == null || result.isEmpty()) {
-                        ToastUtil.shortToast(
-                            this@CameraCloudStorageActivity,
-                            getString(R.string.no_data)
-                        )
-                    } else {
-                        dayBeanList.clear()
-                        dayBeanList.addAll(result)
-                        ToastUtil.shortToast(
-                            this@CameraCloudStorageActivity,
-                            getString(R.string.operation_suc)
-                        )
+        cloudCamera?.queryCloudServiceStatus(
+            devId,
+            object : IThingResultCallback<CloudStatusBean> {
+                override fun onSuccess(result: CloudStatusBean) {
+                    //Get cloud storage status
+                    viewBinding.statusTv.text =
+                        getString(R.string.cloud_status) + getServiceStatus(result.status)
+                    if (result.status == SERVICE_EXPIRED || result.status == SERVICE_RUNNING) {
+                        viewBinding.queryBtn.visibility = View.VISIBLE
+                        viewBinding.llBottom.visibility = View.VISIBLE
                     }
                 }
 
@@ -103,29 +90,37 @@ class CameraCloudStorageActivity : AppCompatActivity() {
                     )
                 }
             })
-        }
-        viewBinding.queryTimeBtn.setOnClickListener { //Get the time data of the first day queried
-            //2. Get time slice at a specified time
-            if (dayBeanList.size > 0) {
-                getAppointedDayCloudTimes(dayBeanList[0])
-            } else {
-                ToastUtil.shortToast(this@CameraCloudStorageActivity, getString(R.string.no_data))
-            }
-        }
-        viewBinding.startBtn.setOnClickListener {
-            if (timePieceBeans.size > 0) {
-                playCloudDataWithStartTime(
-                    timePieceBeans[0].startTime,
-                    timePieceBeans[0].endTime,
-                    true
-                )
-                ToastUtil.shortToast(
-                    this@CameraCloudStorageActivity,
-                    getString(R.string.operation_suc)
-                )
-            } else {
-                ToastUtil.shortToast(this@CameraCloudStorageActivity, getString(R.string.no_data))
-            }
+        viewBinding.queryBtn.setOnClickListener {
+            //1. Get device cloud storage-related data
+            cloudCamera?.getCloudDays(devId,
+                TimeZone.getDefault().id,
+                object : IThingResultCallback<List<CloudDayBean>?> {
+                    override fun onSuccess(result: List<CloudDayBean>?) {
+                        if (result == null || result.isEmpty()) {
+                            ToastUtil.shortToast(
+                                this@CameraCloudStorageActivity,
+                                getString(R.string.no_data)
+                            )
+                        } else {
+                            dayBeanList.clear()
+                            dayBeanList.addAll(result)
+                            dateAdapter?.notifyDataSetChanged()
+                            if (dayBeanList.size > 0)
+                                viewBinding.dateRv.scrollToPosition(dayBeanList.size - 1)
+                            ToastUtil.shortToast(
+                                this@CameraCloudStorageActivity,
+                                getString(R.string.operation_suc)
+                            )
+                        }
+                    }
+
+                    override fun onError(errorCode: String, errorMessage: String) {
+                        ToastUtil.shortToast(
+                            this@CameraCloudStorageActivity,
+                            getString(R.string.err_code) + errorCode
+                        )
+                    }
+                })
         }
         viewBinding.pauseBtn.setOnClickListener { pausePlayCloudVideo() }
 
@@ -138,6 +133,62 @@ class CameraCloudStorageActivity : AppCompatActivity() {
         viewBinding.recordStart.setOnClickListener { startCloudRecordLocalMP4() }
         viewBinding.recordEnd.setOnClickListener { stopCloudRecordLocalMP4() }
 
+        val mLayoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        viewBinding.timeRv.layoutManager = mLayoutManager
+        viewBinding.timeRv.addItemDecoration(DividerItemDecoration(this,
+            DividerItemDecoration.VERTICAL))
+        timeAdapter = CameraVideoTimeAdapter(this, timePieceBeans)
+        viewBinding.timeRv.adapter = timeAdapter
+        val ipcSavePathUtils = IPCSavePathUtils(this)
+        timeAdapter?.setListener(object : CameraVideoTimeAdapter.OnTimeItemListener {
+            override fun onClick(bean: TimePieceBean) {
+                playCloudDataWithStartTime(bean.startTime, bean.endTime, bean.isEvent)
+            }
+
+            override fun onLongClick(o: TimePieceBean) {
+                val openStorage = Constants.requestPermission(this@CameraCloudStorageActivity,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Constants.EXTERNAL_STORAGE_REQ_CODE,
+                    "open_storage")
+                if (openStorage) {
+                    ToastUtil.shortToast(this@CameraCloudStorageActivity, "start download")
+                    startCloudDataDownload(o.startTime.toLong(),
+                        o.endTime.toLong(),
+                        ipcSavePathUtils.recordPathSupportQ(
+                            devId!!),
+                        "download_" + System.currentTimeMillis() + ".mp4")
+                }
+            }
+        })
+
+        val mDateLayoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        viewBinding.dateRv.layoutManager = mDateLayoutManager
+        dateAdapter = CameraCloudVideoDateAdapter(this, dayBeanList)
+        viewBinding.dateRv.adapter = dateAdapter
+        dateAdapter?.setListener(object : CameraCloudVideoDateAdapter.OnTimeItemListener {
+            override fun onClick(dayBean: CloudDayBean?) {
+                getTimeLineInfoByTimeSlice(devId,
+                    dayBean?.currentStartDayTime.toString(),
+                    dayBean?.currentDayEndTime.toString())
+            }
+        })
+    }
+
+    private fun getServiceStatus(code: Int): String? {
+        return when (code) {
+            SERVICE_EXPIRED -> {
+                getString(R.string.ipc_sdk_service_expired)
+            }
+            SERVICE_RUNNING -> {
+                getString(R.string.ipc_sdk_service_running)
+            }
+            NO_SERVICE -> {
+                getString(R.string.ipc_sdk_no_service)
+            }
+            else -> {
+                code.toString()
+            }
+        }
     }
 
     override fun onResume() {
@@ -147,7 +198,7 @@ class CameraCloudStorageActivity : AppCompatActivity() {
             if (viewBinding.cameraCloudVideoView.createdView() is IRegistorIOTCListener) {
                 it.generateCloudCameraView(viewBinding.cameraCloudVideoView.createdView() as IRegistorIOTCListener)
             }
-            it.registorOnP2PCameraListener(object : OnP2PCameraListener {
+            it.registerP2PCameraListener(object : AbsP2pCameraListener() {
                 override fun receiveFrameDataForMediaCodec(
                     i: Int,
                     bytes: ByteArray,
@@ -155,7 +206,7 @@ class CameraCloudStorageActivity : AppCompatActivity() {
                     i2: Int,
                     bytes1: ByteArray,
                     b: Boolean,
-                    i3: Int
+                    i3: Int,
                 ) {
                 }
 
@@ -171,7 +222,7 @@ class CameraCloudStorageActivity : AppCompatActivity() {
                     l: Long,
                     l1: Long,
                     l2: Long,
-                    o: Any
+                    o: Any,
                 ) {
                 }
 
@@ -180,10 +231,10 @@ class CameraCloudStorageActivity : AppCompatActivity() {
                     y: ByteBuffer?,
                     u: ByteBuffer?,
                     v: ByteBuffer?,
-                    videoFrameInfo: TuyaVideoFrameInfo?,
-                    camera: Any?
+                    videoFrameInfo: ThingVideoFrameInfo?,
+                    camera: Any?,
                 ) {
-                    TODO("Not yet implemented")
+
                 }
 
                 override fun onSessionStatusChanged(o: Any, i: Int, i1: Int) {}
@@ -193,7 +244,7 @@ class CameraCloudStorageActivity : AppCompatActivity() {
                     i2: Int,
                     l: Long,
                     l1: Long,
-                    l2: Long
+                    l2: Long,
                 ) {
                 }
 
@@ -357,16 +408,6 @@ class CameraCloudStorageActivity : AppCompatActivity() {
             })
     }
 
-    private fun getAppointedDayCloudTimes(dayBean: CloudDayBean?) {
-        dayBean?.let {
-            getTimeLineInfoByTimeSlice(
-                devId,
-                it.currentStartDayTime.toString(),
-                it.currentDayEndTime.toString()
-            )
-        }
-    }
-
     /**
      * Get the time slice of the specified time.
      *
@@ -381,7 +422,7 @@ class CameraCloudStorageActivity : AppCompatActivity() {
             devId,
             timeGT.toLong(),
             timeLT.toLong(),
-            object : ITuyaResultCallback<List<TimePieceBean>?> {
+            object : IThingResultCallback<List<TimePieceBean>?> {
                 override fun onSuccess(result: List<TimePieceBean>?) {
                     if (result == null || result.isEmpty()) {
                         ToastUtil.shortToast(
@@ -391,6 +432,7 @@ class CameraCloudStorageActivity : AppCompatActivity() {
                     } else {
                         timePieceBeans.clear()
                         timePieceBeans.addAll(result)
+                        timeAdapter?.notifyDataSetChanged()
                         ToastUtil.shortToast(
                             this@CameraCloudStorageActivity,
                             getString(R.string.operation_suc)
@@ -421,7 +463,7 @@ class CameraCloudStorageActivity : AppCompatActivity() {
         timeGT: String,
         timeLT: String,
         offset: Int,
-        limit: Int
+        limit: Int,
     ) {
         cloudCamera?.getMotionDetectionInfo(
             devId,
@@ -429,7 +471,7 @@ class CameraCloudStorageActivity : AppCompatActivity() {
             timeLT.toLong(),
             offset,
             limit,
-            object : ITuyaResultCallback<List<TimeRangeBean?>?> {
+            object : IThingResultCallback<List<TimeRangeBean?>?> {
                 override fun onSuccess(result: List<TimeRangeBean?>?) {}
                 override fun onError(errorCode: String, errorMessage: String) {}
             })
@@ -443,5 +485,150 @@ class CameraCloudStorageActivity : AppCompatActivity() {
         calendar[Calendar.SECOND] = 0
         calendar.add(Calendar.DAY_OF_MONTH, 1)
         return calendar.timeInMillis
+    }
+
+
+    /**
+     * 设置倍数播放，在开始播放时进行设置
+     */
+    private fun setPlayCloudDataSpeed(@CloudPlaySpeed speed: Int) {
+        cloudCamera?.setPlayCloudDataSpeed(speed, object : OperationCallBack {
+            override fun onSuccess(sessionId: Int, requestId: Int, data: String, camera: Any) {
+                // TODO " setPlayCloudDataSpeed  onSuccess"
+            }
+
+            override fun onFailure(sessionId: Int, requestId: Int, errCode: Int, camera: Any) {}
+        })
+    }
+
+    /**
+     * 查询 NVR 子设备云盘配置信息（子设备是否开通云存储）
+     *
+     * @param curNodeId      当前设备的nodeId
+     * @param parentDeviceId 当前设备的父设备id
+     */
+    private fun getCloudDiskPro(curNodeId: String, parentDeviceId: String) {
+        cloudCamera?.queryCloudDiskProperty(parentDeviceId,
+            object : IThingResultCallback<JSONObject> {
+                override fun onSuccess(result: JSONObject) {
+                    try { // 解析子列表
+                        val jsonArray = result.getJSONArray("propertyList")
+                        if (jsonArray != null && jsonArray.size > 0) {
+                            for (i in jsonArray.indices) {
+                                val jsonObject = jsonArray.getJSONObject(i)
+                                val nodeId = jsonObject.getString("nodeId")
+                                if (TextUtils.equals(curNodeId, nodeId)) {
+                                    val openStatus = jsonObject.getBoolean("openStatus")
+                                    if (openStatus) {
+                                        // TODO 已开通云存储
+                                    }
+                                    break
+                                }
+                            }
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+
+                override fun onError(errorCode: String, errorMessage: String) {}
+            })
+    }
+
+
+    /**
+     * 云存储下载
+     *
+     * @param startTime
+     * @param stopTime
+     * @param folderPath
+     * @param mp4FileName
+     */
+    private fun startCloudDataDownload(
+        startTime: Long,
+        stopTime: Long,
+        folderPath: String,
+        mp4FileName: String,
+    ) {
+        cloudCamera?.startCloudDataDownload(startTime,
+            stopTime,
+            folderPath,
+            mp4FileName,
+            object : OperationCallBack {
+                override fun onSuccess(
+                    sessionId: Int,
+                    requestId: Int,
+                    data: String,
+                    camera: Any,
+                ) {
+                }
+
+                override fun onFailure(
+                    sessionId: Int,
+                    requestId: Int,
+                    errCode: Int,
+                    camera: Any,
+                ) {
+                }
+            },
+            { sessionId: Int, requestId: Int, pos: Int, camera: Any? -> },
+            object : OperationCallBack {
+                override fun onSuccess(
+                    sessionId: Int,
+                    requestId: Int,
+                    data: String,
+                    camera: Any,
+                ) {
+                    runOnUiThread{
+                        ToastUtil.shortToast(this@CameraCloudStorageActivity, "download finished")
+                    }
+                }
+
+                override fun onFailure(
+                    sessionId: Int,
+                    requestId: Int,
+                    errCode: Int,
+                    camera: Any,
+                ) {
+                }
+            })
+    }
+
+
+    /**
+     * 停止下载视频
+     */
+    private fun stopCloudDataDownload() {
+        cloudCamera?.stopCloudDataDownload(object : OperationCallBack {
+            override fun onSuccess(sessionId: Int, requestId: Int, data: String, camera: Any) {}
+            override fun onFailure(sessionId: Int, requestId: Int, errCode: Int, camera: Any) {}
+        })
+    }
+
+    /**
+     * 删除云存储视频
+     *
+     * @param devId
+     * @param timeGT
+     * @param timeLT
+     * @param isAllDay
+     * @param timeZone
+     */
+    private fun deleteCloudVideo(
+        devId: String,
+        timeGT: Long,
+        timeLT: Long,
+        isAllDay: Boolean,
+        timeZone: String,
+    ) {
+        cloudCamera?.deleteCloudVideo(devId,
+            timeGT,
+            timeLT,
+            isAllDay,
+            timeZone,
+            object : IThingResultCallback<String?> {
+                override fun onSuccess(result: String?) {}
+                override fun onError(errorCode: String, errorMessage: String) {}
+            })
     }
 }

@@ -9,15 +9,15 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.tuya.smart.android.camera.sdk.TuyaIPCSdk
-import com.tuya.smart.android.camera.sdk.api.ITYCameraMessage
+import com.thingclips.smart.android.camera.sdk.ThingIPCSdk
+import com.thingclips.smart.android.camera.sdk.api.IThingCameraMessage
 import com.tuya.smart.android.demo.camera.adapter.AlarmDetectionAdapter
 import com.tuya.smart.android.demo.camera.adapter.AlarmDetectionAdapter.OnItemListener
 import com.tuya.smart.android.demo.camera.databinding.ActivityCameraMessageBinding
 import com.tuya.smart.android.demo.camera.utils.*
-import com.tuya.smart.home.sdk.callback.ITuyaResultCallback
-import com.tuya.smart.ipc.messagecenter.bean.CameraMessageBean
-import com.tuya.smart.ipc.messagecenter.bean.CameraMessageClassifyBean
+import com.thingclips.smart.home.sdk.callback.IThingResultCallback
+import com.thingclips.smart.ipc.messagecenter.bean.CameraMessageBean
+import com.thingclips.smart.ipc.messagecenter.bean.CameraMessageClassifyBean
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -36,7 +36,7 @@ class AlarmDetectionActivity : AppCompatActivity(), View.OnClickListener {
     private var year: Int = 0
     private var month: Int = 0
     private var offset = 0
-    private var mTyCameraMessage: ITYCameraMessage? = null
+    private var mTyCameraMessage: IThingCameraMessage? = null
     private lateinit var viewBinding: ActivityCameraMessageBinding
     private val mHandler: Handler = object : Handler() {
         override fun handleMessage(msg: Message) {
@@ -75,7 +75,7 @@ class AlarmDetectionActivity : AppCompatActivity(), View.OnClickListener {
                 selectClassify!!.msgCode,
                 offset,
                 30,
-                object : ITuyaResultCallback<List<CameraMessageBean>?> {
+                object : IThingResultCallback<List<CameraMessageBean>?> {
                     override fun onSuccess(result: List<CameraMessageBean>?) {
                         if (result != null) {
                             offset += result.size
@@ -134,7 +134,7 @@ class AlarmDetectionActivity : AppCompatActivity(), View.OnClickListener {
     private fun initData() {
         mWaitingDeleteCameraMessageList = arrayListOf()
         mCameraMessageList = arrayListOf()
-        mTyCameraMessage = TuyaIPCSdk.getMessage()?.createCameraMessage()
+        mTyCameraMessage = ThingIPCSdk.getMessage()?.createCameraMessage()
         queryCameraMessageClassify(devId)
         viewBinding.queryList.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
@@ -172,7 +172,7 @@ class AlarmDetectionActivity : AppCompatActivity(), View.OnClickListener {
     private fun queryCameraMessageClassify(devId: String?) {
         mTyCameraMessage?.queryAlarmDetectionClassify(
             devId,
-            object : ITuyaResultCallback<List<CameraMessageClassifyBean>> {
+            object : IThingResultCallback<List<CameraMessageClassifyBean>> {
                 override fun onSuccess(result: List<CameraMessageClassifyBean>) {
                     selectClassify = result[0]
                     mHandler.sendEmptyMessage(Constants.MOTION_CLASSIFY_SUCCESS)
@@ -189,7 +189,7 @@ class AlarmDetectionActivity : AppCompatActivity(), View.OnClickListener {
         mWaitingDeleteCameraMessageList.add(cameraMessageBean)
         val ids: MutableList<String> = ArrayList()
         ids.add(cameraMessageBean.id)
-        mTyCameraMessage?.deleteMotionMessageList(ids, object : ITuyaResultCallback<Boolean?> {
+        mTyCameraMessage?.deleteMotionMessageList(ids, object : IThingResultCallback<Boolean?> {
             override fun onSuccess(result: Boolean?) {
                 mCameraMessageList.removeAll(mWaitingDeleteCameraMessageList)
                 mWaitingDeleteCameraMessageList.clear()
@@ -232,7 +232,7 @@ class AlarmDetectionActivity : AppCompatActivity(), View.OnClickListener {
             devId,
             year,
             month,
-            object : ITuyaResultCallback<List<String>> {
+            object : IThingResultCallback<List<String>> {
                 override fun onSuccess(result: List<String>) {
                     if (result.isNotEmpty()) {
                         Collections.sort(result)
