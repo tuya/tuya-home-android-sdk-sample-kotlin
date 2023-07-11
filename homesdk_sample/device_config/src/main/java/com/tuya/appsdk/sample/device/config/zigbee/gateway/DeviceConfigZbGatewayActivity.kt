@@ -9,12 +9,24 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.google.android.material.progressindicator.CircularProgressIndicator
+import com.thingclips.smart.activator.core.kit.ThingActivatorCoreKit
+import com.thingclips.smart.activator.core.kit.active.inter.IThingActiveManager
+import com.thingclips.smart.activator.core.kit.bean.ThingActivatorScanDeviceBean
+import com.thingclips.smart.activator.core.kit.bean.ThingActivatorScanFailureBean
+import com.thingclips.smart.activator.core.kit.bean.ThingDeviceActiveErrorBean
+import com.thingclips.smart.activator.core.kit.bean.ThingDeviceActiveLimitBean
+import com.thingclips.smart.activator.core.kit.builder.ThingDeviceActiveBuilder
+import com.thingclips.smart.activator.core.kit.callback.ThingActivatorScanCallback
+import com.thingclips.smart.activator.core.kit.constant.ThingDeviceActiveModeEnum
+import com.thingclips.smart.activator.core.kit.devicecore.ThingActivatorDeviceCoreKit
+import com.thingclips.smart.activator.core.kit.listener.IThingDeviceActiveListener
 import com.tuya.appsdk.sample.device.config.R
 import com.tuya.appsdk.sample.resource.HomeModel
 import com.thingclips.smart.android.hardware.bean.HgwBean
 import com.thingclips.smart.home.sdk.ThingHomeSdk.getActivatorInstance
 import com.thingclips.smart.home.sdk.builder.ThingGwActivatorBuilder
 import com.thingclips.smart.sdk.api.IThingActivatorGetToken
+import com.thingclips.smart.sdk.api.IThingDevActivatorListener
 import com.thingclips.smart.sdk.api.IThingSmartActivatorListener
 import com.thingclips.smart.sdk.bean.DeviceBean
 
@@ -25,6 +37,8 @@ import com.thingclips.smart.sdk.bean.DeviceBean
  * @since 2/24/21 11:12 AM
  */
 class DeviceConfigZbGatewayActivity : AppCompatActivity() {
+
+    private var activeManager: IThingActiveManager? = null
 
     companion object {
         private const val TAG = "DeviceConfigZbGateway"
@@ -48,7 +62,7 @@ class DeviceConfigZbGatewayActivity : AppCompatActivity() {
 
     private fun initView() {
         findViewById<TextView>(R.id.tv_hint_info).text =
-                getString(R.string.device_config_zb_gateway_hint)
+            getString(R.string.device_config_zb_gateway_hint)
         cpiLoading = findViewById(R.id.cpiLoading)
 
         searchButton = findViewById(R.id.bt_search)
@@ -66,84 +80,79 @@ class DeviceConfigZbGatewayActivity : AppCompatActivity() {
     }
 
 
+    override fun onDestroy() {
+        super.onDestroy()
+        activeManager?.stopActive()
+    }
+
     // Search ZigBee Gateway Device
     private fun searchGatewayDevice() {
         setPbViewVisible(true)
-        val newSearcher = getActivatorInstance().newThingGwActivator().newSearcher()
-        newSearcher.registerGwSearchListener {
-            getNetworkConfigToken(it)
-        }
+        ThingActivatorCoreKit.getScanDeviceManager().startLocalGatewayDeviceSearch(
+            60 * 1000,
+            object : ThingActivatorScanCallback {
+                override fun deviceFound(deviceBean: ThingActivatorScanDeviceBean) {
+                    startNetworkConfig(deviceBean)
+                }
+
+                override fun deviceRepeat(deviceBean: ThingActivatorScanDeviceBean) {
+                }
+
+                override fun deviceUpdate(deviceBean: ThingActivatorScanDeviceBean) {
+                }
+
+                override fun scanFailure(failureBean: ThingActivatorScanFailureBean) {
+                }
+
+                override fun scanFinish() {
+                }
+
+            }
+        )
     }
-
-
-    // Get Network Configuration Token
-    private fun getNetworkConfigToken(hgwBean: HgwBean) {
-        Log.i(TAG, "getNetworkConfigToken: homeId=${homeId}")
-        Log.i(TAG, "getNetworkConfigToken: GwId->${hgwBean.getGwId()}")
-
-        getActivatorInstance().getActivatorToken(homeId,
-                object : IThingActivatorGetToken {
-                    override fun onSuccess(token: String) {
-                        Log.i(TAG, "getNetworkConfigToken: onSuccess->${token}")
-                        startNetworkConfig(token, hgwBean)
-                    }
-
-                    override fun onFailure(errorCode: String?, errorMsg: String?) {
-                        setPbViewVisible(false)
-                        Toast.makeText(
-                                this@DeviceConfigZbGatewayActivity,
-                                "Error->$errorMsg",
-                                Toast.LENGTH_LONG
-                        ).show()
-                    }
-                })
-    }
-
 
     // Start network configuration -- ZigBee Gateway
-    private fun startNetworkConfig(token: String, hgwBean: HgwBean) {
-        val activatorBuilder = getActivatorInstance().newGwActivator(
-                ThingGwActivatorBuilder()
-                        .setContext(this@DeviceConfigZbGatewayActivity)
-                        .setTimeOut(100)
-                        .setToken(token)
-                        .setHgwBean(hgwBean)
-                        .setListener(object : IThingSmartActivatorListener {
-                            override fun onError(errorCode: String?, errorMsg: String?) {
-                                Log.i(TAG, "Activate error->$errorMsg")
-                                setPbViewVisible(false)
-                                Toast.makeText(
-                                        this@DeviceConfigZbGatewayActivity,
-                                        "Activate Error",
-                                        Toast.LENGTH_LONG
-                                ).show()
-                            }
+    private fun startNetworkConfig(bean: ThingActivatorScanDeviceBean) {
 
-                            override fun onActiveSuccess(devResp: DeviceBean?) {
-                                Log.i(TAG, "Activate success")
-                                setPbViewVisible(false)
-                                Toast.makeText(
-                                        this@DeviceConfigZbGatewayActivity,
-                                        "Activate success",
-                                        Toast.LENGTH_LONG
-                                ).show()
-                                finish()
-                            }
+        activeManager = ThingActivatorCoreKit.getActiveManager().newThingActiveManager()
+        activeManager!!.startActive(ThingDeviceActiveBuilder().apply {
+            activeModel = ThingDeviceActiveModeEnum.WN
+            timeOut = 60
+            context = this@DeviceConfigZbGatewayActivity
+            setActivatorScanDeviceBean(bean)
+            listener = object : IThingDeviceActiveListener {
+                override fun onActiveError(errorBean: ThingDeviceActiveErrorBean) {
+                    Log.i(TAG, "Activate error->${errorBean.errMsg}")
+                    setPbViewVisible(false)
+                    Toast.makeText(
+                        this@DeviceConfigZbGatewayActivity,
+                        "Activate Error",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
 
-                            override fun onStep(step: String?, data: Any?) {
-                                Log.i(TAG, "onStep: step->$step")
-                            }
+                override fun onActiveLimited(limitBean: ThingDeviceActiveLimitBean) {
+                }
 
-                        })
-        )
+                override fun onActiveSuccess(deviceBean: DeviceBean) {
+                    Log.i(TAG, "Activate success")
+                    setPbViewVisible(false)
+                    Toast.makeText(
+                        this@DeviceConfigZbGatewayActivity,
+                        "Activate success",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    finish()
+                }
 
-        //Start configuration
-        activatorBuilder.start()
+                override fun onBind(devId: String) {
+                }
 
-        // Stop configuration
-        // mTuyaActivator.stop()
-        // Exit the page to destroy some cache data and monitoring data.
-        // mTuyaActivator.onDestroy()
+                override fun onFind(devId: String) {
+                }
+
+            }
+        })
 
     }
 

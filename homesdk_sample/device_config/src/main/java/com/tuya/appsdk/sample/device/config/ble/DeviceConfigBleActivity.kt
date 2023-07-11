@@ -13,6 +13,16 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.material.progressindicator.CircularProgressIndicator
+import com.thingclips.smart.activator.core.kit.ThingActivatorCoreKit
+import com.thingclips.smart.activator.core.kit.active.inter.IThingActiveManager
+import com.thingclips.smart.activator.core.kit.bean.ThingActivatorScanDeviceBean
+import com.thingclips.smart.activator.core.kit.bean.ThingActivatorScanFailureBean
+import com.thingclips.smart.activator.core.kit.bean.ThingActivatorScanKey
+import com.thingclips.smart.activator.core.kit.bean.ThingDeviceActiveErrorBean
+import com.thingclips.smart.activator.core.kit.bean.ThingDeviceActiveLimitBean
+import com.thingclips.smart.activator.core.kit.builder.ThingDeviceActiveBuilder
+import com.thingclips.smart.activator.core.kit.callback.ThingActivatorScanCallback
+import com.thingclips.smart.activator.core.kit.listener.IThingDeviceActiveListener
 import com.tuya.appsdk.sample.device.config.R
 import com.tuya.appsdk.sample.resource.HomeModel
 import com.thingclips.smart.android.ble.api.BleConfigType
@@ -37,6 +47,9 @@ class DeviceConfigBleActivity : AppCompatActivity() {
     lateinit var cpiLoading: CircularProgressIndicator
     lateinit var searchButton: Button
 
+    lateinit var activeManager: IThingActiveManager
+    var activatorScanKey: ThingActivatorScanKey? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.device_config_info_hint_activity)
@@ -48,24 +61,25 @@ class DeviceConfigBleActivity : AppCompatActivity() {
     // You need to check permissions before using Bluetooth devices
     private fun checkPermission() {
         if (ContextCompat.checkSelfPermission(
-                        this,
-                        Manifest.permission.ACCESS_COARSE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-                || ContextCompat.checkSelfPermission(
-                        this,
-                        Manifest.permission.ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+            || ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
         ) {
             ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(
-                            Manifest.permission.ACCESS_COARSE_LOCATION,
-                            Manifest.permission.ACCESS_FINE_LOCATION
-                    ),
-                    REQUEST_CODE
+                this,
+                arrayOf(
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ),
+                REQUEST_CODE
             )
         }
     }
+
 
     private fun initView() {
         findViewById<TextView>(R.id.tv_hint_info).text = getString(R.string.device_config_ble_hint)
@@ -84,37 +98,82 @@ class DeviceConfigBleActivity : AppCompatActivity() {
 
 
     private fun scanSingleBleDevice() {
-        val currentHomeId = HomeModel.INSTANCE.getCurrentHome(this)
         setPbViewVisible(true)
 
         // Scan Single Ble Device
-        ThingHomeSdk.getBleOperator().startLeScan(60 * 1000, ScanType.SINGLE) { bean ->
-            Log.i(TAG, "scanSingleBleDevice: deviceUUID=${bean.uuid}")
-            // Start configuration -- Single Ble Device
-            if (bean?.configType == BleConfigType.CONFIG_TYPE_SINGLE.type) {
-                ThingHomeSdk.getBleManager().startBleConfig(currentHomeId, bean.uuid, null,
-                        object : IThingBleConfigListener {
-                            override fun onSuccess(bean: DeviceBean?) {
-                                setPbViewVisible(false)
-                                Toast.makeText(
-                                        this@DeviceConfigBleActivity,
-                                        "Config Success",
-                                        Toast.LENGTH_LONG
-                                ).show()
-                                finish()
-                            }
+        activatorScanKey =
+            ThingActivatorCoreKit.getScanDeviceManager().startBlueToothDeviceSearch(
+                60 * 1000,
+                arrayListOf(ScanType.SINGLE),
+                object : ThingActivatorScanCallback {
+                    override fun deviceFound(deviceBean: ThingActivatorScanDeviceBean) {
+                        Log.i(TAG, "scanSingleBleDevice: uniqueId=${deviceBean.uniqueId}")
+                        startActivator(deviceBean)
+                    }
 
-                            override fun onFail(code: String?, msg: String?, handle: Any?) {
-                                setPbViewVisible(false)
-                                Toast.makeText(
-                                        this@DeviceConfigBleActivity,
-                                        "Config Failed",
-                                        Toast.LENGTH_LONG
-                                ).show()
-                            }
-                        })
+                    override fun deviceRepeat(deviceBean: ThingActivatorScanDeviceBean) {
+                    }
+
+                    override fun deviceUpdate(deviceBean: ThingActivatorScanDeviceBean) {
+                    }
+
+                    override fun scanFailure(failureBean: ThingActivatorScanFailureBean) {
+
+                    }
+
+                    override fun scanFinish() {
+
+                    }
+
+                }
+            )
+    }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        ThingActivatorCoreKit.getScanDeviceManager().stopScan(activatorScanKey)
+        activeManager.stopActive()
+    }
+
+    private fun startActivator(deviceBean: ThingActivatorScanDeviceBean) {
+        val activeManager = ThingActivatorCoreKit.getActiveManager().newThingActiveManager()
+        activeManager.startActive(ThingDeviceActiveBuilder().apply {
+            activeModel = deviceBean.supprotActivatorTypeList[0]
+            setActivatorScanDeviceBean(deviceBean)
+            timeOut = 60
+            relationId = HomeModel.INSTANCE.getCurrentHome(this@DeviceConfigBleActivity)
+            listener = object : IThingDeviceActiveListener {
+                override fun onActiveError(errorBean: ThingDeviceActiveErrorBean) {
+                    setPbViewVisible(false)
+                    Toast.makeText(
+                        this@DeviceConfigBleActivity,
+                        "Config Failed",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+
+                override fun onActiveLimited(limitBean: ThingDeviceActiveLimitBean) {
+                }
+
+                override fun onActiveSuccess(deviceBean: DeviceBean) {
+                    setPbViewVisible(false)
+                    Toast.makeText(
+                        this@DeviceConfigBleActivity,
+                        "Config Success",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    finish()
+                }
+
+                override fun onBind(devId: String) {
+                }
+
+                override fun onFind(devId: String) {
+                }
+
             }
-        }
+        })
     }
 
 
@@ -128,9 +187,9 @@ class DeviceConfigBleActivity : AppCompatActivity() {
 
 
     override fun onRequestPermissionsResult(
-            requestCode: Int,
-            permissions: Array<out String>,
-            grantResults: IntArray
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {

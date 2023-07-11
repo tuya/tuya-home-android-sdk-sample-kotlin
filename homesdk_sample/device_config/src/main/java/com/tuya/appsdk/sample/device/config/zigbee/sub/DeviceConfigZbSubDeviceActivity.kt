@@ -10,6 +10,13 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.google.android.material.progressindicator.CircularProgressIndicator
+import com.thingclips.smart.activator.core.kit.ThingActivatorCoreKit
+import com.thingclips.smart.activator.core.kit.active.inter.IThingActiveManager
+import com.thingclips.smart.activator.core.kit.bean.ThingDeviceActiveErrorBean
+import com.thingclips.smart.activator.core.kit.bean.ThingDeviceActiveLimitBean
+import com.thingclips.smart.activator.core.kit.builder.ThingDeviceActiveBuilder
+import com.thingclips.smart.activator.core.kit.constant.ThingDeviceActiveModeEnum
+import com.thingclips.smart.activator.core.kit.listener.IThingDeviceActiveListener
 import com.tuya.appsdk.sample.device.config.R
 import com.tuya.appsdk.sample.device.config.util.sp.Preference
 import com.thingclips.smart.home.sdk.ThingHomeSdk
@@ -39,6 +46,7 @@ class DeviceConfigZbSubDeviceActivity : AppCompatActivity() {
     var currentGatewayName: String by Preference(this, CURRENT_GATEWAY_NAME, "")
     var currentGatewayId: String by Preference(this, CURRENT_GATEWAY_ID, "")
 
+    var activeManager: IThingActiveManager? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,14 +67,18 @@ class DeviceConfigZbSubDeviceActivity : AppCompatActivity() {
         // choose zigBee gateway
         findViewById<TextView>(R.id.tv_current_zb_gateway).setOnClickListener {
             startActivityForResult(
-                    Intent(this, DeviceConfigChooseZbGatewayActivity::class.java),
-                    REQUEST_CODE
+                Intent(this, DeviceConfigChooseZbGatewayActivity::class.java), REQUEST_CODE
             )
         }
 
         btSearch.setOnClickListener {
             subDeviceConfiguration()
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        activeManager?.stopActive()
     }
 
 
@@ -80,43 +92,41 @@ class DeviceConfigZbSubDeviceActivity : AppCompatActivity() {
 
         Log.i(TAG, "subDeviceConfiguration: currentGatewayId=${currentGatewayId}")
         setPbViewVisible(true)
-        val builder = ThingGwSubDevActivatorBuilder()
-                .setDevId(currentGatewayId)
-                .setTimeOut(100)
-                .setListener(object : IThingSmartActivatorListener {
-                    override fun onError(errorCode: String?, errorMsg: String?) {
 
-                        setPbViewVisible(false)
-                        Toast.makeText(
-                                this@DeviceConfigZbSubDeviceActivity,
-                                "Active Error->$errorMsg",
-                                Toast.LENGTH_LONG
-                        ).show()
-                    }
+        activeManager = ThingActivatorCoreKit.getActiveManager().newThingActiveManager()
+        activeManager!!.startActive(ThingDeviceActiveBuilder().apply {
+            gwId = currentGatewayId
+            timeOut = 100
+            activeModel = ThingDeviceActiveModeEnum.SUB
+            listener = object : IThingDeviceActiveListener {
+                override fun onActiveError(errorBean: ThingDeviceActiveErrorBean) {
+                    setPbViewVisible(false)
+                    Toast.makeText(
+                        this@DeviceConfigZbSubDeviceActivity,
+                        "Active Error->${errorBean.errMsg}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
 
-                    override fun onActiveSuccess(devResp: DeviceBean?) {
-                        setPbViewVisible(false)
-                        Toast.makeText(
-                                this@DeviceConfigZbSubDeviceActivity,
-                                "Active Success",
-                                Toast.LENGTH_LONG
-                        ).show()
-                        finish()
-                    }
+                override fun onActiveLimited(limitBean: ThingDeviceActiveLimitBean) {
+                }
 
-                    override fun onStep(step: String?, data: Any?) {
-                        Log.i(TAG, "onStep: step->$step")
-                    }
-                })
+                override fun onActiveSuccess(deviceBean: DeviceBean) {
+                    setPbViewVisible(false)
+                    Toast.makeText(
+                        this@DeviceConfigZbSubDeviceActivity, "Active Success", Toast.LENGTH_LONG
+                    ).show()
+                    finish()
+                }
 
-        val tuyaGWSubActivator = ThingHomeSdk.getActivatorInstance().newGwSubDevActivator(builder)
+                override fun onBind(devId: String) {
+                }
 
-        // Start network configuration
-        tuyaGWSubActivator.start()
-        // Stop network configuration
-        // tuyaGWSubActivator.stop();
-        // Destroy
-        // tuyaGWSubActivator.onDestroy()
+                override fun onFind(devId: String) {
+                }
+
+            }
+        })
     }
 
 

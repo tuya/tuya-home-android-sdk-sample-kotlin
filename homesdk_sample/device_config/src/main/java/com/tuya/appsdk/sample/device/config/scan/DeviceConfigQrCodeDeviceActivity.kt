@@ -10,18 +10,28 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.alibaba.fastjson.JSONException
+import com.alibaba.fastjson.JSONObject
 import com.google.android.material.appbar.MaterialToolbar
-import com.tuya.appsdk.sample.device.config.R
-import com.tuya.appsdk.sample.resource.HomeModel
+import com.thingclips.smart.activator.core.kit.ThingActivatorCoreKit
+import com.thingclips.smart.activator.core.kit.ThingActivatorCoreKit.getRequestOperateManager
+import com.thingclips.smart.activator.core.kit.active.inter.IThingActiveManager
+import com.thingclips.smart.activator.core.kit.bean.ThingDeviceActiveErrorBean
+import com.thingclips.smart.activator.core.kit.bean.ThingDeviceActiveLimitBean
+import com.thingclips.smart.activator.core.kit.builder.ThingDeviceActiveBuilder
+import com.thingclips.smart.activator.core.kit.constant.ThingDeviceActiveModeEnum
+import com.thingclips.smart.activator.core.kit.listener.IThingDeviceActiveListener
+import com.thingclips.smart.activator.network.request.api.bean.ScanActionBean
+import com.thingclips.smart.android.network.Business.ResultListener
+import com.thingclips.smart.android.network.http.BusinessResponse
 import com.thingclips.smart.home.sdk.ThingHomeSdk
 import com.thingclips.smart.home.sdk.builder.ThingQRCodeActivatorBuilder
-import com.thingclips.smart.sdk.api.IThingDataCallback
 import com.thingclips.smart.sdk.api.IThingSmartActivatorListener
 import com.thingclips.smart.sdk.bean.DeviceBean
+import com.tuya.appsdk.sample.device.config.R
+import com.tuya.appsdk.sample.resource.HomeModel
 import com.uuzuche.lib_zxing.activity.CaptureActivity
 import com.uuzuche.lib_zxing.activity.CodeUtils
-import org.json.JSONObject
-import java.util.*
 
 /**
  * Qr Code
@@ -33,6 +43,8 @@ class DeviceConfigQrCodeDeviceActivity : AppCompatActivity(), View.OnClickListen
     private var topAppBar: MaterialToolbar? = null
     private var bt_search: Button? = null
     private var mUuid: String? = null
+
+    private var activeManager: IThingActiveManager? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.device_config_info_hint_activity)
@@ -99,38 +111,54 @@ class DeviceConfigQrCodeDeviceActivity : AppCompatActivity(), View.OnClickListen
         }
     }
 
-    private fun deviceQrCode(result: String?) {
-        val postData = HashMap<String, Any?>()
-        postData["code"] = result
-        ThingHomeSdk.getRequestInstance().requestWithApiNameWithoutSession(
-            "tuya.m.qrcode.parse",
-            "4.0",
-            postData,
-            String::class.java,
-            object : IThingDataCallback<String> {
-                override fun onSuccess(result: String) {
-                    initQrCode(result)
-                }
-
-                override fun onError(errorCode: String, errorMessage: String) {}
-            }
-        )
+    override fun onDestroy() {
+        super.onDestroy()
+        activeManager?.stopActive()
     }
 
-    private fun initQrCode(result: String) {
-        val homeId = HomeModel.INSTANCE.getCurrentHome(this)
-        val obj = JSONObject(result)
-        val actionObj = obj.optJSONObject("actionData")
-        if (null != actionObj) {
-            mUuid = actionObj.optString("uuid")
-            val builder = ThingQRCodeActivatorBuilder()
-                .setUuid(mUuid)
-                .setHomeId(homeId)
-                .setContext(this)
-                .setTimeOut(100)
-                .setListener(object : IThingSmartActivatorListener {
-                    override fun onError(errorCode: String, errorMsg: String) {}
-                    override fun onActiveSuccess(devResp: DeviceBean) {
+    private fun deviceQrCode(result: String?) {
+        getRequestOperateManager().parseQrCode(
+            result!!, object : ResultListener<ScanActionBean> {
+                override fun onFailure(
+                    bizResponse: BusinessResponse?,
+                    bizResult: ScanActionBean?,
+                    apiName: String?
+                ) {
+                }
+
+                override fun onSuccess(
+                    bizResponse: BusinessResponse?,
+                    bizResult: ScanActionBean?,
+                    apiName: String?
+                ) {
+                    initQrCode(bizResult)
+                }
+
+            })
+    }
+
+    private fun initQrCode(result: ScanActionBean?) {
+        if (result?.actionData == null) return
+
+        try {
+            val obj = JSONObject.parseObject(JSONObject.toJSONString(result.actionData))
+            val mUuid = obj.getString("uuid")
+            val homeId = HomeModel.INSTANCE.getCurrentHome(this)
+            activeManager = ThingActivatorCoreKit.getActiveManager().newThingActiveManager()
+            activeManager!!.startActive(ThingDeviceActiveBuilder().apply {
+                activeModel = ThingDeviceActiveModeEnum.QR
+                this.uuid = mUuid
+                context = this@DeviceConfigQrCodeDeviceActivity
+                timeOut = 100
+                relationId = homeId
+                listener = object : IThingDeviceActiveListener {
+                    override fun onActiveError(errorBean: ThingDeviceActiveErrorBean) {
+                    }
+
+                    override fun onActiveLimited(limitBean: ThingDeviceActiveLimitBean) {
+                    }
+
+                    override fun onActiveSuccess(deviceBean: DeviceBean) {
                         Toast.makeText(
                             this@DeviceConfigQrCodeDeviceActivity,
                             "ActiveSuccess",
@@ -138,12 +166,19 @@ class DeviceConfigQrCodeDeviceActivity : AppCompatActivity(), View.OnClickListen
                         ).show()
                     }
 
-                    override fun onStep(step: String, data: Any) {}
-                })
-            val iTuyaActivator = ThingHomeSdk.getActivatorInstance().newQRCodeDevActivator(builder)
-            iTuyaActivator.start()
+                    override fun onBind(devId: String) {
+                    }
+
+                    override fun onFind(devId: String) {
+                    }
+
+                }
+            })
+        } catch (e: JSONException) {
+
         }
     }
+
     companion object {
         private const val REQUEST_CODE_SCAN = 1
     }

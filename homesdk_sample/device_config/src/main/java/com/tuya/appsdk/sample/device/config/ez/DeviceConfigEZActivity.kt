@@ -22,6 +22,14 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.google.android.material.progressindicator.CircularProgressIndicator
+import com.thingclips.smart.activator.core.kit.ThingActivatorCoreKit
+import com.thingclips.smart.activator.core.kit.active.inter.IThingActiveManager
+import com.thingclips.smart.activator.core.kit.bean.ThingDeviceActiveErrorBean
+import com.thingclips.smart.activator.core.kit.bean.ThingDeviceActiveLimitBean
+import com.thingclips.smart.activator.core.kit.builder.ThingDeviceActiveBuilder
+import com.thingclips.smart.activator.core.kit.constant.ThingDeviceActiveModeEnum
+import com.thingclips.smart.activator.core.kit.devicecore.ThingActivatorDeviceCoreKit
+import com.thingclips.smart.activator.core.kit.listener.IThingDeviceActiveListener
 import com.tuya.appsdk.sample.device.config.R
 import com.tuya.appsdk.sample.resource.HomeModel
 import com.thingclips.smart.home.sdk.ThingHomeSdk
@@ -47,6 +55,8 @@ class DeviceConfigEZActivity : AppCompatActivity(), View.OnClickListener {
     lateinit var btnSearch: Button
     lateinit var mContentTv: TextView
 
+    private var activeManager: IThingActiveManager? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.device_config_activity)
@@ -56,12 +66,17 @@ class DeviceConfigEZActivity : AppCompatActivity(), View.OnClickListener {
             finish()
         }
         toolbar.title = getString(R.string.device_config_ez_title)
-        mContentTv=findViewById(R.id.content_tv)
-        mContentTv.text=getString(R.string.device_config_ez_description)
+        mContentTv = findViewById(R.id.content_tv)
+        mContentTv.text = getString(R.string.device_config_ez_description)
 
         cpiLoading = findViewById(R.id.cpiLoading)
         btnSearch = findViewById(R.id.btnSearch)
         btnSearch.setOnClickListener(this)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        activeManager?.stopActive()
     }
 
     override fun onClick(v: View?) {
@@ -72,72 +87,63 @@ class DeviceConfigEZActivity : AppCompatActivity(), View.OnClickListener {
             if (it == R.id.btnSearch) {
                 val homeId = HomeModel.INSTANCE.getCurrentHome(this)
                 // Get Network Configuration Token
-                ThingHomeSdk.getActivatorInstance().getActivatorToken(homeId,
-                        object : IThingActivatorGetToken {
-                            override fun onSuccess(token: String) {
-                                // Start network configuration -- EZ mode
-                                val builder = ActivatorBuilder()
-                                        .setSsid(strSsid)
-                                        .setContext(v.context)
-                                        .setPassword(strPassword)
-                                        .setActivatorModel(ActivatorModelEnum.THING_EZ)
-                                        .setTimeOut(100)
-                                        .setToken(token)
-                                        .setListener(object : IThingSmartActivatorListener {
+                ThingActivatorDeviceCoreKit.getActivatorInstance()
+                    .getActivatorToken(homeId, object : IThingActivatorGetToken {
+                        override fun onSuccess(mToken: String) {
+                            // Start network configuration -- EZ mode
+                            activeManager =
+                                ThingActivatorCoreKit.getActiveManager().newThingActiveManager()
+                            activeManager!!.startActive(ThingDeviceActiveBuilder().apply {
+                                activeModel = ThingDeviceActiveModeEnum.EZ
+                                ssid = strSsid
+                                password = strPassword
+                                token = mToken
+                                timeOut = 100
+                                context = this@DeviceConfigEZActivity
+                                listener = object : IThingDeviceActiveListener {
 
-                                            @Override
-                                            override fun onStep(step: String?, data: Any?) {
-                                                Log.i(TAG, "$step --> $data")
-                                            }
+                                    override fun onActiveError(errorBean: ThingDeviceActiveErrorBean) {
+                                        cpiLoading.visibility = View.GONE
+                                        btnSearch.isClickable = true
 
-                                            override fun onActiveSuccess(devResp: DeviceBean?) {
-                                                cpiLoading.visibility = View.GONE
+                                        Toast.makeText(
+                                            this@DeviceConfigEZActivity,
+                                            "Activate error-->${errorBean.errMsg}",
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                    }
 
-                                                Log.i(TAG, "Activate success")
-                                                Toast.makeText(
-                                                        this@DeviceConfigEZActivity,
-                                                        "Activate success",
-                                                        Toast.LENGTH_LONG
-                                                ).show()
+                                    override fun onActiveLimited(limitBean: ThingDeviceActiveLimitBean) {
+                                    }
 
-                                                finish()
-                                            }
+                                    override fun onActiveSuccess(deviceBean: DeviceBean) {
+                                        cpiLoading.visibility = View.GONE
 
-                                            override fun onError(
-                                                    errorCode: String?,
-                                                    errorMsg: String?
-                                            ) {
-                                                cpiLoading.visibility = View.GONE
-                                                btnSearch.isClickable = true
+                                        Log.i(TAG, "Activate success")
+                                        Toast.makeText(
+                                            this@DeviceConfigEZActivity,
+                                            "Activate success",
+                                            Toast.LENGTH_LONG
+                                        ).show()
 
-                                                Toast.makeText(
-                                                        this@DeviceConfigEZActivity,
-                                                        "Activate error-->$errorMsg",
-                                                        Toast.LENGTH_LONG
-                                                ).show()
-                                            }
-                                        }
-                                        )
+                                        finish()
+                                    }
 
-                                val mTuyaActivator =
-                                        ThingHomeSdk.getActivatorInstance().newMultiActivator(builder)
+                                    override fun onBind(devId: String) {
+                                    }
 
+                                    override fun onFind(devId: String) {
+                                    }
+                                }
+                            })
 
-                                //Start configuration
-                                mTuyaActivator.start()
+                            //Show loading progress, disable btnSearch clickable
+                            cpiLoading.visibility = View.VISIBLE
+                            btnSearch.isClickable = false
+                        }
 
-                                //Show loading progress, disable btnSearch clickable
-                                cpiLoading.visibility = View.VISIBLE
-                                btnSearch.isClickable = false
-
-                                //Stop configuration
-//                                mTuyaActivator.stop()
-                                //Exit the page to destroy some cache data and monitoring data.
-//                                mTuyaActivator.onDestroy()
-                            }
-
-                            override fun onFailure(s: String, s1: String) {}
-                        })
+                        override fun onFailure(s: String, s1: String) {}
+                    })
             }
         }
     }

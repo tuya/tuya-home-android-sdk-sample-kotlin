@@ -24,6 +24,14 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.google.android.material.progressindicator.CircularProgressIndicator
+import com.thingclips.smart.activator.core.kit.ThingActivatorCoreKit
+import com.thingclips.smart.activator.core.kit.active.inter.IThingActiveManager
+import com.thingclips.smart.activator.core.kit.bean.ThingDeviceActiveErrorBean
+import com.thingclips.smart.activator.core.kit.bean.ThingDeviceActiveLimitBean
+import com.thingclips.smart.activator.core.kit.builder.ThingDeviceActiveBuilder
+import com.thingclips.smart.activator.core.kit.constant.ThingDeviceActiveModeEnum
+import com.thingclips.smart.activator.core.kit.devicecore.ThingActivatorDeviceCoreKit
+import com.thingclips.smart.activator.core.kit.listener.IThingDeviceActiveListener
 import com.tuya.appsdk.sample.device.config.R
 import com.tuya.appsdk.sample.resource.HomeModel
 import com.thingclips.smart.home.sdk.ThingHomeSdk
@@ -55,6 +63,8 @@ class DeviceConfigAPActivity : AppCompatActivity(), View.OnClickListener {
     lateinit var strPassword: String
     lateinit var mContentTv: TextView
 
+    private lateinit var activatorManager: IThingActiveManager
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,8 +75,8 @@ class DeviceConfigAPActivity : AppCompatActivity(), View.OnClickListener {
             finish()
         }
         toolbar.title = getString(R.string.device_config_ap_title)
-        mContentTv=findViewById(R.id.content_tv)
-        mContentTv.text=getString(R.string.device_config_ap_description)
+        mContentTv = findViewById(R.id.content_tv)
+        mContentTv.text = getString(R.string.device_config_ap_description)
 
         cpiLoading = findViewById(R.id.cpiLoading)
         btnSearch = findViewById(R.id.btnSearch)
@@ -81,29 +91,25 @@ class DeviceConfigAPActivity : AppCompatActivity(), View.OnClickListener {
             if (it == R.id.btnSearch) {
                 val homeId = HomeModel.INSTANCE.getCurrentHome(this)
                 // Get Network Configuration Token
-                ThingHomeSdk.getActivatorInstance().getActivatorToken(homeId,
-                        object : IThingActivatorGetToken {
-                            override fun onSuccess(token: String) {
-                                mToken = token
-                                // Start network configuration -- AP mode
+                ThingActivatorDeviceCoreKit.getActivatorInstance().getActivatorToken(homeId,
+                    object : IThingActivatorGetToken {
+                        override fun onSuccess(token: String) {
+                            mToken = token
+                            // Start network configuration -- AP mode
 
-                                onClickSetting()
-                                //Stop configuration
+                            onClickSetting()
+                            //Stop configuration
 //                                mTuyaActivator.stop()
-                                //Exit the page to destroy some cache data and monitoring data.
+                            //Exit the page to destroy some cache data and monitoring data.
 //                                mTuyaActivator.onDestroy()
-                            }
+                        }
 
-                            override fun onFailure(s: String, s1: String) {
+                        override fun onFailure(s: String, s1: String) {
 
-                            }
-                        })
+                        }
+                    })
             }
         }
-    }
-
-    override fun onPause() {
-        super.onPause()
     }
 
     override fun onRestart() {
@@ -112,54 +118,53 @@ class DeviceConfigAPActivity : AppCompatActivity(), View.OnClickListener {
         cpiLoading.visibility = View.VISIBLE
         btnSearch.isClickable = false
         cpiLoading.isIndeterminate = true
-        val builder = ActivatorBuilder()
-                .setSsid(strSsid)
-                .setContext(this)
-                .setPassword(strPassword)
-                .setActivatorModel(ActivatorModelEnum.THING_AP)
-                .setTimeOut(100)
-                .setToken(mToken)
-                .setListener(object : IThingSmartActivatorListener {
 
-                    @Override
-                    override fun onStep(step: String?, data: Any?) {
-                        Log.i(TAG, "$step --> $data")
+        activatorManager = ThingActivatorCoreKit.getActiveManager().newThingActiveManager()
+        activatorManager.startActive(
+            ThingDeviceActiveBuilder().apply {
+                activeModel = ThingDeviceActiveModeEnum.AP
+                timeOut = 120
+                ssid = strSsid
+                password = strPassword
+                token = mToken
+                context = this@DeviceConfigAPActivity
+                listener = object : IThingDeviceActiveListener {
+                    override fun onActiveError(errorBean: ThingDeviceActiveErrorBean) {
+                        cpiLoading.visibility = View.GONE
+                        btnSearch.isClickable = true
+
+                        Toast.makeText(
+                            this@DeviceConfigAPActivity,
+                            "Activate error-->${errorBean.errMsg}",
+                            Toast.LENGTH_LONG
+                        ).show()
                     }
 
-                    override fun onActiveSuccess(devResp: DeviceBean?) {
+                    override fun onActiveLimited(limitBean: ThingDeviceActiveLimitBean) {
+                    }
+
+                    override fun onActiveSuccess(deviceBean: DeviceBean) {
                         cpiLoading.visibility = View.GONE
 
                         Log.i(TAG, "Activate success")
                         Toast.makeText(
-                                this@DeviceConfigAPActivity,
-                                "Activate success",
-                                Toast.LENGTH_LONG
+                            this@DeviceConfigAPActivity,
+                            "Activate success",
+                            Toast.LENGTH_LONG
                         ).show()
 
                         finish()
                     }
 
-                    override fun onError(
-                            errorCode: String?,
-                            errorMsg: String?
-                    ) {
-                        cpiLoading.visibility = View.GONE
-                        btnSearch.isClickable = true
-
-                        Toast.makeText(
-                                this@DeviceConfigAPActivity,
-                                "Activate error-->$errorMsg",
-                                Toast.LENGTH_LONG
-                        ).show()
+                    override fun onBind(devId: String) {
                     }
+
+                    override fun onFind(devId: String) {
+                    }
+
                 }
-                )
-        mTuyaActivator =
-            ThingHomeSdk.getActivatorInstance().newActivator(builder)
-        //Start configuration
-        mTuyaActivator?.start()
-
-
+            }
+        )
     }
 
     /**
@@ -171,7 +176,7 @@ class DeviceConfigAPActivity : AppCompatActivity(), View.OnClickListener {
         if (null == wifiSettingsIntent.resolveActivity(packageManager)) {
             wifiSettingsIntent = Intent(Settings.ACTION_WIFI_SETTINGS)
         }
-        if (null == wifiSettingsIntent.resolveActivity(packageManager)){
+        if (null == wifiSettingsIntent.resolveActivity(packageManager)) {
             return
         }
         startActivity(wifiSettingsIntent)
@@ -179,7 +184,7 @@ class DeviceConfigAPActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onDestroy() {
         super.onDestroy()
-        mTuyaActivator?.onDestroy()
+        activatorManager.stopActive()
     }
 
 }

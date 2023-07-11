@@ -2,23 +2,26 @@ package com.tuya.appsdk.sample.device.config.qrcode
 
 import android.graphics.Bitmap
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.*
+import android.widget.Button
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.google.zxing.WriterException
-import com.tuya.appsdk.sample.device.config.R
-import com.tuya.appsdk.sample.device.config.util.qrcode.DensityUtil
-import com.tuya.appsdk.sample.device.config.util.qrcode.QRCodeUtil
-import com.tuya.appsdk.sample.resource.HomeModel
-import com.thingclips.smart.home.sdk.ThingHomeSdk
+import com.thingclips.smart.activator.core.kit.devicecore.ThingActivatorDeviceCoreKit
 import com.thingclips.smart.home.sdk.builder.ThingCameraActivatorBuilder
 import com.thingclips.smart.sdk.api.IThingActivatorGetToken
 import com.thingclips.smart.sdk.api.IThingCameraDevActivator
 import com.thingclips.smart.sdk.api.IThingSmartCameraActivatorListener
 import com.thingclips.smart.sdk.bean.DeviceBean
+import com.tuya.appsdk.sample.device.config.R
+import com.tuya.appsdk.sample.device.config.util.qrcode.DensityUtil
+import com.tuya.appsdk.sample.device.config.util.qrcode.QRCodeUtil
+import com.tuya.appsdk.sample.resource.HomeModel
 
 /**
  * TODO feature
@@ -29,7 +32,6 @@ import com.thingclips.smart.sdk.bean.DeviceBean
 class QrCodeConfigActivity : AppCompatActivity(),View.OnClickListener{
     private var wifiSSId = ""
     private var wifiPwd = ""
-    private val mtoken = ""
     private lateinit var mIvQr: ImageView
     private lateinit var mLlInputWifi: LinearLayout
     private lateinit var mEtInputWifiSSid: EditText
@@ -63,7 +65,7 @@ class QrCodeConfigActivity : AppCompatActivity(),View.OnClickListener{
             val homeId: Long = HomeModel.INSTANCE.getCurrentHome(this)
 
             // Get Network Configuration Token
-            ThingHomeSdk.getActivatorInstance().getActivatorToken(homeId,
+            ThingActivatorDeviceCoreKit.getActivatorInstance().getActivatorToken(homeId,
                 object : IThingActivatorGetToken {
                     override fun onSuccess(token: String) {
                         //Create and show qrCode
@@ -95,7 +97,7 @@ class QrCodeConfigActivity : AppCompatActivity(),View.OnClickListener{
                                     Toast.makeText(this@QrCodeConfigActivity, "config success!", Toast.LENGTH_LONG).show()
                                 }
                             })
-                        mTuyaActivator = ThingHomeSdk.getActivatorInstance().newCameraDevActivator(builder)
+                        mTuyaActivator = ThingActivatorDeviceCoreKit.getActivatorInstance().newCameraDevActivator(builder)
                         mTuyaActivator?.createQRCode()
                         mTuyaActivator?.start()
                     }
