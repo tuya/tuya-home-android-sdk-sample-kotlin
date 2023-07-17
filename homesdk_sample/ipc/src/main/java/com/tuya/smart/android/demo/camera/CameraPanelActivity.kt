@@ -622,6 +622,68 @@ class CameraPanelActivity : AppCompatActivity(), View.OnClickListener {
         viewBinding.cameraControlBoard.recordTxt.isSelected = isRecording
     }
 
+    /**
+     * 设置智能画框的属性来控制框的样式（如框的颜色，画笔宽度，闪烁频率等），需要设备上报的 SEI 信息支持
+     *
+     * @param rectFeaturesJson 格式
+     * {
+     * "SmartRectFeature":[
+     * {
+     * "type":0,
+     * "index":0,
+     * "brushWidth":1,
+     * "flashFps":{
+     * "drawKeepFrames":2,
+     * "stopKeepFrames":2
+     * },
+     * "rgb":0xFF0000,
+     * "shape":0
+     * },
+     * {
+     * "type":0,
+     * "index":1,
+     * "brushWidth":2,
+     * "flashFps":{
+     * "drawKeepFrames":3,
+     * "stopKeepFrames":2
+     * },
+     * "rgb":0x00FF00,
+     * "shape":1
+     * }
+     * ]
+     * }
+     */
+    private fun setSmartRectFeatures(rectFeaturesJson: String) {
+        mCameraP2P?.setSmartRectFeatures(rectFeaturesJson)
+    }
+
+    /**
+     * 支持拉伸/缩放，左右/上下镜像，90/180/270度旋转等。
+     *
+     * @param renderFeaturesJson 格式
+     * {
+     * "DecPostProcess":{
+     * "video":[
+     * {
+     * "restype":"4",
+     * "oldres":"944*1080",
+     * "newres":"1920*1080"
+     * },
+     * {
+     * "restype":"2",
+     * "oldres":"944*1080",
+     * "newres":"1920*1080"
+     * }
+     * ],
+     * "mirror":0,
+     * "rotation":2
+     * }
+     * }
+     */
+    private fun setDeviceFeatures(renderFeaturesJson: String) {
+        mCameraP2P?.setDeviceFeatures(renderFeaturesJson)
+    }
+
     override fun onResume() {
         super.onResume()
         viewBinding.cameraVideoView.onResume()
