@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId "com.test007.demo"
-        minSdkVersion 21
+        minSdkVersion 23
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
@@ -54,6 +54,11 @@ android {
     }
 
 }
+
+configurations.all {
+    exclude group: "com.thingclips.smart" ,module: 'thingsmart-modularCampAnno'
+}
+
 
 dependencies {
 
