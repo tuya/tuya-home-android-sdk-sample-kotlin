@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:minWidth="480dp"
+    android:fitsSystemWindows="true">
+
+    <TextView
+        android:id="@+id/tv_add_member"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:text="@string/add_member"
+        android:textColor="@color/color_accent"
+        android:textSize="16sp"
+        android:gravity="center_vertical"
+        android:paddingLeft="21dp"
+        android:textStyle="bold"
+        android:background="@color/white"/>
+    <TextView
+        android:id="@+id/tv_invaition_member"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:text="@string/invaition_member"
+        android:textColor="@color/color_accent"
+        android:textSize="16sp"
+        android:gravity="center_vertical"
+        android:paddingLeft="21dp"
+        android:textStyle="bold"
+        android:background="@color/white"/>
+    <TextView
+        android:id="@+id/tv_leave_family"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:text="@string/family_leave"
+        android:textColor="@color/color_accent"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@color/white"/>
+
+</LinearLayout>

@@ -1,0 +1,100 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    namespace 'com.thing.appbizsdk.sample'
+    compileSdk 33
+    signingConfigs {
+        debug {
+            storeFile file("debug.keystore")
+            storePassword "android"
+            keyAlias "AndroidDebugKey"
+            keyPassword "android"
+            v1SigningEnabled true
+            v2SigningEnabled true
+        }
+    }
+    defaultConfig {
+        applicationId "com.thing.appbizsdk.sample"
+        minSdkVersion 23
+        targetSdkVersion 33
+        versionCode 1
+        versionName "1.0"
+        multiDexEnabled true
+
+        Properties properties = new Properties()
+        properties.load(project.rootProject.file('local.properties').newDataInputStream())
+        manifestPlaceholders = [
+                TUYA_SMART_APPKEY           : "${properties.getProperty("appKey")}",
+                TUYA_SMART_SECRET           : "${properties.getProperty("appSecret")}",
+                PACKAGE_NAME                : applicationId
+        ]
+        ndk {
+            abiFilters "armeabi-v7a", "arm64-v8a"
+        }
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    packagingOptions {
+        pickFirst 'lib/*/libc++_shared.so' // 多个aar存在此so，需要选择第一个
+        pickFirst 'lib/*/libgnustl_shared.so'//业务包需要
+        pickFirst 'lib/*/liblog.so'
+        pickFirst 'lib/*/libopenh264.so'
+    }
+    packagingOptions {
+        exclude 'AndroidManifest.xml'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+    buildFeatures {
+        viewBinding true
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: "libs", include: ["*.jar","*.aar"])
+
+    implementation "androidx.core:core-ktx:${kotlin_version}"
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'com.google.android.material:material:1.3.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.1'
+
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+
+    //demo use only start
+    api "com.thingclips.smart:thingsmart:${sdk_version}"
+    api 'com.thingclips.smart:thingsmart-demo-login:4.5.2'
+
+    implementation "com.thingclips.smart:thingsmart-expansion-sdk:${expansion_version}"
+//
+//    implementation "com.thingclips.smart:thingsmart-family-biz:${familybiz_version}"
+
+    implementation 'com.alibaba:fastjson:1.1.67.android'
+    implementation 'com.squareup.okhttp3:okhttp-urlconnection:3.14.9'
+    implementation "com.facebook.fresco:fresco:2.6.0"
+
+    implementation 'cn.yipianfengye.android:zxing-library:2.2'
+
+
+    implementation project(path: ':familybiz')
+    implementation project(path: ':activator')
+    implementation project(path: ':scenebiz')
+    implementation project(path: ':devicebiz')
+
+}
