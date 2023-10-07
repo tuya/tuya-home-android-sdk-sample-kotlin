@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:minWidth="480dp"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:id="@+id/aiv_family_name"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:paddingLeft="21dp"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:gravity="center_vertical"
+            android:ellipsize="end"
+            android:lines="1"
+            android:text="@string/familyname"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:singleLine="true"
+            android:textColor="@color/black"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tv_family"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:gravity="center_vertical"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="64dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:ellipsize="end"
+            android:lines="1"
+            android:singleLine="true"
+            android:textColor="@color/text_color"
+            android:textSize="16sp" />
+
+
+        <ImageView
+            android:id="@+id/imvset1"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="24dp"
+            android:layout_centerVertical="true"
+            android:scaleType="centerCrop"
+            android:layout_alignParentRight="true"
+            android:src="@mipmap/right"  />
+        <View
+            android:background="@color/gray"
+            android:layout_alignParentBottom="true"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"></View>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/aiv_room_manage"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginBottom="16dp"
+        android:paddingLeft="21dp"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:gravity="center_vertical"
+            android:ellipsize="end"
+            android:lines="1"
+            android:text="@string/room_manager"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:singleLine="true"
+            android:textColor="@color/black"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tv_room"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:gravity="center_vertical"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="64dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:ellipsize="end"
+            android:lines="1"
+            android:singleLine="true"
+            android:textColor="@color/text_color"
+            android:textSize="16sp" />
+
+
+        <ImageView
+            android:id="@+id/imvset2"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="24dp"
+            android:layout_centerVertical="true"
+            android:scaleType="centerCrop"
+            android:layout_alignParentRight="true"
+            android:src="@mipmap/right"  />
+        <View
+            android:background="@color/gray"
+            android:layout_alignParentBottom="true"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"></View>
+    </RelativeLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:gravity="center_vertical"
+        android:ellipsize="end"
+        android:lines="1"
+        android:text="@string/family_member"
+        android:paddingLeft="21dp"
+        android:layout_centerVertical="true"
+        android:layout_alignParentLeft="true"
+        android:singleLine="true"
+        android:textColor="@color/gray_85"
+        android:textSize="16sp" />
+
+</LinearLayout>

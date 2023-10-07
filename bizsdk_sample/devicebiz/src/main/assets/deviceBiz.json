@@ -1,0 +1,12 @@
+{
+  "deviceBiz": [
+    {
+      "deviceBizName": "设备信息",
+      "deviceBizId": "device_info"
+    },
+    {
+      "deviceBizName": "设备定时",
+      "deviceBizId": "device_timer"
+    }
+  ]
+}

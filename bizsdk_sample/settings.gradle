@@ -1,0 +1,6 @@
+rootProject.name = "BizSdkSample"
+include ':app'
+include ':familybiz'
+include ':activator'
+include ':scenebiz'
+include ':devicebiz'

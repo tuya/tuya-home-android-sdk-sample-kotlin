@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">bizsdk_sample</string>
+    <string name="action_settings">Settings</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <string name="my_default_family">我的家..</string>
+    <string name="deivce">设备(%d个设备%d分享设备)</string>
+    <string name="group">群组(%d个群组%d分享群组)</string>
+    <string name="activator_biz">配网业务</string>
+    <string name="scene_biz">场景业务(敬请期待)</string>
+    <string name="family_biz">家庭管理</string>
+    <string name="device_biz">设备管理</string>
+</resources>

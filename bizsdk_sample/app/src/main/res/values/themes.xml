@@ -1,0 +1,97 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.Bizsdk_sample" parent="AppTheme">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">#FF5800</item>
+        <item name="colorPrimaryVariant">#e54000</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondaryVariant">@color/teal_700</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
+        <!--        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>-->
+
+        <item name="app_bg_color">@color/app_bg_color</item>
+        <!--        <item name="color_accent">@color/color_accent</item>-->
+        <!--        <item name="line_color">@color/line_color</item>-->
+        <item name="list_primary_color">@color/list_primary_color</item>
+        <item name="list_secondary_color">@color/list_secondary_color</item>
+        <item name="app_name">@string/app_name</item>
+        <!--        <item name="status_bg_color">@color/status_bg_color</item>-->
+        <!-- Customize your theme here. -->
+    </style>
+    <style name="ProgressBar.Normal" parent="Widget.AppCompat.ProgressBar">
+        <item name="android:minWidth">23dp</item>
+        <item name="android:maxWidth">23dp</item>
+        <item name="android:minHeight">23dp</item>
+        <item name="android:maxHeight">23dp</item>
+        <item name="android:color">@color/color_626262</item>
+    </style>
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textColorSecondary">@android:color/white</item>
+        <item name="android:textColorHint">@android:color/darker_gray</item>
+        <item name="drawerArrowStyle">@android:style/DeviceDefault.ButtonBar</item>
+        <item name="searchViewStyle">@android:style/Widget.Material.SearchView</item>
+    </style>
+    <style name="Theme.Bizsdk_sample.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.Bizsdk_sample.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="Theme.Bizsdk_sample.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="ListItem.ItemNormal" parent="android:Widget">
+        <item name="android:layout_height">48dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:paddingLeft">16dp</item>
+        <item name="android:paddingRight">16dp</item>
+        <item name="android:paddingTop">@dimen/ts_12</item>
+        <item name="android:paddingBottom">@dimen/ts_12</item>
+        <item name="android:gravity">center_vertical|right</item>
+        <item name="android:textColor">@color/text_color</item>
+    </style>
+    <style name="toolbar_action_text" parent="android:TextAppearance.Holo.Widget.ActionBar.Menu">
+        <item name="android:textSize">@dimen/ts_17</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">@color/gray_85</item>
+        <item name="popupTheme">@style/ThemeOverlay.AppCompat.DayNight</item>
+        <item name="titleTextAppearance">@style/myActionTitleTextAppearance</item>
+        <item name="actionMenuTextColor">@style/myActionCenterMenuTextAppearance</item>
+
+    </style>
+    <style name="myActionMenuTextAppearance" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Menu">
+        <item name="android:textSize">@dimen/ts_17</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+    <style name="myActionTitleTextAppearance" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Menu">
+        <item name="android:textSize">@dimen/ts_17</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/gray_85</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+    <style name="myActionCenterMenuTextAppearance" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Menu">
+        <item name="android:textSize">@dimen/ts_17</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/menu_title_textcolor</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+    <style name="Progress.Dialog" parent="Theme.AppCompat.DayNight.Dialog">
+        <item name="colorAccent">@color/color_accent</item>
+        <item name="android:lineSpacingExtra">@dimen/wh_4</item>
+    </style>
+    <attr name="app_bg_color" format="color" />
+    <attr name="list_primary_color" format="color" />
+    <attr name="list_secondary_color" format="color" />
+    <attr format="string" name="app_name"/>
+
+
+    <color name="color_626262">#626262</color>
+    <color name="menu_title_textcolor">#ff1989fa</color>
+</resources>

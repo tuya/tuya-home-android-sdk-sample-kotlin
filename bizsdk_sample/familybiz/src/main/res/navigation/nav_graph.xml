@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph" >
+    <fragment
+        android:id="@+id/fragment_family_list"
+        android:name="com.thing.appbizsdk.familybiz.FamilyListFragment"
+        android:label="FamilyListFragment"
+        tools:layout="@layout/fragment_familylist" />
+
+    <fragment
+        android:id="@+id/fragment_family_setting"
+        android:name="com.thing.appbizsdk.familybiz.setting.FamilySettingFragment"
+        android:label="FamilySettingFragment"
+        tools:layout="@layout/fragment_familysetting" />
+    <fragment
+        android:id="@+id/fragment_room_setting"
+        android:name="com.thing.appbizsdk.familybiz.room.RoomSettingFragment"
+        android:label="RoomSettingFragment"
+        tools:layout="@layout/fragment_roomsetting" />
+    <fragment
+        android:id="@+id/fragment_room_dev_setting"
+        android:name="com.thing.appbizsdk.familybiz.roomdev.RoomDevSettingFragment"
+        android:label="RoomSettingFragment"
+        tools:layout="@layout/fragment_roomdev_setting">
+
+    </fragment>
+</navigation>
