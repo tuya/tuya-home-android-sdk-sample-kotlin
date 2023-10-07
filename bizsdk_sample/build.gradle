@@ -8,9 +8,8 @@ buildscript {
         expansion_version='5.5.4'//
     }
     repositories {
-        maven { url "https://maven.tuya-inc.top/repository/maven-android-pre/"}
-//        maven { url "https://maven-other.tuya.com/repository/maven-commercial-releases/" }
-//        maven { url "https://maven.tuya-inc.top/nexus/content/repositories/releases/"}
+        maven { url 'https://maven-other.tuya.com/repository/maven-releases/' }
+        maven { url "https://maven-other.tuya.com/repository/maven-commercial-releases/" }
 
         google()
         mavenCentral()
@@ -26,9 +25,9 @@ buildscript {
 
 allprojects {
     repositories {
-        maven { url "https://maven.tuya-inc.top/repository/maven-android-pre/"}
-//        maven { url "https://maven-other.tuya.com/repository/maven-commercial-releases/" }
-//        maven { url "https://maven.tuya-inc.top/nexus/content/repositories/releases/"}
+        maven { url 'https://maven-other.tuya.com/repository/maven-releases/' }
+        maven { url "https://maven-other.tuya.com/repository/maven-commercial-releases/" }
+
         google()
         mavenCentral()
         mavenLocal()
