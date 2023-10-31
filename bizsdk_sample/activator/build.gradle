@@ -49,6 +49,9 @@ dependencies {
     implementation 'com.alibaba:fastjson:1.1.67.android'
     implementation 'com.squareup.okhttp3:okhttp-urlconnection:3.14.9'
 
+
+//    implementation project(':base_res')
+
     implementation 'cn.yipianfengye.android:zxing-library:2.2'
 
     implementation "com.thingclips.smart:thingsmart-expansion-sdk:${expansion_version}"

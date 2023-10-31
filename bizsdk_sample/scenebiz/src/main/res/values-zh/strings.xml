@@ -1,0 +1,79 @@
+<resources>
+    <string name="title_activity_scene_main">联动列表</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+
+    <string name="add_scene">新增联动</string>
+    <string name="weather_list">气象类型</string>
+    <string name="choose_linkage">联动列表</string>
+    <string name="add_condition">新增条件</string>
+    <string name="add_action">新增动作</string>
+    <string name="title_condition">条件</string>
+    <string name="title_action">动作</string>
+
+    <string name="scene_ui_one_click_excute">一键执行</string>
+    <string name="scene_weather_change">气象变化时</string>
+    <string name="scene_position_change">位置变化时</string>
+    <string name="timer">定时</string>
+    <string name="scene_device_status_change">某设备状态变化时</string>
+    <string name="scene_recognize_face">识别到人脸</string>
+    <string name="thing_scene_member_back_home">家人回家</string>
+
+    <string name="thing_scene_create_tip_click_excute">例如：一键关闭卧室所有的灯</string>
+    <string name="thing_scene_create_tip_weather_change">例如：当所在城市温度>28℃时</string>
+    <string name="thing_scene_create_tip_position_change">例如：离开家后</string>
+    <string name="thing_scene_create_tip_timer">例如：每天早上7点</string>
+    <string name="thing_scene_create_tip_device_status_change">例如：当报警器检测报警时</string>
+    <string name="thing_scene_create_tip_recognize_face">例如：识别到人脸</string>
+    <string name="thing_scene_create_tip_member_go_home">例如：母亲节，当母亲进门时</string>
+
+    <string name="thing_smart_scene_edit_equal">等于</string>
+    <string name="thing_smart_scene_edit_lessthan">小于</string>
+    <string name="thing_smart_scene_edit_morethan">大于</string>
+
+    <string name="weekday">工作日</string>
+    <string name="weekend">周末</string>
+    <string name="everyday">每天</string>
+    <string name="clock_timer_once">一次</string>
+
+    <string name="thing_scene_date">yyyyMMdd</string>
+
+    <string name="scene_name_hint">请设定场景名称</string>
+
+    <string name="scene_all_day">全天</string>
+    <string name="scene_day">白天</string>
+    <string name="scene_night">夜间</string>
+
+    <string name="thing_smart_scene_save">保存</string>
+    <string name="satisfy_following_conditions">添加条件</string>
+    <string name="add_execute_action">添加任务</string>
+
+    <string name="scene_control_single_device">控制单个设备</string>
+    <string name="scene_execute_smart">选择已有智能场景</string>
+    <string name="scene_send_message">发送通知提醒</string>
+    <string name="scene_delay">延时执行</string>
+    <string name="choose_linkage_explain">联动类型说明：M角标表示一键执行，A角标表示自动化。自动化可以选择标记启用或禁用，一键执行直接选择。目前样例只做自动化的启用</string>
+    <string name="linkage_badge_explain">联动类型说明：M角标表示一键执行，A角标表示自动化</string>
+    <string name="scene_push_message_phone">消息中心</string>
+    <string name="scene_phone_notice">来电提醒</string>
+    <string name="scene_note_notice">短信提醒</string>
+    <string name="phone_notify_expired">电话通知已过期</string>
+
+    <string name="thing_countdown_hour">时</string>
+    <string name="thing_countdown_minute">分</string>
+    <string name="thing_countdown_second">秒</string>
+
+    <string name="scene_family_member_go_home">家人回家</string>
+    <string name="scene_sunsetrise">日落日出</string>
+    <string name="thing_scene_dp_duration">持续时间</string>
+    <string name="thing_temp_celsius">c</string>
+    <string name="confirm">确认</string>
+
+    <string name="scene_condition_type_and">当满足所有条件时</string>
+    <string name="scene_condition_type_or">当满足任一条件时</string>
+</resources>

@@ -63,7 +63,7 @@ class MainActivity : AppCompatActivity(), IHomeView {
         }
         binding.scene.setOnClickListener {
             val i = Intent()
-            i.setClassName(this@MainActivity, "com.tuya.appbizsdk.scenebiz.SceneMainActivity")
+            i.setClassName(this@MainActivity, "com.tuya.appbizsdk.scenebiz.main.SceneMainActivity")
             startActivity(i)
         }
         binding.device.setOnClickListener {

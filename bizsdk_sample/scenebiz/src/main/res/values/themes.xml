@@ -8,4 +8,14 @@
     <style name="Theme.BizSdkSample.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="Theme.BizSdkSample.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="FullDialog" parent="Theme.AppCompat.DayNight.Dialog">
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowEnterAnimation">@anim/scene_popup_scale_in</item>
+        <item name="android:windowExitAnimation">@anim/scene_slide_none</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowCloseOnTouchOutside">false</item>
+    </style>
 </resources>
