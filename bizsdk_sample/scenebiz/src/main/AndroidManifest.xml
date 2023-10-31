@@ -3,10 +3,24 @@
 
     <application>
         <activity
-            android:name=".SceneMainActivity"
+            android:name=".main.SceneMainActivity"
             android:exported="false"
-            android:label="@string/title_activity_scene_main"
-            android:theme="@style/Theme.BizSdkSample.NoActionBar" />
+            android:label="@string/title_activity_scene_main" />
+
+        <activity
+            android:name=".detail.SceneDetailActivity"
+            android:exported="false"
+            android:label="@string/add_scene" />
+
+        <activity
+            android:name=".cond.WeatherListActivity"
+            android:exported="false"
+            android:label="@string/weather_list" />
+
+        <activity
+            android:name=".act.LinkageChooseListActivity"
+            android:exported="false"
+            android:label="@string/choose_linkage" />
     </application>
 
 </manifest>

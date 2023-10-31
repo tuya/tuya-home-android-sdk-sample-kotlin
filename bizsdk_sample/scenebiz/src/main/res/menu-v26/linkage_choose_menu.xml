@@ -1,0 +1,10 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_next"
+        android:icon="@drawable/cell_ic_arrow_24dp"
+        android:iconTint="@color/color_white"
+        android:iconTintMode="src_in"
+        android:title="@string/next"
+        app:showAsAction="always" />
+</menu>

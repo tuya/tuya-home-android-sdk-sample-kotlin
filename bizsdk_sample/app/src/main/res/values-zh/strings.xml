@@ -14,7 +14,7 @@
     <string name="deivce">设备(%d个设备%d分享设备)</string>
     <string name="group">群组(%d个群组%d分享群组)</string>
     <string name="activator_biz">配网业务</string>
-    <string name="scene_biz">场景业务(敬请期待)</string>
+    <string name="scene_biz">场景业务</string>
     <string name="family_biz">家庭管理</string>
     <string name="device_biz">设备管理</string>
 </resources>

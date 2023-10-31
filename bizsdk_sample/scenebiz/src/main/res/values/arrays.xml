@@ -1,0 +1,6 @@
+<resources>
+    <string-array name="match_type_options_array">
+        <item>@string/scene_condition_type_and</item>
+        <item>@string/scene_condition_type_or</item>
+    </string-array>
+</resources>
