@@ -18,9 +18,11 @@ import com.thingclips.smart.family.callback.IFamilyDataCallback
 import com.thingclips.smart.home.sdk.ThingHomeSdk
 import com.thingclips.smart.scene.api.IResultCallback
 import com.thingclips.smart.scene.api.service.IBaseService
+import com.thingclips.smart.scene.api.service.IExtService
 import com.thingclips.smart.scene.model.NormalScene
 import com.thingclips.smart.scene.model.action.SceneAction
 import com.thingclips.smart.scene.model.condition.SceneCondition
+import com.thingclips.smart.scene.model.constant.CONDITION_TYPE_GEO_FENCING
 import com.thingclips.smart.scene.model.constant.CONDITION_TYPE_MANUAL
 import com.thingclips.smart.scene.model.constant.SceneType
 import com.thingclips.smart.scene.model.constant.TimeInterval
@@ -54,6 +56,7 @@ class SceneDetailActivity : AppCompatActivity() {
     private var editScene: NormalScene? = null
 
     private val baseService: IBaseService? = ThingHomeSdk.getSceneServiceInstance()?.baseService()
+    private val extService: IExtService? = ThingHomeSdk.getSceneServiceInstance()?.extService()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -321,10 +324,21 @@ class SceneDetailActivity : AppCompatActivity() {
                                 val msg1 = "saveScene onSuccess, result: $result"
                                 Log.i(TAG, msg1)
                                 Toast.makeText(this@SceneDetailActivity, "saveScene succeed.", Toast.LENGTH_LONG).show()
+                                // 注册地理围栏
+                                if (result?.conditions?.any { condition -> condition.entityType == CONDITION_TYPE_GEO_FENCING } == true) {
+                                    val geofenceCondition = result.conditions?.find { condition -> condition.entityType == CONDITION_TYPE_GEO_FENCING }
+                                    geofenceCondition?.let { condition ->
+                                        extService?.addGeofence(condition)
+                                    }
+                                }
                                 finish()
                             }
                         }
                         if (sceneId == null) {
+                            // 自动启用自动化
+                            if(normalScene.sceneType() == SceneType.SCENE_TYPE_AUTOMATION){
+                                normalScene.isEnabled = true
+                            }
                             baseService?.saveScene(it, normalScene, cb)
                         } else {
                             baseService?.modifyScene(sceneId!!, normalScene, cb)
