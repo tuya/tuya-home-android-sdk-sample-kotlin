@@ -28,11 +28,11 @@ import com.thingclips.smart.family.bean.MemberBean
 import com.thingclips.smart.home.sdk.anntation.MemberRole
 import kotlinx.coroutines.launch
 
-class FamilySettingFragment: Fragment(), OnItemClickListener, OnHeadFootClickListener {
+class FamilySettingFragment : Fragment(), OnItemClickListener, OnHeadFootClickListener {
     private val viewModel: FamilyManagerModel by activityViewModels()
     private lateinit var binding: FragmentFamilysettingBinding
     private var familyAdapter: FamilySettingAdapter? = null
-    private var settingFamilybean:FamilyBean? = null
+    private var settingFamilybean: FamilyBean? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -54,20 +54,20 @@ class FamilySettingFragment: Fragment(), OnItemClickListener, OnHeadFootClickLis
         initBackPressed()
         initData()
 
-        viewModel.mMemberList.observe(viewLifecycleOwner){
-            familyAdapter?.notifyDataSetChanged(it,viewModel.isAdmin)
+        viewModel.mMemberList.observe(viewLifecycleOwner) {
+            familyAdapter?.notifyDataSetChanged(it, viewModel.isAdmin)
         }
         viewModel.mRefreshFamilybean.observe(viewLifecycleOwner) {
             settingFamilybean = it
-            familyAdapter?.updateHead( it)
+            familyAdapter?.updateHead(it)
         }
-        lifecycleScope.launch {
+        lifecycleScope.launchWhenResumed {
             viewModel.delFamilybean.collect {
                 NavHostFragment.findNavController(this@FamilySettingFragment).popBackStack()
             }
         }
-        lifecycleScope.launch {
-            viewModel.mInvitationMessageBean.collect{
+        lifecycleScope.launchWhenResumed {
+            viewModel.mInvitationMessageBean.collect {
                 Toast.makeText(
                     requireContext(),
                     it.invitationMsgContent,
@@ -75,20 +75,19 @@ class FamilySettingFragment: Fragment(), OnItemClickListener, OnHeadFootClickLis
                 )
             }
         }
-        lifecycleScope.launch {
-            viewModel.errorEvent.collect {
-                Toast.makeText(
-                    requireContext(),
-                    it.second,
-                    Toast.LENGTH_LONG
-                ).show()
-            }
+        viewModel.errorEvent.observe(viewLifecycleOwner) {
+            Toast.makeText(
+                requireContext(),
+                it.second,
+                Toast.LENGTH_SHORT
+            ).show()
         }
+
     }
 
     private fun initData() {
         settingFamilybean = arguments?.get("family") as FamilyBean
-        familyAdapter?.updateHead( settingFamilybean)
+        familyAdapter?.updateHead(settingFamilybean)
         settingFamilybean?.homeId?.let {
             viewModel.getFamilyDetail(it)
             viewModel.getMemberList(it)
@@ -98,26 +97,26 @@ class FamilySettingFragment: Fragment(), OnItemClickListener, OnHeadFootClickLis
 
 
     override fun onItemClick(memberBean: MemberBean?) {
-        if(viewModel.mCurMemberBen == null || memberBean== null){
+        if (viewModel.mCurMemberBen == null || memberBean == null) {
             return
         }
-        if(viewModel.isAdmin && (viewModel.mCurMemberBen!!.role <= memberBean!!.role)){
+        if (viewModel.isAdmin && (viewModel.mCurMemberBen!!.role <= memberBean!!.role)) {
             Toast.makeText(
                 requireContext(),
                 getString(R.string.member_can_not_delete_tip),
-                Toast.LENGTH_LONG
+                Toast.LENGTH_SHORT
             )
             return
         }
-        showUpdateMemberDialog(requireContext(),memberBean)
+        showUpdateMemberDialog(requireContext(), memberBean)
 
     }
 
     override fun onLongItemClick(memberBean: MemberBean?) {
-        if(viewModel.mCurMemberBen == null || memberBean== null){
+        if (viewModel.mCurMemberBen == null || memberBean == null) {
             return
         }
-        if(viewModel.isAdmin && (viewModel.mCurMemberBen!!.role <= memberBean!!.role)){
+        if (viewModel.isAdmin && (viewModel.mCurMemberBen!!.role <= memberBean!!.role)) {
             Toast.makeText(
                 requireContext(),
                 getString(R.string.member_can_not_delete_tip),
@@ -128,7 +127,7 @@ class FamilySettingFragment: Fragment(), OnItemClickListener, OnHeadFootClickLis
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.confirm_delete_member))
             .setPositiveButton(getString(R.string.confirm)) { d, _ ->
-                settingFamilybean?.homeId?.let { viewModel.deleteMember(it,memberBean) }
+                settingFamilybean?.homeId?.let { viewModel.deleteMember(it, memberBean) }
                 d.dismiss()
             }
             .setNegativeButton(getString(R.string.cancel)) { d, _ ->
@@ -142,32 +141,33 @@ class FamilySettingFragment: Fragment(), OnItemClickListener, OnHeadFootClickLis
     }
 
     override fun onRoomManageClick() {
-        view?.let { Navigation.findNavController(it).navigate( R.id.fragment_room_setting, Bundle().apply {
-            settingFamilybean?.homeId?.let { it1 -> putLong("homeId", it1) }
-        }) }
+        view?.let {
+            Navigation.findNavController(it).navigate(R.id.fragment_room_setting, Bundle().apply {
+                settingFamilybean?.homeId?.let { it1 -> putLong("homeId", it1) }
+            })
+        }
     }
 
     override fun onLeaveFamilyClick() {
-       if(viewModel.isOwn ){
-           if(viewModel.isCanTransferOwn ) {
-               Toast.makeText(
-                   activity,
-                   getString(R.string.family_can_not_delete_tip),
-                   Toast.LENGTH_LONG
-               ).show()
-               return
-           }else{
-               viewModel.dismissfamily(settingFamilybean?.homeId)
-           }
-       }else {
-           viewModel.leavefamily(settingFamilybean?.homeId)
-       }
+        if (viewModel.isOwn) {
+            if (viewModel.isCanTransferOwn) {
+                Toast.makeText(
+                    activity,
+                    getString(R.string.family_can_not_delete_tip),
+                    Toast.LENGTH_LONG
+                ).show()
+                return
+            } else {
+                viewModel.dismissfamily(settingFamilybean?.homeId)
+            }
+        } else {
+            viewModel.leavefamily(settingFamilybean?.homeId)
+        }
     }
 
     override fun onAddMemberClick() {
-       showAddMemberDialog()
+        showAddMemberDialog()
     }
-
 
 
     override fun onInvationMemberClick() {
@@ -215,7 +215,7 @@ class FamilySettingFragment: Fragment(), OnItemClickListener, OnHeadFootClickLis
                     lat = -73.9385
                     address = radioButton2.text.toString()
                 }
-                viewModel.updateFamily(name,lon,lat,address,settingFamilybean)
+                viewModel.updateFamily(name, lon, lat, address, settingFamilybean)
                 d.dismiss()
             }
             .setNegativeButton(getString(R.string.cancel)) { d, _ ->
@@ -223,6 +223,7 @@ class FamilySettingFragment: Fragment(), OnItemClickListener, OnHeadFootClickLis
             }
             .show()
     }
+
     private fun showAddMemberDialog() {
         val inputLayout = TextInputLayout(requireContext()).apply {
             hint = getString(R.string.add_member_name_hint)
@@ -284,7 +285,8 @@ class FamilySettingFragment: Fragment(), OnItemClickListener, OnHeadFootClickLis
             .show()
 
     }
-    private fun showUpdateMemberDialog(context: Context,member:MemberBean) {
+
+    private fun showUpdateMemberDialog(context: Context, member: MemberBean) {
         val inputLayout = TextInputLayout(requireContext()).apply {
             hint = getString(R.string.add_member_name_hint)
             setPadding(32, 0, 32, 0)
@@ -304,7 +306,7 @@ class FamilySettingFragment: Fragment(), OnItemClickListener, OnHeadFootClickLis
         }
         radioGroup.addView(radioButton1)
         radioGroup.addView(radioButton2)
-        if(viewModel.isOwn && viewModel.isCanTransferOwn ) {
+        if (viewModel.isOwn && viewModel.isCanTransferOwn) {
             val radioButton3 = MaterialRadioButton(requireContext()).apply {
                 text = "own"
             }
@@ -324,14 +326,14 @@ class FamilySettingFragment: Fragment(), OnItemClickListener, OnHeadFootClickLis
                 var role = MemberRole.ROLE_OWNER
                 if (radioGroup.checkedRadioButtonId == radioButton1.id) {
                     role = MemberRole.ROLE_ADMIN
-                } else if(radioGroup.checkedRadioButtonId == radioButton2.id){
+                } else if (radioGroup.checkedRadioButtonId == radioButton2.id) {
                     role = MemberRole.ROLE_CUSTOM
                 }
                 member.memberName = name
                 member.role = role
-                if(role == MemberRole.ROLE_OWNER){
-                    settingFamilybean?.homeId?.let { viewModel.transferOwner(it,member) }
-                }else {
+                if (role == MemberRole.ROLE_OWNER) {
+                    settingFamilybean?.homeId?.let { viewModel.transferOwner(it, member) }
+                } else {
                     viewModel.updateMember(member)
                 }
 
@@ -342,6 +344,7 @@ class FamilySettingFragment: Fragment(), OnItemClickListener, OnHeadFootClickLis
             }
             .show()
     }
+
     private fun initBackPressed() {
         val obj = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {

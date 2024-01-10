@@ -39,10 +39,18 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.9.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation "androidx.recyclerview:recyclerview:1.2.1"
+
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+
     implementation "androidx.navigation:navigation-fragment-ktx:${navigation_fragment_ktx}"
     implementation "androidx.navigation:navigation-ui-ktx:${navigation_ui_ktx}"
 
+    api "com.thingclips.smart:thingsmart:${sdk_version}"
+    implementation "com.thingclips.smart:thingsmart-expansion-sdk:${expansion_version}"
+    implementation 'com.google.android.gms:play-services-maps:17.0.0'
+    implementation 'com.google.android.gms:play-services-location:17.0.0'
+    implementation 'com.alibaba:fastjson:1.1.67.android'
 }

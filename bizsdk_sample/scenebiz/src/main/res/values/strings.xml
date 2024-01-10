@@ -1,11 +1,79 @@
 <resources>
-    <string name="title_activity_scene_main">SceneMainActivity</string>
+    <string name="title_activity_scene_main">Linkage List</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
     <string name="second_fragment_label">Second Fragment</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
-
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+
+    <string name="add_scene">New Linkage</string>
+    <string name="weather_list">Meteorological Type List</string>
+    <string name="choose_linkage">Choose Linkage</string>
+    <string name="add_condition">New Condition</string>
+    <string name="add_action">New Action</string>
+    <string name="title_condition">Conditions</string>
+    <string name="title_action">Actions</string>
+
+    <string name="scene_ui_one_click_excute">Tap-to-Run</string>
+    <string name="scene_weather_change">When weather changes</string>
+    <string name="scene_position_change">When location changes</string>
+    <string name="timer">Schedule</string>
+    <string name="scene_device_status_change">When device status changes</string>
+    <string name="scene_recognize_face">Detected a human face</string>
+    <string name="thing_scene_member_back_home">Family Member Going Home</string>
+
+    <string name="thing_scene_create_tip_click_excute">Example: turn off all lights in the bedroom with one tap.</string>
+    <string name="thing_scene_create_tip_device_status_change">Example: when an unusual activity is detected.</string>
+    <string name="thing_scene_create_tip_member_go_home">Example: when mom comes home on Mother\'s Day.</string>
+    <string name="thing_scene_create_tip_position_change">Example: after you leave home.</string>
+    <string name="thing_scene_create_tip_recognize_face">Example: when a visitor comes.</string>
+    <string name="thing_scene_create_tip_timer">Example: 7:00 a.m. every morning.</string>
+    <string name="thing_scene_create_tip_weather_change">Example: when local temperature is greater than 28°C.</string>
+
+    <string name="thing_smart_scene_edit_equal">=</string>
+    <string name="thing_smart_scene_edit_lessthan">&lt;</string>
+    <string name="thing_smart_scene_edit_morethan">&gt;</string>
+
+    <string name="weekday">Weekday</string>
+    <string name="weekend">Weekend</string>
+    <string name="everyday">Every day</string>
+    <string name="clock_timer_once">Once</string>
+
+    <string name="thing_scene_date">yyyyMMdd</string>
+
+    <string name="scene_name_hint">Please input scene name</string>
+
+    <string name="scene_all_day">All day</string>
+    <string name="scene_day">Daytime</string>
+    <string name="scene_night">Night</string>
+
+    <string name="thing_smart_scene_save">Save</string>
+    <string name="satisfy_following_conditions">Add Condition</string>
+    <string name="add_execute_action">Add Task</string>
+
+    <string name="scene_control_single_device">Control Single Device</string>
+    <string name="scene_execute_smart">Select smart scenes</string>
+    <string name="scene_send_message">Send notification</string>
+    <string name="scene_delay">Delay the action</string>
+    <string name="choose_linkage_explain">Description of linkage type: M sign indicates one-click execution, and A sign indicates automation. Automation can be enabled or disabled with one click. The current sample only enables automated activation.</string>
+    <string name="linkage_badge_explain">Description of linkage type: M sign indicates one-click execution, and A sign indicates automation.</string>
+    <string name="scene_push_message_phone">Message Center</string>
+    <string name="scene_phone_notice">Phone Notification</string>
+    <string name="scene_note_notice">Message Notification</string>
+    <string name="phone_notify_expired">Phone notification has expired</string>
+
+    <string name="thing_countdown_hour">h</string>
+    <string name="thing_countdown_minute">min</string>
+    <string name="thing_countdown_second">s</string>
+
+    <string name="scene_family_member_go_home">Family Member Going Home</string>
+    <string name="scene_sunsetrise">Sunset and Sunrise</string>
+    <string name="thing_scene_dp_duration">Duration</string>
+    <string name="thing_temp_celsius">c</string>
+    <string name="confirm">Confirm</string>
+
+    <string name="scene_condition_type_and">When all conditions are met</string>
+    <string name="scene_condition_type_or">When any condition is met</string>
 </resources>

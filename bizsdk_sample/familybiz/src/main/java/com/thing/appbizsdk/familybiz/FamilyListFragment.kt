@@ -57,15 +57,15 @@ class FamilyListFragment : Fragment(), FamilyListAdapter.OnFamilyMenuItemClickLi
                 updateList(it)
             }
         }
-        lifecycleScope.launch {
-            viewModel.errorEvent.collect {
-                Toast.makeText(
-                    requireContext(),
-                    it.second,
-                    Toast.LENGTH_LONG
-                ).show()
-            }
+
+        viewModel.errorEvent.observe(viewLifecycleOwner) {
+            Toast.makeText(
+                requireContext(),
+                it.second,
+                Toast.LENGTH_LONG
+            ).show()
         }
+
     }
 
     private fun updateList(familyBeans: List<FamilyBean>) {
@@ -75,7 +75,7 @@ class FamilyListFragment : Fragment(), FamilyListAdapter.OnFamilyMenuItemClickLi
     override fun onClickFamily(home: FamilyBean) {
         if (home.familyStatus == HomeStatus.WAITING) {
             showInvitationDialog(home)
-        }else {
+        } else {
             view?.let {
                 Navigation.findNavController(it)
                     .navigate(R.id.fragment_family_setting, Bundle().apply {

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/color_white">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/linkage_badge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/color_blue"
+        android:gravity="center"
+        android:minWidth="24dp"
+        android:minHeight="24dp"
+        android:textColor="@android:color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="M" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/cell_linkage_list"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        app:layout_constraintEnd_toStartOf="@+id/mch_linkage"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/mch_linkage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/cell_linkage_list"
+        app:layout_constraintEnd_toStartOf="@+id/linkage_badge"
+        app:layout_constraintStart_toEndOf="@+id/cell_linkage_list"
+        app:layout_constraintTop_toTopOf="@+id/cell_linkage_list"
+        tools:checked="true" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

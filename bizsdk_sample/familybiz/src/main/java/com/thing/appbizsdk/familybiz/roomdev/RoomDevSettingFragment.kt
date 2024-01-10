@@ -47,22 +47,22 @@ class RoomDevSettingFragment : Fragment(), RoomDevSettingAdapter.OnAddRemoveList
         initData()
         initView()
         initBackPressed()
-        viewModel.mAllDevList.observe(viewLifecycleOwner){
+        viewModel.mAllDevList.observe(viewLifecycleOwner) {
             val noids = ArrayList(it).apply {
                 settingRoomBean?.ids?.let { it1 -> removeAll(it1) }
             }
-            roomAdapter?.notifyDataChange(settingRoomBean?.ids,noids)
+            roomAdapter?.notifyDataChange(settingRoomBean?.ids, noids)
         }
-        viewModel.mRefreshRoombean.observe(viewLifecycleOwner){
+        viewModel.mRefreshRoombean.observe(viewLifecycleOwner) {
             settingRoomBean = it
             val newids = ArrayList(viewModel.mAllDevList.value).apply {
                 removeAll(it.ids)
             }
-            roomAdapter?.notifyDataChange(it?.ids,newids)
+            roomAdapter?.notifyDataChange(it?.ids, newids)
             roomAdapter?.updateName(it?.name)
         }
         lifecycleScope.launch {
-            viewModel.sortDevInRoomBean.collect{
+            viewModel.sortDevInRoomBean.collect {
                 if (!NavHostFragment.findNavController(this@RoomDevSettingFragment)
                         .popBackStack()
                 ) {
@@ -70,39 +70,40 @@ class RoomDevSettingFragment : Fragment(), RoomDevSettingAdapter.OnAddRemoveList
                 }
             }
         }
-        lifecycleScope.launch {
-            viewModel.errorEvent.collect {
-                Toast.makeText(
-                    requireContext(),
-                    it.second,
-                    Toast.LENGTH_LONG
-                ).show()
-            }
+
+        viewModel.errorEvent.observe(viewLifecycleOwner) {
+            Toast.makeText(
+                requireContext(),
+                it.second,
+                Toast.LENGTH_LONG
+            ).show()
         }
+
     }
 
     private fun initView() {
         binding.recyclerview.layoutManager = LinearLayoutManager(context)
-        roomAdapter = RoomDevSettingAdapter(requireContext(),settingRoomBean?.name?:"")
+        roomAdapter = RoomDevSettingAdapter(requireContext(), settingRoomBean?.name ?: "")
         binding.recyclerview.adapter = roomAdapter
-        val itemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN,0) {
-            override fun onMove(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                target: RecyclerView.ViewHolder
-            ): Boolean {
-                val fromPosition = viewHolder.adapterPosition
-                val toPosition = target.adapterPosition
-                roomAdapter?.moveItem(fromPosition, toPosition)
-                isUpdate = true
-                return true
+        val itemTouchHelperCallback =
+            object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0) {
+                override fun onMove(
+                    recyclerView: RecyclerView,
+                    viewHolder: RecyclerView.ViewHolder,
+                    target: RecyclerView.ViewHolder
+                ): Boolean {
+                    val fromPosition = viewHolder.adapterPosition
+                    val toPosition = target.adapterPosition
+                    roomAdapter?.moveItem(fromPosition, toPosition)
+                    isUpdate = true
+                    return true
+                }
+
+                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+
+                }
+
             }
-
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-
-            }
-
-        }
 
         val itemTouchHelper = ItemTouchHelper(itemTouchHelperCallback)
         itemTouchHelper.attachToRecyclerView(binding.recyclerview)
@@ -113,7 +114,7 @@ class RoomDevSettingFragment : Fragment(), RoomDevSettingAdapter.OnAddRemoveList
     private fun initData() {
         settingRoomBean = arguments?.get("roomBean") as TRoomBean
         homeId = arguments?.getLong("homeId")
-        if(viewModel.mAllDevList.value == null){
+        if (viewModel.mAllDevList.value == null) {
             homeId?.let { viewModel.getAllDevInRoomList(it) }
         }
 
@@ -127,11 +128,14 @@ class RoomDevSettingFragment : Fragment(), RoomDevSettingAdapter.OnAddRemoveList
                         .setTitle(getString(R.string.confirm_save))
                         .setMessage(getString(R.string.confirm_save_desc_sortroomindev))
                         .setPositiveButton(getString(R.string.confirm)) { _, _ ->
-                            settingRoomBean?.let { roomAdapter?.mInRoomDevList?.let { it1 ->
-                                viewModel.sortDevInRoom(it,
-                                    it1
-                                )
-                            } }
+                            settingRoomBean?.let {
+                                roomAdapter?.mInRoomDevList?.let { it1 ->
+                                    viewModel.sortDevInRoom(
+                                        it,
+                                        it1
+                                    )
+                                }
+                            }
                         }
                         .setNegativeButton(getString(R.string.cancel)) { _, _ ->
                             if (!NavHostFragment.findNavController(this@RoomDevSettingFragment)
@@ -159,10 +163,10 @@ class RoomDevSettingFragment : Fragment(), RoomDevSettingAdapter.OnAddRemoveList
             .setTitle(getString(R.string.confirmation_delete_tip))
             .setMessage(getString(R.string.confirmation_delete_desc_removeinroom))
             .setPositiveButton(getString(R.string.confirm)) { _, _ ->
-                roomAdapter?.mInRoomDevList?.get(position-1)?.let {
+                roomAdapter?.mInRoomDevList?.get(position - 1)?.let {
                     settingRoomBean?.let { it1 ->
                         viewModel.deleteDevFromRoom(
-                            it , it1
+                            it, it1
                         )
                     }
                 }
@@ -172,12 +176,14 @@ class RoomDevSettingFragment : Fragment(), RoomDevSettingAdapter.OnAddRemoveList
     }
 
     override fun onAdd(position: Int) {
-        val remove: DeviceInRoomBean? = roomAdapter?.mOutRoomDevList?.removeAt(position - 2 -(roomAdapter?.mInRoomDevList?.size?:0) )
+        val remove: DeviceInRoomBean? = roomAdapter?.mOutRoomDevList?.removeAt(
+            position - 2 - (roomAdapter?.mInRoomDevList?.size ?: 0)
+        )
         roomAdapter?.notifyItemRemoved(position)
         if (remove != null) {
             roomAdapter?.mInRoomDevList?.add(remove)
         }
-        roomAdapter?.notifyItemInserted(roomAdapter?.mInRoomDevList?.size?:0)
+        roomAdapter?.notifyItemInserted(roomAdapter?.mInRoomDevList?.size ?: 0)
         isUpdate = true
     }
 
