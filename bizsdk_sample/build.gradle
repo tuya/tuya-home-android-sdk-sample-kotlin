@@ -37,6 +37,8 @@ allprojects {
         
     }
     configurations.all {
+        // i.e use google geofence in demo project
+        exclude group: "com.thingclips.smart", module: "thingsmart-geofence-huawei"
         exclude group:"com.thingclips.smart",module:"thingplugin-annotation"
         exclude group:"com.thingclips.android.module",module:"thingmodule-annotation"
         exclude group: "com.thingclips.smart" ,module: 'thingsmart-modularCampAnno'
