@@ -32,6 +32,9 @@ android {
         manifestPlaceholders = [
                 TUYA_SMART_APPKEY           : "${properties.getProperty("appKey")}",
                 TUYA_SMART_SECRET           : "${properties.getProperty("appSecret")}",
+                //4.In the local.properties file, add googleMapKey:
+                //googleMapKey=your_google_map_key, In order to build and run smoothly, you can configure any one, but Google Maps will definitely not be usable.
+                GOOGLE_MAP_KEY              : "${properties.getProperty("googleMapKey")}",
                 PACKAGE_NAME                : applicationId
         ]
         ndk {
@@ -69,7 +72,7 @@ android {
 }
 
 dependencies {
-    //4.Remember to add the downloaded security library（security-algorithm-1.0.0-beta.aar） to the libs folder.
+    //5.Remember to add the downloaded security library（security-algorithm-1.0.0-beta.aar） to the libs folder.
     implementation fileTree(dir: "libs", include: ["*.jar","*.aar"])
 
     implementation "androidx.core:core-ktx:${kotlin_version}"
