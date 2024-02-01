@@ -11,5 +11,6 @@
     <string name="device_mgt_control">Device Control</string>
     <string name="device_mgt_remove">Remove</string>
     <string name="device_mgt_reset">Reset Factory</string>
+    <string name="quick_op_area">quick op area</string>
 
 </resources>

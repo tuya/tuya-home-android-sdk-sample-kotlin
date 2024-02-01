@@ -18,14 +18,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.thingclips.smart.home.sdk.ThingHomeSdk
+import com.thingclips.smart.home.sdk.bean.HomeBean
+import com.thingclips.smart.home.sdk.callback.IThingHomeResultCallback
+import com.tuya.appsdk.sample.device.mgt.DeviceDataHandler
 import com.tuya.appsdk.sample.device.mgt.R
 import com.tuya.appsdk.sample.device.mgt.list.adapter.DeviceMgtAdapter
 import com.tuya.appsdk.sample.device.mgt.list.enum.DeviceListTypePage
 import com.tuya.appsdk.sample.resource.HomeModel
-import com.thingclips.smart.home.sdk.ThingHomeSdk
-import com.thingclips.smart.home.sdk.bean.HomeBean
-import com.thingclips.smart.home.sdk.callback.IThingHomeResultCallback
-import com.thingclips.smart.sdk.bean.DeviceBean
 
 /**
  * Device Management initial device data sample
@@ -37,6 +37,8 @@ class DeviceMgtListActivity : AppCompatActivity() {
 
     lateinit var adapter: DeviceMgtAdapter
     var type = DeviceListTypePage.NORMAL_DEVICE_LIST
+
+    private lateinit var dataHandler: DeviceDataHandler
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,7 +54,8 @@ class DeviceMgtListActivity : AppCompatActivity() {
         val rvList = findViewById<RecyclerView>(R.id.rvList)
         rvList.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
 
-        adapter = DeviceMgtAdapter(type)
+        adapter = DeviceMgtAdapter(this, type)
+        dataHandler = DeviceDataHandler(this, adapter)
         rvList.adapter = adapter
     }
 
@@ -79,24 +82,20 @@ class DeviceMgtListActivity : AppCompatActivity() {
          */
         ThingHomeSdk.newHomeInstance(homeId).getHomeDetail(object : IThingHomeResultCallback {
             override fun onSuccess(bean: HomeBean?) {
-                bean?.let { it ->
-                    if (type == DeviceListTypePage.NORMAL_DEVICE_LIST) {
-                        adapter.data = it.deviceList as ArrayList<DeviceBean>
-                        adapter.notifyDataSetChanged()
-                    } else {
-                        adapter.data = it.deviceList.filter {
-                            it.isZigBeeWifi
-                        } as ArrayList<DeviceBean>
-                        adapter.notifyDataSetChanged()
+                dataHandler.execute {
+                    bean?.let { it ->
+                        if (type == DeviceListTypePage.NORMAL_DEVICE_LIST) {
+                            dataHandler.updateAdapter(it.deviceList)
+                        } else {
+                            dataHandler.updateAdapter(it.deviceList.filter { it.isZigBeeWifi })
+                        }
                     }
                 }
-
             }
 
             override fun onError(errorCode: String?, errorMsg: String?) {
 
             }
-
         })
     }
 }
