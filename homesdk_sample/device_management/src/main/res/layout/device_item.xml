@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="16dp"
+    android:layout_marginTop="12dp"
+    android:layout_marginEnd="16dp"
+    android:background="@drawable/card_bg"
+    android:minWidth="121dp">
+
+    <View
+        android:id="@+id/anchor"
+        android:layout_width="1px"
+        android:layout_height="104dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/iconView"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        app:layout_constraintBottom_toBottomOf="@id/anchor"
+        app:layout_constraintStart_toEndOf="@+id/anchor"
+        app:layout_constraintTop_toTopOf="@+id/anchor"
+        tools:background="@android:color/holo_red_light" />
+
+    <Space
+        android:id="@+id/center"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        app:layout_constraintBottom_toBottomOf="@id/anchor"
+        app:layout_constraintEnd_toStartOf="@+id/switchButton"
+        app:layout_constraintStart_toEndOf="@+id/iconView"
+        app:layout_constraintTop_toTopOf="@+id/anchor" />
+
+    <ImageView
+        android:id="@+id/switchButton"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginRight="16dp"
+        app:layout_constraintBottom_toBottomOf="@id/anchor"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/center"
+        app:layout_constraintTop_toTopOf="@id/anchor" />
+
+    <TextView
+        android:id="@+id/deviceName"
+        android:layout_width="0dp"
+        android:layout_height="24dp"
+        android:ellipsize="end"
+        android:lines="1"
+        android:textColor="#e6000000"
+        android:textSize="17dp"
+        android:textStyle="bold"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintStart_toStartOf="@id/center"
+        app:layout_constraintEnd_toEndOf="@id/center"
+        app:layout_constraintTop_toTopOf="@id/center"
+        app:layout_constraintBottom_toTopOf="@id/statusView"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="照明照照明照照明照照明照照明照照明照照明照照明照照明照照明照照明照" />
+
+    <TextView
+        android:id="@+id/statusView"
+        android:layout_width="0dp"
+        android:layout_height="20dp"
+        android:ellipsize="end"
+        android:gravity="center_vertical"
+        android:lines="1"
+        android:textSize="13dp"
+        android:visibility="gone"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toEndOf="@id/center"
+        app:layout_constraintStart_toStartOf="@id/center"
+        app:layout_constraintTop_toBottomOf="@id/deviceName"
+        app:layout_constraintBottom_toTopOf="@id/devFuncView"
+        tools:text="测试传感区域过程会怎么样呢测试传感区域过程会怎么样呢" />
+
+    <TextView
+        android:id="@+id/devFuncView"
+        android:layout_width="wrap_content"
+        android:layout_height="16dp"
+        android:layout_marginTop="4dp"
+        android:gravity="center"
+        android:text="@string/quick_op_area"
+        android:textColor="#ff00cc99"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/statusView"
+        app:layout_constraintBottom_toBottomOf="@id/center"
+        app:layout_constraintStart_toStartOf="@id/center"
+        android:textSize="11dp" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/center" />
+</androidx.constraintlayout.widget.ConstraintLayout>

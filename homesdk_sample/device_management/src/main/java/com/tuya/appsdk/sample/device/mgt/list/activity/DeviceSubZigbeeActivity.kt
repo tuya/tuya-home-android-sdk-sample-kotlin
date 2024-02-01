@@ -13,6 +13,7 @@ import com.tuya.appsdk.sample.device.mgt.list.enum.DeviceListTypePage
 import com.thingclips.smart.home.sdk.ThingHomeSdk
 import com.thingclips.smart.sdk.api.IThingDataCallback
 import com.thingclips.smart.sdk.bean.DeviceBean
+import com.tuya.appsdk.sample.device.mgt.DeviceDataHandler
 
 
 /**
@@ -23,54 +24,47 @@ import com.thingclips.smart.sdk.bean.DeviceBean
  */
 class DeviceSubZigbeeActivity : AppCompatActivity() {
 
+    private lateinit var adapter: DeviceMgtAdapter
+    private lateinit var deviceId: String
+    private lateinit var dataHandler: DeviceDataHandler
 
-    lateinit var adapter: DeviceMgtAdapter
-
-    lateinit var deviceId: String
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.device_mgt_activity_list)
         deviceId = intent.getStringExtra("deviceId").toString()
-
-
 
         initToolbar()
 
         val rvList = findViewById<RecyclerView>(R.id.rvList)
         rvList.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
 
-        adapter = DeviceMgtAdapter(DeviceListTypePage.ZIGBEE_SUB_DEVICE_LIST)
+        adapter = DeviceMgtAdapter(this, DeviceListTypePage.ZIGBEE_SUB_DEVICE_LIST)
+        dataHandler = DeviceDataHandler(this, adapter)
         rvList.adapter = adapter
 
-
         getZbSubDeviceList()
-
     }
 
 
     // Get Sub-devices
     private fun getZbSubDeviceList() {
         ThingHomeSdk.newGatewayInstance(deviceId)
-                .getSubDevList(object : IThingDataCallback<List<DeviceBean>> {
-                    override fun onSuccess(result: List<DeviceBean>?) {
-                        result?.let {
-                            adapter.data = it as ArrayList<DeviceBean>
-                            adapter.notifyDataSetChanged()
-                        }
+            .getSubDevList(object : IThingDataCallback<List<DeviceBean>> {
+                override fun onSuccess(result: List<DeviceBean>?) {
+                    dataHandler.execute {
+                        dataHandler.updateAdapter(result ?: arrayListOf())
                     }
+                }
 
-                    override fun onError(errorCode: String?, errorMessage: String?) {
-                        Toast.makeText(
-                                this@DeviceSubZigbeeActivity,
-                                "Error->$errorMessage",
-                                Toast.LENGTH_LONG
-                        ).show()
-                    }
-
-                })
-
+                override fun onError(errorCode: String?, errorMessage: String?) {
+                    Toast.makeText(
+                        this@DeviceSubZigbeeActivity,
+                        "Error->$errorMessage",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            })
     }
-
 
     private fun initToolbar() {
         val toolbar: Toolbar = findViewById<View>(R.id.topAppBar) as Toolbar
