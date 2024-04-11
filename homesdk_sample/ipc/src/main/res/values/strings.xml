@@ -93,4 +93,6 @@
     <string name="ipc_sdk_service_running">running</string>
     <string name="ipc_sdk_service_expired">expired</string>
     <string name="ipc_sdk_no_service">no service</string>
+    <string name="multi_camera_title">Multi Video</string>
+    <string name="ipc_video_talk_title">Video Call</string>
 </resources>

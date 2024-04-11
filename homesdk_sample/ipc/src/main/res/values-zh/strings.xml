@@ -94,4 +94,7 @@
     <string name="ipc_sdk_service_running">正常</string>
     <string name="ipc_sdk_service_expired">已过期</string>
     <string name="ipc_sdk_no_service">无服务</string>
+    <string name="multi_camera_title">多目 Demo</string>
+    <string name="ipc_video_talk_title">视频通话</string>
+
 </resources>

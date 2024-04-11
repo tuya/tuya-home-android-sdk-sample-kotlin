@@ -13,15 +13,18 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.android.material.textfield.TextInputEditText
+import com.thingclips.smart.android.ble.api.BleConfigType
+import com.thingclips.smart.android.ble.api.ScanType
+import com.thingclips.smart.home.sdk.ThingHomeSdk
+import com.thingclips.smart.sdk.api.IExtMultiModeActivatorListener
+import com.thingclips.smart.sdk.api.IThingActivatorGetToken
+import com.thingclips.smart.sdk.bean.DeviceBean
+import com.thingclips.smart.sdk.bean.MultiModeActivatorBean
+import com.thingclips.smart.sdk.bean.PauseStateData
 import com.tuya.appsdk.sample.device.config.R
 import com.tuya.appsdk.sample.device.config.ble.DeviceConfigBleActivity
 import com.tuya.appsdk.sample.resource.HomeModel
-import com.thingclips.smart.android.ble.api.BleConfigType
-import com.thingclips.smart.android.ble.api.IThingBleConfigListener
-import com.thingclips.smart.android.ble.api.ScanType
-import com.thingclips.smart.home.sdk.ThingHomeSdk
-import com.thingclips.smart.sdk.api.IThingActivatorGetToken
-import com.thingclips.smart.sdk.bean.DeviceBean
+
 
 /**
  * Device Configuration Dual Device Sample
@@ -78,7 +81,6 @@ class DeviceConfigDualActivity : AppCompatActivity() {
             scanDualBleDevice()
 
         }
-
     }
 
 
@@ -94,21 +96,21 @@ class DeviceConfigDualActivity : AppCompatActivity() {
     // You need to check permissions before using Bluetooth devices
     private fun checkPermission() {
         if (ContextCompat.checkSelfPermission(
-                        this,
-                        Manifest.permission.ACCESS_COARSE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-                || ContextCompat.checkSelfPermission(
-                        this,
-                        Manifest.permission.ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+            || ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
         ) {
             ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(
-                            Manifest.permission.ACCESS_COARSE_LOCATION,
-                            Manifest.permission.ACCESS_FINE_LOCATION
-                    ),
-                    DeviceConfigBleActivity.REQUEST_CODE
+                this,
+                arrayOf(
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ),
+                DeviceConfigBleActivity.REQUEST_CODE
             )
         }
     }
@@ -130,61 +132,67 @@ class DeviceConfigDualActivity : AppCompatActivity() {
 
                 //  Get Network Configuration Token
                 ThingHomeSdk.getActivatorInstance().getActivatorToken(homeId,
-                        object : IThingActivatorGetToken {
-                            override fun onSuccess(token: String) {
+                    object : IThingActivatorGetToken {
+                        override fun onSuccess(token: String?) {
+                            var multiModeActivatorBean = MultiModeActivatorBean()
+                            multiModeActivatorBean.deviceType = bean.deviceType
+                            multiModeActivatorBean.uuid = bean.uuid
+                            multiModeActivatorBean.address = bean.address
+                            multiModeActivatorBean.mac = bean.mac
+                            multiModeActivatorBean.ssid = etSsid.text.toString()
+                            multiModeActivatorBean.pwd = etPassword.text.toString()
+                            multiModeActivatorBean.token = token
+                            multiModeActivatorBean.homeId = homeId
+                            multiModeActivatorBean.timeout = 120 * 1000
 
-                                // Start configuration -- Dual Ble Device
-                                val param = mutableMapOf<String, String>()
-                                param["ssid"] = etSsid.text.toString()
-                                param["password"] = etPassword.text.toString()
-                                param["token"] = token
-                                ThingHomeSdk.getBleManager()
-                                        .startBleConfig(homeId, bean.uuid, param as Map<String, String>,
-                                                object : IThingBleConfigListener {
-                                                    override fun onSuccess(bean: DeviceBean?) {
-                                                        setPbViewVisible(false)
-                                                        Toast.makeText(
-                                                                this@DeviceConfigDualActivity,
-                                                                "Config Success",
-                                                                Toast.LENGTH_LONG
-                                                        ).show()
-                                                        finish()
-                                                    }
+                            // start activator
+                            ThingHomeSdk.getActivator().newMultiModeActivator().startActivator(
+                                multiModeActivatorBean,
+                                object : IExtMultiModeActivatorListener {
+                                    override fun onActivatorStatePauseCallback(stateData: PauseStateData?) {
+                                        //queryWifiList(stateData.uuid);
+                                    }
 
-                                                    override fun onFail(
-                                                            code: String?,
-                                                            msg: String?,
-                                                            handle: Any?
-                                                    ) {
-                                                        setPbViewVisible(false)
-                                                        finish()
-                                                        Toast.makeText(
-                                                                this@DeviceConfigDualActivity,
-                                                                "Config Failed",
-                                                                Toast.LENGTH_LONG
-                                                        ).show()
-                                                    }
-                                                })
-                            }
+                                    override fun onSuccess(deviceBean: DeviceBean?) {
+                                        setPbViewVisible(false)
+                                        Toast.makeText(
+                                            this@DeviceConfigDualActivity,
+                                            "Config Success",
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                        finish()
+                                    }
 
-                            override fun onFailure(errorCode: String?, errorMsg: String?) {
-                                setPbViewVisible(false)
-                                Toast.makeText(
-                                        this@DeviceConfigDualActivity,
-                                        "Error->$errorMsg",
-                                        Toast.LENGTH_LONG
-                                ).show()
-                            }
-                        })
+                                    override fun onFailure(code: Int, msg: String, handle: Any?) {
+                                        setPbViewVisible(false)
+                                        finish()
+                                        Toast.makeText(
+                                            this@DeviceConfigDualActivity,
+                                            "Config Failed",
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                    }
+                                })
+                        }
+
+                        override fun onFailure(errorCode: String?, errorMsg: String?) {
+                            setPbViewVisible(false)
+                            Toast.makeText(
+                                this@DeviceConfigDualActivity,
+                                "Error->$errorMsg",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    })
             }
         }
     }
 
 
     override fun onRequestPermissionsResult(
-            requestCode: Int,
-            permissions: Array<out String>,
-            grantResults: IntArray
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray,
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 

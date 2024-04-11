@@ -61,5 +61,8 @@
     <string name="device_biz_list">Device Biz List</string>
     <string name="timer_list">Timer list</string>
     <string name="device_info">Device info</string>
+    <string name="update_success">update success</string>
+    <string name="device_offline_remind">Offline Remind</string>
+    <string name="device_offline_remind_tip">The device does not support offline reminders</string>
     <string name="title_activity_device_info">DeviceInfoActivity</string>
 </resources>

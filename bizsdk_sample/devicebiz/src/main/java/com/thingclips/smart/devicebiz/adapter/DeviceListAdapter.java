@@ -13,12 +13,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.thingclips.smart.devicebiz.DeviceListActivity;
 import com.thingclips.smart.devicebiz.R;
+import com.thingclips.smart.devicebiz.bean.ItemBean;
 
 import java.util.List;
 
 
 public class DeviceListAdapter extends RecyclerView.Adapter<DeviceListAdapter.ViewHolder> {
-    private List<DeviceListActivity.ItemBean> mData;
+    private List<ItemBean> mData;
 
     private OnItemClickListener mOnItemClickListener;
 
@@ -34,17 +35,21 @@ public class DeviceListAdapter extends RecyclerView.Adapter<DeviceListAdapter.Vi
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder viewHolder, int position) {
-        final DeviceListActivity.ItemBean bean = mData.get(position);
+        final ItemBean bean = mData.get(position);
         if (bean == null) {
             return;
         }
         if (!TextUtils.isEmpty(bean.getIconUrl())) {
             Uri uri = Uri.parse(bean.getIconUrl());
             viewHolder.icon.setImageURI(uri);
-
         }
-        viewHolder.title.setText(bean.getTitle());
 
+        viewHolder.title.setText(bean.getTitle());
+        if (TextUtils.isEmpty(bean.getDevId()) && bean.getGroupId() > 0) {
+            viewHolder.isGroup.setVisibility(View.VISIBLE);
+        } else {
+            viewHolder.isGroup.setVisibility(View.GONE);
+        }
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -64,7 +69,7 @@ public class DeviceListAdapter extends RecyclerView.Adapter<DeviceListAdapter.Vi
         this.mOnItemClickListener = l;
     }
 
-    public void setData(List<DeviceListActivity.ItemBean> beans) {
+    public void setData(List<ItemBean> beans) {
         mData = beans;
         notifyDataSetChanged();
     }
@@ -72,15 +77,17 @@ public class DeviceListAdapter extends RecyclerView.Adapter<DeviceListAdapter.Vi
     static class ViewHolder extends RecyclerView.ViewHolder {
         SimpleDraweeView icon;
         TextView title;
+        TextView isGroup;
 
         public ViewHolder(View itemView) {
             super(itemView);
             icon = itemView.findViewById(R.id.home_item_icon);
             title = itemView.findViewById(R.id.home_item_title);
+            isGroup = itemView.findViewById(R.id.isGroup);
         }
     }
 
     public interface OnItemClickListener {
-        void onItemClick(DeviceListActivity.ItemBean bean, int position);
+        void onItemClick(ItemBean bean, int position);
     }
 }

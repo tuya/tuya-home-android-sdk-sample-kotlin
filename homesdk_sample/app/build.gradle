@@ -2,10 +2,7 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
 }
-
-if (new File("thingMapping.gradle").exists()) {
-    apply from : "thingMapping.gradle"
-}
+apply from : "thingMapping.gradle"
 
 android {
     compileSdkVersion 30
@@ -62,7 +59,6 @@ configurations.all {
     exclude group: "com.thingclips.smart" ,module: 'thingsmart-modularCampAnno'
 }
 
-
 dependencies {
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
@@ -85,7 +81,6 @@ dependencies {
     implementation project(":device_config")
     implementation project(":device_management")
     implementation project(":ipc")
-    implementation project(":sweeper")
     implementation 'cn.yipianfengye.android:zxing-library:2.2'
 
 

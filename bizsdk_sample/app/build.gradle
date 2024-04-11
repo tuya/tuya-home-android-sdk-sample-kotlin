@@ -8,7 +8,7 @@ android {
     compileSdk 33
     signingConfigs {
         debug {
-            storeFile file("debug.keystore") //1.Replace with the added SHA256 debug certificate file containing your own information.
+            storeFile file("debug.keystore")
             storePassword "android"
             keyAlias "AndroidDebugKey"
             keyPassword "android"
@@ -17,23 +17,18 @@ android {
         }
     }
     defaultConfig {
-        applicationId "com.thing.appbizsdk.sample" //2.Use your own app ID
+        applicationId "com.thing.appbizsdk.sample"
         minSdkVersion 23
         targetSdkVersion 33
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
 
-        //3.In the local.properties file, add appKey and appSecret:
-        //appKey=your_app_key
-        //appSecret=your_app_secret
         Properties properties = new Properties()
         properties.load(project.rootProject.file('local.properties').newDataInputStream())
         manifestPlaceholders = [
                 TUYA_SMART_APPKEY           : "${properties.getProperty("appKey")}",
                 TUYA_SMART_SECRET           : "${properties.getProperty("appSecret")}",
-                //4.In the local.properties file, add googleMapKey:
-                //googleMapKey=your_google_map_key, In order to build and run smoothly, you can configure any one, but Google Maps will definitely not be usable.
                 GOOGLE_MAP_KEY              : "${properties.getProperty("googleMapKey")}",
                 PACKAGE_NAME                : applicationId
         ]
@@ -72,7 +67,6 @@ android {
 }
 
 dependencies {
-    //5.Remember to add the downloaded security library（security-algorithm-1.0.0-beta.aar） to the libs folder.
     implementation fileTree(dir: "libs", include: ["*.jar","*.aar"])
 
     implementation "androidx.core:core-ktx:${kotlin_version}"

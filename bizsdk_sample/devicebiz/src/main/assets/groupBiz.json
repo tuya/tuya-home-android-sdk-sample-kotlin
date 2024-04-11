@@ -1,0 +1,12 @@
+{
+  "deviceBiz": [
+    {
+      "deviceBizName": "群组信息",
+      "deviceBizId": "group_info"
+    },
+    {
+      "deviceBizName": "群组编辑",
+      "deviceBizId": "group_edit"
+    }
+  ]
+}

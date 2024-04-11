@@ -41,6 +41,8 @@ dependencies {
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
-    api 'com.thingclips.smart:thingsmart:5.8.1'
+    api('com.thingclips.smart:thingsmart:5.11.1') {
+        exclude group: 'com.thingclips.smart', module: 'thingsmart-asynclib'
+    }
 
 }
