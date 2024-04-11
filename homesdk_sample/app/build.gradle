@@ -2,7 +2,10 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
 }
-apply from : "thingMapping.gradle"
+
+if (new File("thingMapping.gradle").exists()) {
+    apply from : "thingMapping.gradle"
+}
 
 android {
     compileSdkVersion 30
@@ -81,6 +84,7 @@ dependencies {
     implementation project(":device_config")
     implementation project(":device_management")
     implementation project(":ipc")
+    implementation project(":sweeper")
     implementation 'cn.yipianfengye.android:zxing-library:2.2'
 
 
