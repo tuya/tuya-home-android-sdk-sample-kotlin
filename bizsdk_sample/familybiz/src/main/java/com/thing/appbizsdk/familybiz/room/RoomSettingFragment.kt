@@ -98,7 +98,7 @@ class RoomSettingFragment : Fragment() {
         viewModel.mRoomList.observe(viewLifecycleOwner) {
             roomAdapter?.updateItem(it)
         }
-        lifecycleScope.launchWhenResumed {
+        lifecycleScope.launch {
             viewModel.sortRoomBean.collect {
                 if (!NavHostFragment.findNavController(this@RoomSettingFragment).popBackStack()) {
                     requireActivity().finish()
@@ -106,15 +106,15 @@ class RoomSettingFragment : Fragment() {
             }
         }
 
-
-        viewModel.errorEvent.observe(viewLifecycleOwner){
+        lifecycleScope.launch {
+            viewModel.errorEvent.collect {
                 Toast.makeText(
                     requireContext(),
                     it.second,
                     Toast.LENGTH_LONG
                 ).show()
             }
-
+        }
 
     }
 

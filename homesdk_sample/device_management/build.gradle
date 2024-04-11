@@ -51,4 +51,5 @@ dependencies {
     implementation project(':base_res')
     implementation project(':ipc')
     implementation project(':sweeper')
+    implementation project(':lock')
 }

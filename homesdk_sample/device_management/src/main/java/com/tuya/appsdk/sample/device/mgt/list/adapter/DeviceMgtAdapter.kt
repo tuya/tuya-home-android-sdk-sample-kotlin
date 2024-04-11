@@ -36,6 +36,7 @@ import com.tuya.appsdk.sample.device.mgt.control.activity.DeviceMgtControlActivi
 import com.tuya.appsdk.sample.device.mgt.getIconFontContent
 import com.tuya.appsdk.sample.device.mgt.list.activity.DeviceSubZigbeeActivity
 import com.tuya.appsdk.sample.device.mgt.list.enum.DeviceListTypePage
+import com.tuya.lock.demo.LockDeviceUtils
 import com.tuya.smart.android.demo.camera.CameraUtils
 
 /**
@@ -78,6 +79,10 @@ class DeviceMgtAdapter(context: Context, val type: Int) :
             val intent = Intent(view.context, SweeperActivity::class.java)
             intent.putExtra("deviceId", deviceBean.devId)
             view.context.startActivity(intent)
+            return
+        }
+
+        if (LockDeviceUtils.check(view.context, deviceBean.devId)) {
             return
         }
         when (type) {

@@ -70,11 +70,17 @@
     </LinearLayout>
 
     <LinearLayout
-        android:gravity="center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <TextView
+            android:id="@+id/activator"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center"
+            android:text="@string/activator_biz"
+            android:textColor="@color/black" />
 
         <TextView
             android:id="@+id/devicemanager"
@@ -92,35 +98,26 @@
             android:text="@string/group"
             android:textColor="@color/black" />
 
-
-        <Button
-            android:id="@+id/activator"
-            android:layout_width="wrap_content"
-            android:layout_height="50dp"
-            android:gravity="center"
-            android:text="@string/activator_biz"
-            android:textColor="@color/black" />
-
-        <Button
-            android:id="@+id/family"
-            android:layout_width="wrap_content"
-            android:layout_height="50dp"
-            android:gravity="center"
-            android:text="@string/family_biz"
-            android:textColor="@color/black" />
-
-        <Button
+        <TextView
             android:id="@+id/scene"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="50dp"
             android:gravity="center"
             android:text="@string/scene_biz"
             android:textColor="@color/black" />
 
 
-        <Button
+        <TextView
+            android:id="@+id/family"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center"
+            android:text="@string/family_biz"
+            android:textColor="@color/black" />
+
+        <TextView
             android:id="@+id/device"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="50dp"
             android:gravity="center"
             android:text="@string/device_biz"

@@ -55,8 +55,8 @@ class FamilyManagerModel(application: Application) : AndroidViewModel(applicatio
     val mAllDevList: MutableLiveData<ArrayList<DeviceInRoomBean>> = _mAllDevList
 
 
-    private val _errorEvent = MutableLiveData<Pair<String?, String?>>()
-    val errorEvent: MutableLiveData<Pair<String?, String?>> = _errorEvent
+    private val _errorEvent = MutableSharedFlow<Pair<String?, String?>>()
+    val errorEvent: SharedFlow<Pair<String?, String?>> = _errorEvent
 
     private val _settingFamilybean = MutableLiveData<FamilyBean>()
     val mRefreshFamilybean = _settingFamilybean
@@ -96,7 +96,7 @@ class FamilyManagerModel(application: Application) : AndroidViewModel(applicatio
 
             override fun onError(errorCode: String?, errorMessage: String?) {
                 viewModelScope.launch {
-                    _errorEvent.postValue(Pair(errorCode, errorMessage))
+                    _errorEvent.emit(Pair(errorCode, errorMessage))
                 }
             }
         })
@@ -121,7 +121,7 @@ class FamilyManagerModel(application: Application) : AndroidViewModel(applicatio
 
                 override fun onError(errorCode: String?, errorMessage: String?) {
                     viewModelScope.launch {
-                        _errorEvent.postValue(Pair(errorCode, errorMessage))
+                        _errorEvent.emit(Pair(errorCode, errorMessage))
                     }
                 }
             })
@@ -135,7 +135,7 @@ class FamilyManagerModel(application: Application) : AndroidViewModel(applicatio
 
             override fun onError(errorCode: String?, errorMessage: String?) {
                 viewModelScope.launch {
-                    _errorEvent.postValue(Pair(errorCode, errorMessage))
+                    _errorEvent.emit(Pair(errorCode, errorMessage))
                 }
             }
         })
@@ -172,7 +172,7 @@ class FamilyManagerModel(application: Application) : AndroidViewModel(applicatio
 
                     override fun onError(errorCode: String?, errorMessage: String?) {
                         viewModelScope.launch {
-                            _errorEvent.postValue(Pair(errorCode, errorMessage))
+                            _errorEvent.emit(Pair(errorCode, errorMessage))
                         }
                     }
                 })
@@ -207,7 +207,7 @@ class FamilyManagerModel(application: Application) : AndroidViewModel(applicatio
 
                     override fun onError(errorCode: String?, errorMessage: String?) {
                         viewModelScope.launch {
-                            _errorEvent.postValue(Pair(errorCode, errorMessage))
+                            _errorEvent.emit(Pair(errorCode, errorMessage))
                         }
                     }
                 })
@@ -260,7 +260,7 @@ class FamilyManagerModel(application: Application) : AndroidViewModel(applicatio
 
                 override fun onError(errorCode: String?, errorMessage: String?) {
                     viewModelScope.launch {
-                        _errorEvent.postValue(Pair(errorCode, errorMessage))
+                        _errorEvent.emit(Pair(errorCode, errorMessage))
                     }
                 }
             })
@@ -282,7 +282,7 @@ class FamilyManagerModel(application: Application) : AndroidViewModel(applicatio
 
             override fun onError(errorCode: String?, errorMessage: String?) {
                 viewModelScope.launch {
-                    _errorEvent.postValue(Pair(errorCode, errorMessage))
+                    _errorEvent.emit(Pair(errorCode, errorMessage))
                 }
             }
         })
@@ -297,7 +297,7 @@ class FamilyManagerModel(application: Application) : AndroidViewModel(applicatio
 
             override fun onError(errorCode: String?, errorMessage: String?) {
                 viewModelScope.launch {
-                    _errorEvent.postValue(Pair(errorCode, errorMessage))
+                    _errorEvent.emit(Pair(errorCode, errorMessage))
                 }
             }
         })
@@ -312,7 +312,7 @@ class FamilyManagerModel(application: Application) : AndroidViewModel(applicatio
         mMemberUseCase.updateMember(bean, object : IFamilyMemberResultCallback {
             override fun onError(code: String?, error: String?) {
                 viewModelScope.launch {
-                    _errorEvent.postValue(Pair(code, error))
+                    _errorEvent.emit(Pair(code, error))
                 }
             }
 
@@ -326,39 +326,21 @@ class FamilyManagerModel(application: Application) : AndroidViewModel(applicatio
     }
 
     fun deleteMember(homeId: Long, memberBean: MemberBean) {
-        if( memberBean.memberId >0){
-            mMemberUseCase.removeMember(
-                homeId,
-                memberBean.memberId,
-                object : IFamilyMemberResultCallback {
-                    override fun onError(code: String?, error: String?) {
-                        viewModelScope.launch {
-                            _errorEvent.postValue(Pair(code, error))
-                        }
+        mMemberUseCase.removeMember(
+            homeId,
+            memberBean.memberId,
+            object : IFamilyMemberResultCallback {
+                override fun onError(code: String?, error: String?) {
+                    viewModelScope.launch {
+                        _errorEvent.emit(Pair(code, error))
                     }
+                }
 
-                    override fun onSuccess() {
-                        val beans = _mMemberList.value?.filter { it.memberId != memberBean.memberId }
-                        _mMemberList.postValue(beans as ArrayList<MemberBean>?)
-                    }
-                })
-        }else{
-            mMemberUseCase.cancelInviteMember(
-                memberBean.invitationId,
-                object : IFamilyMemberResultCallback {
-                    override fun onError(code: String?, error: String?) {
-                        viewModelScope.launch {
-                            _errorEvent.postValue(Pair(code, error))
-                        }
-                    }
-
-                    override fun onSuccess() {
-                        val beans = _mMemberList.value?.filter { it.invitationId != memberBean.invitationId }
-                        _mMemberList.postValue(beans as ArrayList<MemberBean>?)
-                    }
-                })
-        }
-
+                override fun onSuccess() {
+                    val beans = _mMemberList.value?.filter { it.memberId != memberBean.memberId }
+                    _mMemberList.postValue(beans as ArrayList<MemberBean>?)
+                }
+            })
     }
 
     fun addInvationMember(homeId: Long?) {
@@ -376,7 +358,7 @@ class FamilyManagerModel(application: Application) : AndroidViewModel(applicatio
 
                     override fun onError(errorCode: String?, errorMessage: String?) {
                         viewModelScope.launch {
-                            _errorEvent.postValue(Pair(errorCode, errorMessage))
+                            _errorEvent.emit(Pair(errorCode, errorMessage))
                         }
                     }
                 })
@@ -400,7 +382,7 @@ class FamilyManagerModel(application: Application) : AndroidViewModel(applicatio
 
                     override fun onError(errorCode: String?, errorMessage: String?) {
                         viewModelScope.launch {
-                            _errorEvent.postValue(Pair(errorCode, errorMessage))
+                            _errorEvent.emit(Pair(errorCode, errorMessage))
                         }
                     }
                 })
@@ -424,7 +406,7 @@ class FamilyManagerModel(application: Application) : AndroidViewModel(applicatio
 
                     override fun onError(errorCode: String?, errorMessage: String?) {
                         viewModelScope.launch {
-                            _errorEvent.postValue(Pair(errorCode, errorMessage))
+                            _errorEvent.emit(Pair(errorCode, errorMessage))
                         }
                     }
                 })
@@ -440,7 +422,7 @@ class FamilyManagerModel(application: Application) : AndroidViewModel(applicatio
 
                 override fun onError(errorCode: String?, errorMessage: String?) {
                     viewModelScope.launch {
-                        _errorEvent.postValue(Pair(errorCode, errorMessage))
+                        _errorEvent.emit(Pair(errorCode, errorMessage))
                     }
                 }
             })
@@ -458,7 +440,7 @@ class FamilyManagerModel(application: Application) : AndroidViewModel(applicatio
 
             override fun onError(errorCode: String?, errorMessage: String?) {
                 viewModelScope.launch {
-                    _errorEvent.postValue(Pair(errorCode, errorMessage))
+                    _errorEvent.emit(Pair(errorCode, errorMessage))
                 }
             }
         })
@@ -485,7 +467,7 @@ class FamilyManagerModel(application: Application) : AndroidViewModel(applicatio
 
                 override fun onError(errorCode: String?, errorMessage: String?) {
                     viewModelScope.launch {
-                        _errorEvent.postValue(Pair(errorCode, errorMessage))
+                        _errorEvent.emit(Pair(errorCode, errorMessage))
                     }
                 }
             })
@@ -501,7 +483,7 @@ class FamilyManagerModel(application: Application) : AndroidViewModel(applicatio
 
             override fun onError(errorCode: String?, errorMessage: String?) {
                 viewModelScope.launch {
-                    _errorEvent.postValue(Pair(errorCode, errorMessage))
+                    _errorEvent.emit(Pair(errorCode, errorMessage))
                 }
             }
         })
@@ -517,7 +499,7 @@ class FamilyManagerModel(application: Application) : AndroidViewModel(applicatio
 
             override fun onError(errorCode: String?, errorMessage: String?) {
                 viewModelScope.launch {
-                    _errorEvent.postValue(Pair(errorCode, errorMessage))
+                    _errorEvent.emit(Pair(errorCode, errorMessage))
                 }
             }
         })
@@ -541,7 +523,7 @@ class FamilyManagerModel(application: Application) : AndroidViewModel(applicatio
         mMemberUseCase?.processInvitation(homeId,isAccept,object :IFamilyMemberResultCallback{
             override fun onError(code: String?, error: String?) {
                 viewModelScope.launch {
-                    _errorEvent.postValue(Pair(code, error))
+                    _errorEvent.emit(Pair(code, error))
                 }
             }
 

@@ -24,4 +24,15 @@
         app:layout_constraintLeft_toRightOf="@+id/home_item_icon"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="device_name" />
+
+    <TextView
+        android:id="@+id/isGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:visibility="gone"
+        tools:text="群组" />
 </androidx.constraintlayout.widget.ConstraintLayout>

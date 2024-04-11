@@ -7,6 +7,14 @@
     {
       "deviceBizName": "设备定时",
       "deviceBizId": "device_timer"
+    },
+    {
+      "deviceBizName": "群组创建",
+      "deviceBizId": "create_group"
+    },
+    {
+      "deviceBizName": "设备离线提醒设置",
+      "deviceBizId": "device_offline_remind"
     }
   ]
 }

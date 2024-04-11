@@ -61,5 +61,9 @@
     <string name="device_biz_list">设备业务列表</string>
     <string name="timer_list">定时列表</string>
     <string name="device_info">设备信息</string>
+    <string name="update_success">更新成功</string>
+    <string name="device_offline_remind">离线提醒</string>
+    <string name="device_offline_remind_tip">该设备不支持离线提醒</string>
+
     <string name="title_activity_device_info">DeviceInfoActivity</string>
 </resources>

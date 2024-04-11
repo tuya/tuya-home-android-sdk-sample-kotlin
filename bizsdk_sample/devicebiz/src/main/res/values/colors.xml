@@ -4,4 +4,6 @@
     <color name="white">#FFFFFFFF</color>
     <color name="gray">#88FFFFFF</color>
     <color name="base_bg">#fff8f8f8</color>
+    <color name="thing_theme_color_m1">#ffff5a28</color>
+    <color name="thing_theme_color_m1_1">#33ff5a28</color>
 </resources>

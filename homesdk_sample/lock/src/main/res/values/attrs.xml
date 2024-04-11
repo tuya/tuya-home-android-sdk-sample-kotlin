@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="LockButtonProgressView">
+        <attr name="buttonBgColor" format="color" />
+        <attr name="progressColor" format="color" />
+        <attr name="progressWidth" format="dimension" />
+        <attr name="buttonTitle" format="string" />
+    </declare-styleable>
+</resources>
