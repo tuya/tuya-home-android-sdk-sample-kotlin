@@ -87,3 +87,6 @@ lint/tmp/
 
 # gitignore
 t_s.bmp
+.gradle
+key.store
+app/release

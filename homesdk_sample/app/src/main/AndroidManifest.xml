@@ -28,6 +28,7 @@
 
         <!--        User        -->
         <activity
+            android:exported="true"
             android:name=".user.main.UserFuncActivity"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -37,19 +38,15 @@
         </activity>
         <activity
             android:name=".user.login.UserLoginActivity"
-            android:exported="false"
             android:screenOrientation="portrait" />
         <activity
             android:name=".user.register.UserRegisterActivity"
-            android:exported="false"
             android:screenOrientation="portrait" />
         <activity
             android:name=".user.resetPassword.UserResetPasswordActivity"
-            android:exported="false"
             android:screenOrientation="portrait" />
         <activity
             android:name=".user.info.UserInfoActivity"
-            android:exported="false"
             android:screenOrientation="portrait" />
     </application>
 

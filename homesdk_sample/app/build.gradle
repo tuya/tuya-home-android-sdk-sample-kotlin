@@ -2,19 +2,17 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
 }
-
 if (new File("thingMapping.gradle").exists()) {
     apply from : "thingMapping.gradle"
 }
 
 android {
-    compileSdkVersion 30
-    buildToolsVersion "29.0.3"
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.test007.demo"
         minSdkVersion 23
-        targetSdkVersion 30
+        targetSdkVersion 34
         versionCode 1
         versionName "1.0"
 
@@ -39,6 +37,7 @@ android {
         pickFirst 'lib/*/libgnustl_shared.so'//业务包需要
         pickFirst 'lib/*/liblog.so'
         pickFirst 'lib/*/libopenh264.so'
+        pickFirst 'lib/*/libyuv.so'
     }
 
     buildTypes {

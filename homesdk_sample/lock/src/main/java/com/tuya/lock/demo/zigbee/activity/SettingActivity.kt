@@ -189,6 +189,8 @@ class SettingActivity : AppCompatActivity() {
 
                     RemotePermissionEnum.REMOTE_NOT_DP_KEY_ADMIN -> remotePermissionsStr =
                         getString(R.string.zigbee_remote_not_key_admin)
+
+                    else -> {}
                 }
                 remote_permissions_state!!.text = remotePermissionsStr
                 showPupList()
