@@ -266,6 +266,8 @@ class DeviceDetail: AppCompatActivity() {
                                 isRemoteOpen = 1
                                 deviceOnline()
                             }
+
+                            else -> {}
                         }
                     }
 

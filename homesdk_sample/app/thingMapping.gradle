@@ -190,7 +190,7 @@ private static def readMappingFile(String mapping) {
 }
 
 private static void dfsFile(File file, ArrayList<File> list, List<String> extensionList) {
-    if (file.isFile()
+    if (file.isFile()) {
         int i = file.absolutePath.lastIndexOf(".")
         if (i > 0) {
             // 获取文件扩展名
