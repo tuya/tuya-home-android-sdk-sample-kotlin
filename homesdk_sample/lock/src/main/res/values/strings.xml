@@ -5,8 +5,11 @@
     <string name="device_online">Online</string>
     <string name="device_offline">Offline</string>
     <string name="device_unbind">Device unbinding</string>
+    <string name="google_voice_password">google voice password</string>
     <string name="lock_demo_unbind">Unbind</string>
+    <string name="google_voice_password_open_check">check google voice password is open</string>
     <string name="lock_demo_unbind_and_clear">Unbind and clear data</string>
+    <string name="google_voice_password_set">set</string>
 
     <string name="door_lock_member">door lock member</string>
     <string name="ble_connection">ble connection</string>

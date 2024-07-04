@@ -8,7 +8,7 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.alibaba.fastjson.JSONObject
-import com.thingclips.smart.camera.utils.chaos.L
+import com.thingclips.smart.android.common.utils.L
 import com.thingclips.smart.optimus.lock.api.ThingUnlockType
 import com.thingclips.smart.optimus.lock.api.bean.UnlockRelation
 import com.thingclips.smart.sdk.optimus.lock.utils.StandardDpConverter

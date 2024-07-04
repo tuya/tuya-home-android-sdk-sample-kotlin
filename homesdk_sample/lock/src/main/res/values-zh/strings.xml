@@ -5,9 +5,12 @@
     <string name="device_online">在线</string>
     <string name="device_offline">离线</string>
     <string name="device_unbind">设备解绑</string>
+    <string name="google_voice_password">设置google语音密码</string>
     <string name="lock_demo_unbind">解绑</string>
+    <string name="google_voice_password_open_check">查询google 语音密码是否开启</string>
     <string name="lock_demo_unbind_and_clear">解绑并清除数据</string>
 
+    <string name="google_voice_password_set">设置</string>
     <string name="door_lock_member">门锁成员</string>
     <string name="ble_connection">蓝牙连接</string>
     <string name="ble_unlock_and_lock">蓝牙解锁和落锁</string>

@@ -13,11 +13,14 @@ import com.thingclips.sdk.os.ThingOSDevice
 import com.thingclips.smart.home.sdk.ThingHomeSdk
 import com.thingclips.smart.sdk.api.IDevListener
 import com.thingclips.smart.sdk.api.IThingDevice
+import com.thingclips.smart.sdk.optimus.lock.bean.ble.DataPoint
+import com.thingclips.smart.sdk.optimus.lock.utils.LockUtil
 import com.thingclips.smart.sdk.optimus.lock.utils.StandardDpConverter
 import com.tuya.lock.demo.R
 import com.tuya.lock.demo.ble.activity.DeleteDeviceActivity
 import com.tuya.lock.demo.common.constant.Constant
 import com.tuya.lock.demo.common.view.LockButtonProgressView
+import com.tuya.lock.demo.wifi.activity.GoogleVoiceSettingActivity
 import com.tuya.lock.demo.wifi.activity.MemberListActivity
 import java.util.Locale
 
@@ -178,6 +181,34 @@ class VideoDeviceDetail: AppCompatActivity() {
                 mDevId
             )
         }
+
+        /**
+         * 谷歌语音密码
+         */
+        //校验远程语音是否有对应dp
+        val voice_settings_view = findViewById<TextView>(R.id.device_google_password)
+        val dpId = LockUtil.convertCode2Id(mDevId, DataPoint.UNLOCK_VOICE_REMOTE)
+        if (TextUtils.isEmpty(dpId)) {
+            val voiceStr = resources.getString(R.string.voice_set_title) + "(not support)"
+            voice_settings_view.text = voiceStr
+            voice_settings_view.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, 0, 0)
+        } else {
+            voice_settings_view.text = resources.getString(R.string.voice_set_title)
+            voice_settings_view.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                0,
+                0,
+                R.drawable.ic_next,
+                0
+            )
+            voice_settings_view.setOnClickListener { v: View ->
+                //远程语音设置
+                GoogleVoiceSettingActivity.startActivity(
+                    this,
+                    mDevId
+                )
+            }
+        }
+
     }
 
     private fun deviceOnline() {

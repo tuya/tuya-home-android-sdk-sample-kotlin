@@ -2,7 +2,7 @@ package com.tuya.lock.demo
 
 import android.content.Context
 import com.thingclips.sdk.os.ThingOSDevice
-import com.thingclips.smart.camera.utils.chaos.L
+import com.thingclips.smart.android.common.utils.L
 import com.tuya.lock.demo.ble.activity.BleLockDetailActivity
 import com.tuya.lock.demo.video.activity.VideoDeviceDetail
 import com.tuya.lock.demo.wifi.activity.WifiDeviceDetail
