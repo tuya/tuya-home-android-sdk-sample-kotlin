@@ -285,6 +285,7 @@
             android:name="com.tuya.lock.demo.video.activity.LogRecordDetailActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
-
+        <activity android:name=".wifi.activity.GoogleVoiceSettingActivity"
+            android:exported="false"/>
     </application>
 </manifest>

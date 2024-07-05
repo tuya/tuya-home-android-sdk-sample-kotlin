@@ -20,6 +20,8 @@ import com.thingclips.smart.optimus.lock.api.IThingWifiLock
 import com.thingclips.smart.optimus.sdk.ThingOptimusSdk
 import com.thingclips.smart.sdk.api.IDevListener
 import com.thingclips.smart.sdk.api.IThingDevice
+import com.thingclips.smart.sdk.optimus.lock.bean.ble.DataPoint
+import com.thingclips.smart.sdk.optimus.lock.utils.LockUtil
 import com.thingclips.smart.sdk.optimus.lock.utils.StandardDpConverter
 import com.tuya.lock.demo.R
 import com.tuya.lock.demo.ble.activity.DeleteDeviceActivity
@@ -43,6 +45,7 @@ class WifiDeviceDetail: AppCompatActivity() {
     private var temporary_password_view: TextView? = null
     private var member_list_view: TextView? = null
     private var dynamic_password_view: TextView? = null
+    private var device_google_password: TextView? = null
 
     private var wifiLock: IThingWifiLock? = null
 
@@ -162,6 +165,7 @@ class WifiDeviceDetail: AppCompatActivity() {
         temporary_password_view = findViewById(R.id.temporary_password_view)
         member_list_view = findViewById(R.id.member_list_view)
         dynamic_password_view = findViewById(R.id.dynamic_password_view)
+        device_google_password = findViewById(R.id.device_google_password)
         val numStr = String.format(Locale.CHINA, getString(R.string.alarm_records), "")
         alarm_record_view!!.text = numStr
     }
@@ -261,6 +265,32 @@ class WifiDeviceDetail: AppCompatActivity() {
                 v.context,
                 mDevId
             )
+        }
+        /**
+         * 谷歌语音密码
+         */
+        //校验远程语音是否有对应dp
+        val voice_settings_view = findViewById<TextView>(R.id.device_google_password)
+        val dpId = LockUtil.convertCode2Id(mDevId, DataPoint.UNLOCK_VOICE_REMOTE)
+        if (TextUtils.isEmpty(dpId)) {
+            val voiceStr = resources.getString(R.string.voice_set_title) + "(not support)"
+            voice_settings_view.text = voiceStr
+            voice_settings_view.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, 0, 0)
+        } else {
+            voice_settings_view.text = resources.getString(R.string.voice_set_title)
+            voice_settings_view.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                0,
+                0,
+                R.drawable.ic_next,
+                0
+            )
+            voice_settings_view.setOnClickListener { v: View ->
+                //远程语音设置
+                GoogleVoiceSettingActivity.startActivity(
+                    this,
+                    mDevId
+                )
+            }
         }
     }
 

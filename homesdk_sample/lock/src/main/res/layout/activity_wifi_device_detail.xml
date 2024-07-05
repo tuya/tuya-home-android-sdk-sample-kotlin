@@ -156,6 +156,15 @@
                 android:id="@+id/device_delete"
                 style="@style/item_func"
                 android:text="@string/device_unbind" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="20dp"
+                android:background="#FF888888" />
+            <TextView
+                android:id="@+id/device_google_password"
+                style="@style/item_func"
+                android:text="@string/google_voice_password" />
 
         </LinearLayout>
 

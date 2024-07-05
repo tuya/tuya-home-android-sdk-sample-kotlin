@@ -9,6 +9,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BizSdkSample">
         <activity
+            android:name=".biz.net.DeviceNetSetActivity"
+            android:exported="false" />
+        <activity
             android:name=".biz.group.GroupListActivity"
             android:exported="false" />
         <activity
@@ -20,8 +23,8 @@
         <activity android:name=".DeviceListActivity" />
         <activity android:name=".biz.timer.TimerSettingActivity" />
         <activity android:name=".biz.timer.TimerListActivity" />
-        <activity android:name="com.thingclips.smart.devicebiz.biz.group.GroupInfoActivity" />
-        <activity android:name="com.thingclips.smart.devicebiz.biz.offline.DeviceOfflineRemindSettingActivity" />
+        <activity android:name=".biz.group.GroupInfoActivity" />
+        <activity android:name=".biz.offline.DeviceOfflineRemindSettingActivity" />
     </application>
 
 </manifest>

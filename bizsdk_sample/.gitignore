@@ -15,3 +15,4 @@
 local.properties
 app/debug.keystore
 app/libs
+.idea

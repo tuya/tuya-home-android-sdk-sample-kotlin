@@ -48,17 +48,17 @@ open class DeviceOfflineRemindSettingActivity : AppCompatActivity() {
         manager.getOfflineReminderSupportStatus(deviceId,
             object : ResultListener<IsSupportOffLineBean?> {
                 override fun onFailure(
-                    p0: BusinessResponse?,
-                    p1: IsSupportOffLineBean?,
-                    p2: String?
+                    response: BusinessResponse?,
+                    offLineBean: IsSupportOffLineBean?,
+                    apiName: String?
                 ) {
 
                 }
 
                 override fun onSuccess(
-                    p0: BusinessResponse?,
+                    response: BusinessResponse?,
                     offLineBean: IsSupportOffLineBean?,
-                    p2: String?
+                    apiName: String?
                 ) {
                     if (offLineBean?.offlineReminder == true) {
                         switchOffline.visibility = View.VISIBLE
@@ -75,17 +75,17 @@ open class DeviceOfflineRemindSettingActivity : AppCompatActivity() {
         manager.getOfflineReminderStatus(deviceId,
             object : ResultListener<ArrayList<OffLineStatusBean?>?> {
                 override fun onFailure(
-                    p0: BusinessResponse?,
-                    p1: ArrayList<OffLineStatusBean?>?,
-                    p2: String?
+                    response: BusinessResponse?,
+                    statusBeans: ArrayList<OffLineStatusBean?>?,
+                    apiName: String?
                 ) {
 
                 }
 
                 override fun onSuccess(
-                    p0: BusinessResponse?,
+                    response: BusinessResponse?,
                     statusBeans: ArrayList<OffLineStatusBean?>?,
-                    p2: String?
+                    apiName: String?
                 ) {
                     if (!statusBeans.isNullOrEmpty()) {
                         if (statusBeans[0]?.enabled == true) {
@@ -104,11 +104,19 @@ open class DeviceOfflineRemindSettingActivity : AppCompatActivity() {
 
     private fun updateOfflineReminderStatus(deviceId: String?, isOpen: Boolean) {
         manager.updateOfflineReminderStatus(deviceId, isOpen, object : ResultListener<Boolean> {
-            override fun onFailure(p0: BusinessResponse?, p1: Boolean?, p2: String?) {
+            override fun onFailure(
+                response: BusinessResponse?,
+                isOpen: Boolean?,
+                apiName: String?
+            ) {
 
             }
 
-            override fun onSuccess(p0: BusinessResponse?, p1: Boolean?, p2: String?) {
+            override fun onSuccess(
+                response: BusinessResponse?,
+                isOpen: Boolean?,
+                apiName: String?
+            ) {
                 Toast.makeText(
                     this@DeviceOfflineRemindSettingActivity,
                     resources.getString(R.string.update_success),
