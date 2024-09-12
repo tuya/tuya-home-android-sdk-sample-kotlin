@@ -20,6 +20,8 @@ import com.thingclips.smart.devicebiz.bean.DeviceBizBean;
 import com.thingclips.smart.devicebiz.biz.deviceInfo.DeviceInfoActivity;
 import com.thingclips.smart.devicebiz.biz.group.GroupInfoActivity;
 import com.thingclips.smart.devicebiz.biz.group.GroupListActivity;
+import com.thingclips.smart.devicebiz.biz.migrate.DeviceMigrateActivity;
+import com.thingclips.smart.devicebiz.biz.net.DeviceNetSetActivity;
 import com.thingclips.smart.devicebiz.biz.offline.DeviceOfflineRemindSettingActivity;
 import com.thingclips.smart.devicebiz.biz.timer.TimerListActivity;
 import com.thingclips.smart.devicebiz.utils.Constant;
@@ -65,6 +67,12 @@ public class DeviceBizEntranceActivity extends AppCompatActivity {
                 case Constant.DEVICE_OFFLINE_REMIND:
                     gotoDeviceOfflinePage();
                     break;
+                case Constant.DEVICE_NET_SETTING:
+                    gotoDeviceNetSettingPage();
+                    break;
+                case Constant.DEVICE_MIGRATE:
+                    gotoDeviceMigratePage();
+                    break;
                 case Constant.CREATE_GROUP:
                 case Constant.GROUP_EDIT:
                     gotoGroupPage();
@@ -97,6 +105,21 @@ public class DeviceBizEntranceActivity extends AppCompatActivity {
         Intent intent = new Intent();
         intent.putExtra("deviceId", deviceId);
         intent.setClass(DeviceBizEntranceActivity.this, DeviceOfflineRemindSettingActivity.class);
+        startActivity(intent);
+    }
+
+    private void gotoDeviceNetSettingPage() {
+        Intent intent = new Intent();
+        intent.putExtra("deviceId", deviceId);
+        intent.setClass(DeviceBizEntranceActivity.this, DeviceNetSetActivity.class);
+        startActivity(intent);
+    }
+
+    private void gotoDeviceMigratePage() {
+        Intent intent = new Intent();
+        intent.putExtra("deviceId", deviceId);
+        intent.putExtra("homeId", homeId);
+        intent.setClass(DeviceBizEntranceActivity.this, DeviceMigrateActivity.class);
         startActivity(intent);
     }
 

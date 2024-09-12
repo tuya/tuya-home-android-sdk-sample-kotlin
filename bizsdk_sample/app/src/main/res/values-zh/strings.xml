@@ -17,4 +17,5 @@
     <string name="scene_biz">场景业务</string>
     <string name="family_biz">家庭管理</string>
     <string name="device_biz">设备管理</string>
+    <string name="ota_biz">批量ota</string>
 </resources>

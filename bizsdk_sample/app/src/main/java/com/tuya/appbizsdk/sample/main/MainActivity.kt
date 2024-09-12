@@ -3,10 +3,7 @@ package com.tuya.appbizsdk.sample.main
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContentProviderCompat.requireContext
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.thing.appbizsdk.familybiz.ChooseFamilyPopupWindow
-import com.thing.appbizsdk.familybiz.FamilyManagerActivity
 import com.thing.appbizsdk.familybiz.IChooseFamilyListener
 import com.thing.appbizsdk.sample.R
 import com.thing.appbizsdk.sample.databinding.ActivityMainBinding
@@ -69,6 +66,12 @@ class MainActivity : AppCompatActivity(), IHomeView {
         binding.device.setOnClickListener {
             val i = Intent()
             i.setClassName(this@MainActivity, "com.thingclips.smart.devicebiz.DeviceListActivity")
+            i.putExtra("homeId",homePresenter?.mCurrentHomeId)
+            startActivity(i)
+        }
+        binding.ota.setOnClickListener{
+            val i = Intent()
+            i.setClassName(this@MainActivity, "com.thingclips.smart.devicebiz.biz.ota.OtaActivity")
             i.putExtra("homeId",homePresenter?.mCurrentHomeId)
             startActivity(i)
         }

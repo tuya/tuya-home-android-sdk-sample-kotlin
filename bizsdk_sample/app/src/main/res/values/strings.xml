@@ -16,4 +16,5 @@
     <string name="scene_biz">Scene</string>
     <string name="family_biz">Family management</string>
     <string name="device_biz">Device management</string>
+    <string name="ota_biz">Batch OTA</string>
 </resources>

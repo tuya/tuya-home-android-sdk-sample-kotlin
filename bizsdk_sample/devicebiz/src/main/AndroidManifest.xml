@@ -9,6 +9,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BizSdkSample">
         <activity
+            android:name=".biz.ota.OtaActivity"
+            android:exported="false" />
+        <activity
             android:name=".biz.net.DeviceNetSetActivity"
             android:exported="false" />
         <activity
@@ -25,6 +28,7 @@
         <activity android:name=".biz.timer.TimerListActivity" />
         <activity android:name=".biz.group.GroupInfoActivity" />
         <activity android:name=".biz.offline.DeviceOfflineRemindSettingActivity" />
+        <activity android:name=".biz.migrate.DeviceMigrateActivity" />
     </application>
 
 </manifest>

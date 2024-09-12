@@ -15,6 +15,14 @@
     {
       "deviceBizName": "设备离线提醒设置",
       "deviceBizId": "device_offline_remind"
+    },
+    {
+      "deviceBizName": "设备备用网络",
+      "deviceBizId": "device_net_setting"
+    },
+    {
+      "deviceBizName": "替换故障网关",
+      "deviceBizId": "device_migrate"
     }
   ]
 }
