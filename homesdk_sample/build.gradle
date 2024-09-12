@@ -3,7 +3,7 @@ buildscript {
     ext.kotlin_version = "1.7.20"
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
     dependencies {
         classpath "com.android.tools.build:gradle:7.4.2"
@@ -19,12 +19,16 @@ allprojects {
         exclude group: "com.thingclips.smart" ,module: 'thingsmart-modularCampAnno'
     }
     repositories {
+//
+        google()
+        mavenCentral()
+        mavenCentral()
         maven { url 'https://maven-other.tuya.com/repository/maven-releases/' }
         maven { url "https://maven-other.tuya.com/repository/maven-commercial-releases/" }
-        google()
-        jcenter()
-        maven { url 'https://jitpack.io' }
-        maven {url'https : //dl.bintray.com/jenly/maven ' }
+        maven { url 'https://maven.aliyun.com/nexus/content/repositories/central/' }
+        maven { url 'https://maven.aliyun.com/repository/public' }
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        maven { url "https://jitpack.io" }
     }
 }
 
