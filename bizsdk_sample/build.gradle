@@ -2,7 +2,7 @@
 buildscript {
     ext {
         kotlin_version = '1.8.10'
-        sdk_version = '5.16.0'
+        sdk_version = '5.16.1'
         navigation_fragment_ktx='2.3.5'
         navigation_ui_ktx='2.3.5'
         expansion_version='5.16.0'//
