@@ -2,10 +2,10 @@
 buildscript {
     ext {
         kotlin_version = '1.8.10'
-        sdk_version = '5.15.0'
+        sdk_version = '5.16.0'
         navigation_fragment_ktx='2.3.5'
         navigation_ui_ktx='2.3.5'
-        expansion_version='5.15.0'//
+        expansion_version='5.16.0'//
     }
     repositories {
         maven { url 'https://maven-other.tuya.com/repository/maven-releases/' }
