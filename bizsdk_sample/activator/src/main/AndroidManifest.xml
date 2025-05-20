@@ -68,6 +68,11 @@
             android:screenOrientation="portrait" />
 
         <activity
+            android:name="com.tuya.appbizsdk.activator.dual.DeviceConfigWifiListActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <activity
             android:name="com.tuya.appbizsdk.activator.zigbee.gateway.DeviceConfigZbGatewayActivity"
             android:exported="false"
             android:screenOrientation="portrait" />

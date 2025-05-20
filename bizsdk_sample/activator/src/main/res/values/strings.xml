@@ -46,4 +46,6 @@ Translated with www.DeepL.com/Translator (free version)</string>
 
     <string name="home_current_home_tips">Please set current home</string>
 
+    <string name="device_config_wifi_list_title">Dual Mode WiFi List</string>
+
 </resources>

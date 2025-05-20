@@ -111,6 +111,7 @@ class DeviceConfigZbGatewayActivity : AppCompatActivity() {
         activeManager!!.startActive(ThingDeviceActiveBuilder().apply {
             activeModel = ThingDeviceActiveModeEnum.WN
             timeOut = 60
+            relationId = homeId
             context = this@DeviceConfigZbGatewayActivity
             setActivatorScanDeviceBean(bean)
             listener = object : IThingDeviceActiveListener {

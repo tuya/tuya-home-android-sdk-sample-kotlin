@@ -9,6 +9,7 @@ import com.tuya.appbizsdk.activator.R
 import com.tuya.appbizsdk.activator.ap.DeviceConfigAPActivity
 import com.tuya.appbizsdk.activator.ble.DeviceConfigBleActivity
 import com.tuya.appbizsdk.activator.dual.DeviceConfigDualActivity
+import com.tuya.appbizsdk.activator.dual.DeviceConfigWifiListActivity
 import com.tuya.appbizsdk.activator.ez.DeviceConfigEZActivity
 import com.tuya.appbizsdk.activator.qrcode.QrCodeConfigActivity
 import com.tuya.appbizsdk.activator.scan.DeviceConfigQrCodeDeviceActivity
@@ -76,6 +77,20 @@ class ActivatorMainActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
             it.context.startActivity(Intent(it.context, DeviceConfigDualActivity::class.java))
+
+        }
+
+        // Dual Mode wifi list
+        findViewById<TextView>(R.id.tv_dual_mode_wifi_list).setOnClickListener {
+            if (!HomeModel.INSTANCE.checkHomeId(this)) {
+                Toast.makeText(
+                    this,
+                    this.getString(R.string.home_current_home_tips),
+                    Toast.LENGTH_LONG
+                ).show()
+                return@setOnClickListener
+            }
+            it.context.startActivity(Intent(it.context, DeviceConfigWifiListActivity::class.java))
 
         }
 

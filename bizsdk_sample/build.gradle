@@ -2,10 +2,10 @@
 buildscript {
     ext {
         kotlin_version = '1.8.10'
-        sdk_version = '6.2.1'
+        sdk_version = '6.4.0'
         navigation_fragment_ktx='2.3.5'
         navigation_ui_ktx='2.3.5'
-        expansion_version='6.2.1'
+        expansion_version='6.4.0'//
     }
     repositories {
         maven { url 'https://maven-other.tuya.com/repository/maven-releases/' }
@@ -28,6 +28,15 @@ allprojects {
         maven { url 'https://maven-other.tuya.com/repository/maven-releases/' }
         maven { url "https://maven-other.tuya.com/repository/maven-commercial-releases/" }
 
+
+        // 添加 pre maven 源
+        maven { url "https://maven.tuya-inc.top/repository/maven-android-pre/"}
+        maven {
+            url "https://maven.tuya-inc.top/nexus/content/repositories/releases/"
+            mavenContent {
+                releasesOnly()
+            }
+        }
         google()
         mavenCentral()
         mavenLocal()

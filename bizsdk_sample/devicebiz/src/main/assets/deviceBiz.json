@@ -23,6 +23,14 @@
     {
       "deviceBizName": "替换故障网关",
       "deviceBizId": "device_migrate"
+    },
+    {
+      "deviceBizName": "按键防误触",
+      "deviceBizId": "device_prevent_accidental_touch"
+    },
+    {
+      "deviceBizName": "设备远程重启",
+      "deviceBizId": "device_restart"
     }
   ]
 }

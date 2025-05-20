@@ -9,6 +9,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BizSdkSample">
         <activity
+            android:name=".biz.restart.SettingTimerActivity"
+            android:exported="false" />
+        <activity
+            android:name=".biz.restart.DeviceRestartActivity"
+            android:exported="false" />
+        <activity
+            android:name=".biz.preventTouch.PreventAccidentalTouchActivity"
+            android:exported="false" />
+        <activity
             android:name=".biz.ota.OtaActivity"
             android:exported="false" />
         <activity

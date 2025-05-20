@@ -36,4 +36,6 @@
 
     <string name="home_current_home_tips">请设置当前家庭</string>
 
+    <string name="device_config_wifi_list_title">双模配网-WiFi列表</string>
+
 </resources>

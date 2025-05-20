@@ -1,5 +1,7 @@
 package com.thingclips.smart.devicebiz;
 
+import static com.thingclips.smart.devicebiz.utils.Constant.DEVICE_RESTART;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -23,6 +25,8 @@ import com.thingclips.smart.devicebiz.biz.group.GroupListActivity;
 import com.thingclips.smart.devicebiz.biz.migrate.DeviceMigrateActivity;
 import com.thingclips.smart.devicebiz.biz.net.DeviceNetSetActivity;
 import com.thingclips.smart.devicebiz.biz.offline.DeviceOfflineRemindSettingActivity;
+import com.thingclips.smart.devicebiz.biz.preventTouch.PreventAccidentalTouchActivity;
+import com.thingclips.smart.devicebiz.biz.restart.DeviceRestartActivity;
 import com.thingclips.smart.devicebiz.biz.timer.TimerListActivity;
 import com.thingclips.smart.devicebiz.utils.Constant;
 
@@ -79,6 +83,12 @@ public class DeviceBizEntranceActivity extends AppCompatActivity {
                     break;
                 case Constant.GROUP_INFO:
                     gotoGroupInfoPage();
+                    break;
+                case Constant.DEVICE_PREVENT_ACCIDENTAL_TOUCH:
+                    gotoPreventPage();
+                    break;
+                case DEVICE_RESTART:
+                    gotoRestartPage();
                     break;
             }
         });
@@ -139,6 +149,20 @@ public class DeviceBizEntranceActivity extends AppCompatActivity {
         intent.putExtra("homeId", homeId);
         intent.putExtra("devIds", getIntent().getStringArrayListExtra("devIds"));
         intent.setClass(DeviceBizEntranceActivity.this, GroupInfoActivity.class);
+        startActivity(intent);
+    }
+
+    private void gotoPreventPage() {
+        Intent intent = new Intent();
+        intent.putExtra("deviceId", deviceId);
+        intent.setClass(DeviceBizEntranceActivity.this, PreventAccidentalTouchActivity.class);
+        startActivity(intent);
+    }
+
+    private void gotoRestartPage() {
+        Intent intent = new Intent();
+        intent.putExtra("deviceId", deviceId);
+        intent.setClass(DeviceBizEntranceActivity.this, DeviceRestartActivity.class);
         startActivity(intent);
     }
 
