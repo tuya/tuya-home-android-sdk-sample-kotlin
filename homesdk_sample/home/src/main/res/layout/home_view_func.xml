@@ -52,4 +52,15 @@
         android:id="@+id/tvHomeList"
         android:text="@string/home_home_list" />
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="20dp"
+        android:background="#FF888888" />
+
+    <TextView
+        style="@style/item_func"
+        android:id="@+id/tvAiAssistant"
+        android:text="@string/ai_assistant" />
+
 </LinearLayout>

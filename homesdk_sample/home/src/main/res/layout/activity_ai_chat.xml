@@ -1,0 +1,134 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.thingclips.sdk.aistream.ai.AiChatActivity">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:titleTextColor="@android:color/white"
+        android:elevation="4dp"/>
+
+    <TextView
+        android:id="@+id/tv_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar"
+        android:background="#DDDDDD"
+        android:padding="4dp"
+        android:gravity="center"
+        android:text="Status: Disconnected"
+        android:textSize="12sp" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_chat_messages"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/ll_preview_and_input"
+        android:layout_below="@id/tv_status"
+        android:padding="8dp"
+        android:clipToPadding="false"/>
+
+    <LinearLayout
+        android:id="@+id/ll_preview_and_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_alignParentBottom="true">
+
+        <FrameLayout
+            android:id="@+id/fl_image_preview_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="8dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/iv_image_preview"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:scaleType="centerCrop"
+                android:contentDescription="Image Preview" />
+
+            <ImageView
+                android:id="@+id/iv_close_image_preview"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="top|end"
+                android:src="@android:drawable/ic_menu_close_clear_cancel"
+                app:tint="@android:color/white"
+                android:background="#80000000"
+                android:padding="4dp"
+                android:contentDescription="Close Preview"/>
+        </FrameLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_input_area"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="8dp"
+            android:gravity="center_vertical"
+            android:background="#F0F0F0">
+
+            <ImageView
+                android:id="@+id/iv_select_image"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@android:drawable/ic_menu_gallery"
+                android:padding="8dp"
+                android:contentDescription="Select Image"
+                android:background="?attr/selectableItemBackgroundBorderless"/>
+
+            <EditText
+                android:id="@+id/et_message_input"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Type a message"
+                android:inputType="textMultiLine"
+                android:maxLines="4"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:background="@android:drawable/edit_text"
+                android:padding="10dp"/>
+
+            <FrameLayout
+                android:id="@+id/fl_voice_input_container"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:visibility="gone">
+
+                <Button
+                    android:id="@+id/btn_hold_to_talk"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Hold to Talk"
+                    android:visibility="gone"/>
+
+                <com.thingclips.sdk.aistream.ai.AudioAmplitudeView
+                    android:id="@+id/audio_amplitude_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:visibility="gone"/>
+            </FrameLayout>
+
+            <ImageView
+                android:id="@+id/iv_send_or_voice"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@android:drawable/ic_btn_speak_now"
+                android:padding="8dp"
+                android:contentDescription="Send or Record Voice"
+                android:background="?attr/selectableItemBackgroundBorderless"/>
+        </LinearLayout>
+    </LinearLayout>
+</RelativeLayout>
