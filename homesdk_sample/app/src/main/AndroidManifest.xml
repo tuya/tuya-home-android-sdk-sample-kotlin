@@ -19,6 +19,12 @@
         <meta-data
             android:name="THING_SMART_SECRET"
             android:value="${TUYA_SMART_SECRET}" />
+        <meta-data
+            android:name="AI_SOLUTION_CODE"
+            android:value="${AI_SOLUTION_CODE}" />
+        <meta-data
+            android:name="MINI_PROGRAM_ID"
+            android:value="${MINI_PROGRAM_ID}" />
 
         <!--        Main        -->
         <activity
