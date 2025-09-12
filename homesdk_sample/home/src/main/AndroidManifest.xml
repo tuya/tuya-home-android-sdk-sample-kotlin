@@ -21,6 +21,9 @@
             android:name="com.tuya.appsdk.sample.home.edit.HomeEditActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
+        <activity
+            android:name="com.thingclips.sdk.aistream.ai.AiChatActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
     </application>
 
 

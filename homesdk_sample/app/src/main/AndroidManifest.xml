@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.tuya.appsdk.sample">
+    xmlns:tools="http://schemas.android.com/tools">
 
 
     <application
@@ -19,6 +18,12 @@
         <meta-data
             android:name="THING_SMART_SECRET"
             android:value="${TUYA_SMART_SECRET}" />
+        <meta-data
+            android:name="AI_SOLUTION_CODE"
+            android:value="${AI_SOLUTION_CODE}" />
+        <meta-data
+            android:name="MINI_PROGRAM_ID"
+            android:value="${MINI_PROGRAM_ID}" />
 
         <!--        Main        -->
         <activity
