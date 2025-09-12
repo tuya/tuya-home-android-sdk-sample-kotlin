@@ -5,37 +5,41 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import kotlinx.android.synthetic.main.activity_sweeper.*
+import com.thing.smart.sweeper.databinding.ActivitySweeperBinding
 
 /**
  *
  * create by nielev on 2023/2/24
  */
-class SweeperActivity:AppCompatActivity() {
+class SweeperActivity: AppCompatActivity() {
+
+    private lateinit var binding: ActivitySweeperBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_sweeper)
+        binding = ActivitySweeperBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        setSupportActionBar(topAppBar)
-        topAppBar.setNavigationOnClickListener { finish() }
-        btnCommonControl.setOnClickListener { v -> // Navigate to device management
+        setSupportActionBar(binding.topAppBar)
+        binding.topAppBar.setNavigationOnClickListener { finish() }
+        binding.btnCommonControl.setOnClickListener { v ->
             try {
                 val deviceControl =
                     Class.forName("com.tuya.appsdk.sample.device.mgt.control.activity.DeviceMgtControlActivity")
-                val intent = Intent(v.context, deviceControl)
-                intent.putExtra("deviceId", getIntent().getStringExtra("deviceId"))
-                v.context.startActivity(intent)
+                val intent = Intent(this, deviceControl)
+                intent.putExtra("deviceId", intent.getStringExtra("deviceId"))
+                startActivity(intent)
             } catch (e: ClassNotFoundException) {
                 e.printStackTrace()
             }
         }
-        btnP2pConnect.setOnClickListener { v ->
+        binding.btnP2pConnect.setOnClickListener { v ->
             val intent = Intent(
-                v.context,
+                this,
                 P2pConnectActivity::class.java
             )
-            intent.putExtra("deviceId", getIntent().getStringExtra("deviceId"))
-            v.context.startActivity(intent)
+            intent.putExtra("deviceId", intent.getStringExtra("deviceId"))
+            startActivity(intent)
         }
     }
 }
