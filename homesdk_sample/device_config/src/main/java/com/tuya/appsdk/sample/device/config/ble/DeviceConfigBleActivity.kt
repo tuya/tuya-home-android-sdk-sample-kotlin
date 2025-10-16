@@ -92,27 +92,38 @@ class DeviceConfigBleActivity : AppCompatActivity() {
             Log.i(TAG, "scanSingleBleDevice: deviceUUID=${bean.uuid}")
             // Start configuration -- Single Ble Device
             if (bean?.configType == BleConfigType.CONFIG_TYPE_SINGLE.type) {
-                ThingHomeSdk.getBleManager().startBleConfig(currentHomeId, bean.uuid, null,
-                        object : IThingBleConfigListener {
-                            override fun onSuccess(bean: DeviceBean?) {
-                                setPbViewVisible(false)
-                                Toast.makeText(
-                                        this@DeviceConfigBleActivity,
-                                        "Config Success",
-                                        Toast.LENGTH_LONG
-                                ).show()
-                                finish()
-                            }
 
-                            override fun onFail(code: String?, msg: String?, handle: Any?) {
-                                setPbViewVisible(false)
-                                Toast.makeText(
-                                        this@DeviceConfigBleActivity,
-                                        "Config Failed",
-                                        Toast.LENGTH_LONG
-                                ).show()
-                            }
-                        })
+                val bleActivatorBean = BleActivatorBean(bean) // 注意这里必须要传，早期设备可不传，新设备都需要传
+
+                bleActivatorBean.homeId = 123456 // homeId
+                bleActivatorBean.address = bean.getAddress() // 设备地址
+                bleActivatorBean.deviceType = bean.getDeviceType() // 设备类型
+                bleActivatorBean.uuid = bean.getUuid() // UUID
+                bleActivatorBean.productId = bean.getProductId() // 产品 ID
+                bleActivatorBean.isShare = ((bean.getFlag() shr 2) and 0x01 == 1) // 设备是否为共享类型的标志
+
+                // 开始配网
+                ThingHomeSdk.getActivator().newBleActivator()
+                    .startActivator(bleActivatorBean, object : IBleActivatorListener {
+                        override fun onSuccess(deviceBean: DeviceBean?) {
+                            setPbViewVisible(false)
+                            Toast.makeText(
+                                this@DeviceConfigBleActivity,
+                                "Config Success",
+                                Toast.LENGTH_LONG
+                            ).show()
+                            finish()
+                        }
+
+                        override fun onFailure(code: Int, msg: String?, handle: Any?) {
+                            setPbViewVisible(false)
+                            Toast.makeText(
+                                this@DeviceConfigBleActivity,
+                                "Config Failed",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    })
             }
         }
     }
