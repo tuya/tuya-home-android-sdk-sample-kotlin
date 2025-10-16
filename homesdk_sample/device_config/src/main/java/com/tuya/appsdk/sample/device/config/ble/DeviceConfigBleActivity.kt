@@ -20,7 +20,8 @@ import com.thingclips.smart.android.ble.api.IThingBleConfigListener
 import com.thingclips.smart.android.ble.api.ScanType
 import com.thingclips.smart.home.sdk.ThingHomeSdk
 import com.thingclips.smart.sdk.bean.DeviceBean
-
+import com.thingclips.smart.sdk.api.IBleActivatorListener
+import com.thingclips.smart.sdk.bean.BleActivatorBean
 /**
  * Device Configuration Ble Low Energy Sample
  *
