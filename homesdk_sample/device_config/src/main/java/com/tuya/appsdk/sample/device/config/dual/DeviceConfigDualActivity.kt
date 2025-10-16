@@ -134,11 +134,12 @@ class DeviceConfigDualActivity : AppCompatActivity() {
                 ThingHomeSdk.getActivatorInstance().getActivatorToken(homeId,
                     object : IThingActivatorGetToken {
                         override fun onSuccess(token: String?) {
-                            var multiModeActivatorBean = MultiModeActivatorBean()
+                            var multiModeActivatorBean = MultiModeActivatorBean(bean)
                             multiModeActivatorBean.deviceType = bean.deviceType
                             multiModeActivatorBean.uuid = bean.uuid
                             multiModeActivatorBean.address = bean.address
                             multiModeActivatorBean.mac = bean.mac
+                            multiModeActivatorBean.flag = bean.flag
                             multiModeActivatorBean.ssid = etSsid.text.toString()
                             multiModeActivatorBean.pwd = etPassword.text.toString()
                             multiModeActivatorBean.token = token
