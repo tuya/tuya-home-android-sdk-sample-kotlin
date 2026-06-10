@@ -8,8 +8,6 @@ import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import com.thingclips.smart.android.network.Business
-import com.thingclips.smart.android.network.http.BusinessResponse
 import com.tuya.appsdk.sample.user.R
 
 /**
@@ -18,7 +16,7 @@ import com.tuya.appsdk.sample.user.R
  */
 class RoleEditActivity : AppCompatActivity() {
 
-    private val business = AiAgentBusiness()
+    private lateinit var agent: AiAgentManager
     private lateinit var devId: String
     private var roleId: String? = null
 
@@ -43,6 +41,7 @@ class RoleEditActivity : AppCompatActivity() {
             finish()
             return
         }
+        agent = AiAgentManager(devId)
         title = if (roleId == null) "New Role" else "Edit Role"
 
         etName = findViewById(R.id.et_role_name)
@@ -66,51 +65,51 @@ class RoleEditActivity : AppCompatActivity() {
     }
 
     private fun loadAvatars() {
-        business.listAvatars(devId, object : Business.ResultListener<ArrayList<Avatar>> {
-            override fun onSuccess(r: BusinessResponse?, result: ArrayList<Avatar>?, api: String?) {
-                avatars.clear(); result?.let { avatars.addAll(it) }
+        agent.listAvatars(object : Cb<ArrayList<Avatar>> {
+            override fun onOk(data: ArrayList<Avatar>?) {
+                avatars.clear(); data?.let { avatars.addAll(it) }
                 spAvatar.adapter = simpleAdapter(avatars.mapIndexed { i, a -> a.avatarId ?: "avatar $i" })
             }
 
-            override fun onFailure(r: BusinessResponse?, result: ArrayList<Avatar>?, api: String?) {
-                showError("avatars", r)
+            override fun onErr(code: Int, msg: String?) {
+                showError("avatars", msg)
             }
         })
     }
 
     private fun loadLanguages() {
-        business.listLanguages(devId, object : Business.ResultListener<ArrayList<Language>> {
-            override fun onSuccess(r: BusinessResponse?, result: ArrayList<Language>?, api: String?) {
-                languages.clear(); result?.let { languages.addAll(it) }
+        agent.listLanguages(object : Cb<ArrayList<Language>> {
+            override fun onOk(data: ArrayList<Language>?) {
+                languages.clear(); data?.let { languages.addAll(it) }
                 spLanguage.adapter = simpleAdapter(languages.map { it.langName ?: it.langCode ?: "" })
                 val def = languages.indexOfFirst { it.hasDefault }
                 if (def >= 0) spLanguage.setSelection(def)
             }
 
-            override fun onFailure(r: BusinessResponse?, result: ArrayList<Language>?, api: String?) {
-                showError("languages", r)
+            override fun onErr(code: Int, msg: String?) {
+                showError("languages", msg)
             }
         })
     }
 
     private fun loadTimbres() {
-        business.timbrePage(devId, 1, 50, null, null, null, object : Business.ResultListener<ArrayList<Timbre>> {
-            override fun onSuccess(r: BusinessResponse?, result: ArrayList<Timbre>?, api: String?) {
-                timbres.clear(); result?.let { timbres.addAll(it) }
+        agent.timbrePage(1, 50, null, null, null, object : Cb<ArrayList<Timbre>> {
+            override fun onOk(data: ArrayList<Timbre>?) {
+                timbres.clear(); data?.let { timbres.addAll(it) }
                 spTimbre.adapter = simpleAdapter(
                     listOf("(none)") + timbres.map { it.voiceName ?: it.voiceId ?: "" }
                 )
             }
 
-            override fun onFailure(r: BusinessResponse?, result: ArrayList<Timbre>?, api: String?) {
-                showError("timbres", r)
+            override fun onErr(code: Int, msg: String?) {
+                showError("timbres", msg)
             }
         })
     }
 
     private fun loadDetail() {
-        business.customRoleDetail(devId, roleId!!, object : Business.ResultListener<RoleDetail> {
-            override fun onSuccess(r: BusinessResponse?, d: RoleDetail?, api: String?) {
+        agent.customRoleDetail(roleId!!, object : Cb<RoleDetail> {
+            override fun onOk(d: RoleDetail?) {
                 d ?: return
                 etName.setText(d.roleName ?: "")
                 etIntroduce.setText(d.roleIntroduce ?: "")
@@ -120,8 +119,8 @@ class RoleEditActivity : AppCompatActivity() {
                 timbres.indexOfFirst { it.voiceId == d.useTimbreId }.takeIf { it >= 0 }?.let { spTimbre.setSelection(it + 1) }
             }
 
-            override fun onFailure(r: BusinessResponse?, d: RoleDetail?, api: String?) {
-                showError("detail", r)
+            override fun onErr(code: Int, msg: String?) {
+                showError("detail", msg)
             }
         })
     }
@@ -145,30 +144,30 @@ class RoleEditActivity : AppCompatActivity() {
 
         val current = roleId
         if (current == null) {
-            business.addCustomRole(
-                devId, name, introduce, avatarUrl, langCode, desc, timbreId, null,
-                object : Business.ResultListener<String> {
-                    override fun onSuccess(r: BusinessResponse?, result: String?, api: String?) {
-                        Toast.makeText(this@RoleEditActivity, "Created: $result", Toast.LENGTH_SHORT).show()
+            agent.addCustomRole(
+                name, introduce, avatarUrl, langCode, desc, timbreId, null,
+                object : Cb<String> {
+                    override fun onOk(data: String?) {
+                        Toast.makeText(this@RoleEditActivity, "Created: $data", Toast.LENGTH_SHORT).show()
                         finish()
                     }
 
-                    override fun onFailure(r: BusinessResponse?, result: String?, api: String?) {
-                        showError("create", r)
+                    override fun onErr(code: Int, msg: String?) {
+                        showError("create", msg)
                     }
                 }
             )
         } else {
-            business.updateCustomRole(
-                devId, current, name, desc, introduce, avatarUrl, langCode, timbreId, null, false,
-                object : Business.ResultListener<Boolean> {
-                    override fun onSuccess(r: BusinessResponse?, result: Boolean?, api: String?) {
+            agent.updateCustomRole(
+                current, name, desc, introduce, avatarUrl, langCode, timbreId, null, false,
+                object : Cb<Boolean> {
+                    override fun onOk(data: Boolean?) {
                         Toast.makeText(this@RoleEditActivity, "Updated", Toast.LENGTH_SHORT).show()
                         finish()
                     }
 
-                    override fun onFailure(r: BusinessResponse?, result: Boolean?, api: String?) {
-                        showError("update", r)
+                    override fun onErr(code: Int, msg: String?) {
+                        showError("update", msg)
                     }
                 }
             )
@@ -181,14 +180,14 @@ class RoleEditActivity : AppCompatActivity() {
             .setMessage("Delete this role?")
             .setNegativeButton("Cancel", null)
             .setPositiveButton("Delete") { _, _ ->
-                business.deleteCustomRole(devId, current, object : Business.ResultListener<Boolean> {
-                    override fun onSuccess(r: BusinessResponse?, result: Boolean?, api: String?) {
+                agent.deleteCustomRole(current, object : Cb<Boolean> {
+                    override fun onOk(data: Boolean?) {
                         Toast.makeText(this@RoleEditActivity, "Deleted", Toast.LENGTH_SHORT).show()
                         finish()
                     }
 
-                    override fun onFailure(r: BusinessResponse?, result: Boolean?, api: String?) {
-                        showError("delete", r)
+                    override fun onErr(code: Int, msg: String?) {
+                        showError("delete", msg)
                     }
                 })
             }
@@ -198,7 +197,7 @@ class RoleEditActivity : AppCompatActivity() {
     private fun simpleAdapter(items: List<String>): ArrayAdapter<String> =
         ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, items)
 
-    private fun showError(what: String, r: BusinessResponse?) {
-        Toast.makeText(this, "$what failed: ${r?.errorMsg}", Toast.LENGTH_SHORT).show()
+    private fun showError(what: String, msg: String?) {
+        Toast.makeText(this, "$what failed: $msg", Toast.LENGTH_SHORT).show()
     }
 }

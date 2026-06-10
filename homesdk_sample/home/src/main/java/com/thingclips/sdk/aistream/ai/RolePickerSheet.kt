@@ -10,8 +10,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.thingclips.smart.android.network.Business
-import com.thingclips.smart.android.network.http.BusinessResponse
 import com.tuya.appsdk.sample.user.R
 
 /**
@@ -25,7 +23,7 @@ class RolePickerSheet(
 
     private data class Row(val bindRoleType: Int, val roleId: String, val name: String, val desc: String?, val img: String?)
 
-    private val business = AiAgentBusiness()
+    private val agent = AiAgentManager(devId)
     private val rows = mutableListOf<Row>()
     private lateinit var adapter: RowAdapter
 
@@ -40,27 +38,27 @@ class RolePickerSheet(
     }
 
     private fun loadRoles() {
-        business.listRoleTemplates(devId, null, object : Business.ResultListener<ArrayList<RoleTemplate>> {
-            override fun onSuccess(r: BusinessResponse?, result: ArrayList<RoleTemplate>?, api: String?) {
-                result?.forEach {
+        agent.listRoleTemplates(null, object : Cb<ArrayList<RoleTemplate>> {
+            override fun onOk(data: ArrayList<RoleTemplate>?) {
+                data?.forEach {
                     val id = it.roleId ?: it.templateId ?: return@forEach
                     rows.add(Row(BindRoleType.TEMPLATE, id, "[Template] ${it.roleName ?: id}", it.roleIntroduce ?: it.roleDesc, it.roleImgUrl))
                 }
                 adapter.notifyDataSetChanged()
             }
 
-            override fun onFailure(r: BusinessResponse?, result: ArrayList<RoleTemplate>?, api: String?) {}
+            override fun onErr(code: Int, msg: String?) {}
         })
-        business.pageCustomRoles(devId, 1, 50, null, object : Business.ResultListener<ArrayList<RoleSummary>> {
-            override fun onSuccess(r: BusinessResponse?, result: ArrayList<RoleSummary>?, api: String?) {
-                result?.forEach {
+        agent.pageCustomRoles(1, 50, null, object : Cb<ArrayList<RoleSummary>> {
+            override fun onOk(data: ArrayList<RoleSummary>?) {
+                data?.forEach {
                     val id = it.roleId ?: return@forEach
                     rows.add(Row(BindRoleType.CUSTOM, id, "[Custom] ${it.roleName ?: id}", it.roleIntroduce ?: it.roleDesc, it.roleImgUrl))
                 }
                 adapter.notifyDataSetChanged()
             }
 
-            override fun onFailure(r: BusinessResponse?, result: ArrayList<RoleSummary>?, api: String?) {}
+            override fun onErr(code: Int, msg: String?) {}
         })
     }
 

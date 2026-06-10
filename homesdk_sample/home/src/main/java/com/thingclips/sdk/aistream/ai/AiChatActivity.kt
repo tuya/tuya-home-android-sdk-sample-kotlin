@@ -48,8 +48,6 @@ import com.thingclips.sdk.aistream.audio.AudioPlayCallback
 import com.thingclips.sdk.aistream.business.AgentTokenRequestParams
 import com.thingclips.sdk.aistream.helper.EventStartOptions
 import com.thingclips.smart.android.aistream.Constants
-import com.thingclips.smart.android.network.Business
-import com.thingclips.smart.android.network.http.BusinessResponse
 import com.thingclips.smart.home.sdk.ThingHomeSdk
 import com.thingclips.smart.android.aistream.ThingStreamManager
 import com.thingclips.smart.android.aistream.data.StreamAudio
@@ -130,7 +128,7 @@ class AiChatActivity : AppCompatActivity() {
     private lateinit var mMiniProgramId: String
     private lateinit var mDevId: String
 
-    private val business = AiAgentBusiness()
+    private lateinit var agent: AiAgentManager
     private var dbHelper: AiChatRecordDbHelper? = null
     private var currentRoleId: String = "default"
     private var currentBindRoleType: Int = BindRoleType.DEFAULT
@@ -169,6 +167,7 @@ class AiChatActivity : AppCompatActivity() {
             finish()
             return
         }
+        agent = AiAgentManager(mDevId)
         val uid = ThingHomeSdk.getUserInstance().user?.uid ?: "0"
         dbHelper = AiChatRecordDbHelper(this, uid)
 
@@ -1077,21 +1076,21 @@ class AiChatActivity : AppCompatActivity() {
 
     // --- Role management ---
     private fun resolveBoundRole() {
-        business.initAgentRoleBinding(mDevId, object : Business.ResultListener<RoleDetail> {
-            override fun onSuccess(bizResponse: BusinessResponse?, result: RoleDetail?, apiName: String?) {
-                business.getBindRole(mDevId, object : Business.ResultListener<RoleDetail> {
-                    override fun onSuccess(r: BusinessResponse?, bind: RoleDetail?, api: String?) {
-                        applyRole(bind ?: result)
+        agent.initAgentRoleBinding(object : Cb<RoleDetail> {
+            override fun onOk(data: RoleDetail?) {
+                agent.getBindRole(object : Cb<RoleDetail> {
+                    override fun onOk(bind: RoleDetail?) {
+                        applyRole(bind ?: data)
                     }
 
-                    override fun onFailure(r: BusinessResponse?, bind: RoleDetail?, api: String?) {
-                        applyRole(result)
+                    override fun onErr(code: Int, msg: String?) {
+                        applyRole(data)
                     }
                 })
             }
 
-            override fun onFailure(bizResponse: BusinessResponse?, result: RoleDetail?, apiName: String?) {
-                Log.e(TAG, "initAgentRoleBinding failed: ${bizResponse?.errorMsg}")
+            override fun onErr(code: Int, msg: String?) {
+                Log.e(TAG, "initAgentRoleBinding failed: $code $msg")
             }
         })
     }
@@ -1111,8 +1110,8 @@ class AiChatActivity : AppCompatActivity() {
 
     private fun switchRole(bindRoleType: Int, roleId: String) {
         if (roleId.isEmpty()) return
-        business.bindRole(mDevId, bindRoleType, roleId, object : Business.ResultListener<Boolean> {
-            override fun onSuccess(r: BusinessResponse?, result: Boolean?, api: String?) {
+        agent.bindRole(bindRoleType, roleId, object : Cb<Boolean> {
+            override fun onOk(data: Boolean?) {
                 currentRoleId = roleId
                 currentBindRoleType = bindRoleType
                 runOnUiThread {
@@ -1124,25 +1123,25 @@ class AiChatActivity : AppCompatActivity() {
                 loadCloudHistory()
             }
 
-            override fun onFailure(r: BusinessResponse?, result: Boolean?, api: String?) {
-                showToast("Switch role failed: ${r?.errorMsg}")
+            override fun onErr(code: Int, msg: String?) {
+                showToast("Switch role failed: $msg")
             }
         })
     }
 
     private fun loadCloudHistory() {
         if (currentRoleId == "default" || currentRoleId.isEmpty()) return
-        business.fetchHistory(
-            mDevId, currentBindRoleType, currentRoleId,
+        agent.fetchHistory(
+            currentBindRoleType, currentRoleId,
             null, System.currentTimeMillis(), 50, true,
-            object : Business.ResultListener<ArrayList<ChatHistoryItem>> {
-                override fun onSuccess(r: BusinessResponse?, result: ArrayList<ChatHistoryItem>?, api: String?) {
-                    if (result.isNullOrEmpty()) return
-                    mergeCloudHistory(result)
+            object : Cb<ArrayList<ChatHistoryItem>> {
+                override fun onOk(data: ArrayList<ChatHistoryItem>?) {
+                    if (data.isNullOrEmpty()) return
+                    mergeCloudHistory(data)
                 }
 
-                override fun onFailure(r: BusinessResponse?, result: ArrayList<ChatHistoryItem>?, api: String?) {
-                    Log.w(TAG, "fetchHistory failed: ${r?.errorMsg}")
+                override fun onErr(code: Int, msg: String?) {
+                    Log.w(TAG, "fetchHistory failed: $code $msg")
                 }
             }
         )
@@ -1260,12 +1259,12 @@ class AiChatActivity : AppCompatActivity() {
     }
 
     private fun showSummaryDialog() {
-        business.getSummary(mDevId, currentBindRoleType, currentRoleId, object : Business.ResultListener<String> {
-            override fun onSuccess(r: BusinessResponse?, result: String?, api: String?) {
-                runOnUiThread { buildSummaryEditor(result ?: "") }
+        agent.getSummary(currentBindRoleType, currentRoleId, object : Cb<String> {
+            override fun onOk(data: String?) {
+                runOnUiThread { buildSummaryEditor(data ?: "") }
             }
 
-            override fun onFailure(r: BusinessResponse?, result: String?, api: String?) {
+            override fun onErr(code: Int, msg: String?) {
                 runOnUiThread { buildSummaryEditor("") }
             }
         })
@@ -1281,15 +1280,15 @@ class AiChatActivity : AppCompatActivity() {
             .setView(input)
             .setNegativeButton("Cancel", null)
             .setPositiveButton("Save") { _, _ ->
-                business.updateSummary(
-                    mDevId, currentBindRoleType, currentRoleId, input.text.toString(),
-                    object : Business.ResultListener<Boolean> {
-                        override fun onSuccess(r: BusinessResponse?, result: Boolean?, api: String?) {
+                agent.updateSummary(
+                    currentBindRoleType, currentRoleId, input.text.toString(),
+                    object : Cb<Boolean> {
+                        override fun onOk(data: Boolean?) {
                             showToast("Summary saved")
                         }
 
-                        override fun onFailure(r: BusinessResponse?, result: Boolean?, api: String?) {
-                            showToast("Save summary failed: ${r?.errorMsg}")
+                        override fun onErr(code: Int, msg: String?) {
+                            showToast("Save summary failed: $msg")
                         }
                     }
                 )
@@ -1302,13 +1301,13 @@ class AiChatActivity : AppCompatActivity() {
             .setMessage("Clear conversation context for current role?")
             .setNegativeButton("Cancel", null)
             .setPositiveButton("Clear") { _, _ ->
-                business.clearContext(mDevId, currentBindRoleType, currentRoleId, object : Business.ResultListener<Boolean> {
-                    override fun onSuccess(r: BusinessResponse?, result: Boolean?, api: String?) {
+                agent.clearContext(currentBindRoleType, currentRoleId, object : Cb<Boolean> {
+                    override fun onOk(data: Boolean?) {
                         showToast("Context cleared")
                     }
 
-                    override fun onFailure(r: BusinessResponse?, result: Boolean?, api: String?) {
-                        showToast("Clear context failed: ${r?.errorMsg}")
+                    override fun onErr(code: Int, msg: String?) {
+                        showToast("Clear context failed: $msg")
                     }
                 })
             }
@@ -1316,17 +1315,17 @@ class AiChatActivity : AppCompatActivity() {
     }
 
     private fun showCurrentEmotion() {
-        business.currentEmotion(mDevId, object : Business.ResultListener<ChatEmotion> {
-            override fun onSuccess(r: BusinessResponse?, result: ChatEmotion?, api: String?) {
-                result ?: return
+        agent.currentEmotion(object : Cb<ChatEmotion> {
+            override fun onOk(data: ChatEmotion?) {
+                data ?: return
                 runOnUiThread {
-                    if (!result.emotion.isNullOrEmpty()) tvEmoji.text = result.emotion
-                    showToast("Emotion: ${result.emotion} ${result.text ?: ""}")
+                    if (!data.emotion.isNullOrEmpty()) tvEmoji.text = data.emotion
+                    showToast("Emotion: ${data.emotion} ${data.text ?: ""}")
                 }
             }
 
-            override fun onFailure(r: BusinessResponse?, result: ChatEmotion?, api: String?) {
-                showToast("Get emotion failed: ${r?.errorMsg}")
+            override fun onErr(code: Int, msg: String?) {
+                showToast("Get emotion failed: $msg")
             }
         })
     }

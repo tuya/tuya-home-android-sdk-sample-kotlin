@@ -11,8 +11,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.thingclips.smart.android.network.Business
-import com.thingclips.smart.android.network.http.BusinessResponse
 import com.tuya.appsdk.sample.user.R
 
 /**
@@ -21,7 +19,7 @@ import com.tuya.appsdk.sample.user.R
  */
 class MemoryActivity : AppCompatActivity() {
 
-    private val business = AiAgentBusiness()
+    private lateinit var agent: AiAgentManager
     private lateinit var devId: String
     private lateinit var roleId: String
     private var bindRoleType: Int = BindRoleType.DEFAULT
@@ -42,6 +40,7 @@ class MemoryActivity : AppCompatActivity() {
             finish()
             return
         }
+        agent = AiAgentManager(devId)
 
         tvSwitch = findViewById(R.id.tv_memory_switch)
         val rv = findViewById<RecyclerView>(R.id.rv_memory)
@@ -56,39 +55,39 @@ class MemoryActivity : AppCompatActivity() {
     }
 
     private fun loadSwitch() {
-        business.getMemorySwitch(devId, object : Business.ResultListener<MemorySwitch> {
-            override fun onSuccess(r: BusinessResponse?, result: MemorySwitch?, api: String?) {
-                tvSwitch.text = "memoryOpen=${result?.memoryOpen} summaryOpen=${result?.summaryOpen}"
+        agent.getMemorySwitch(object : Cb<MemorySwitch> {
+            override fun onOk(data: MemorySwitch?) {
+                tvSwitch.text = "memoryOpen=${data?.memoryOpen} summaryOpen=${data?.summaryOpen}"
             }
 
-            override fun onFailure(r: BusinessResponse?, result: MemorySwitch?, api: String?) {
-                tvSwitch.text = "Memory switch: failed (${r?.errorMsg})"
+            override fun onErr(code: Int, msg: String?) {
+                tvSwitch.text = "Memory switch: failed ($msg)"
             }
         })
     }
 
     private fun loadMemory() {
-        business.listMemory(devId, bindRoleType, roleId, object : Business.ResultListener<ArrayList<MemoryGroup>> {
-            override fun onSuccess(r: BusinessResponse?, result: ArrayList<MemoryGroup>?, api: String?) {
+        agent.listMemory(bindRoleType, roleId, object : Cb<ArrayList<MemoryGroup>> {
+            override fun onOk(data: ArrayList<MemoryGroup>?) {
                 items.clear()
-                result?.forEach { g -> g.memoryList?.let { items.addAll(it) } }
+                data?.forEach { g -> g.memoryList?.let { items.addAll(it) } }
                 adapter.notifyDataSetChanged()
             }
 
-            override fun onFailure(r: BusinessResponse?, result: ArrayList<MemoryGroup>?, api: String?) {
-                Toast.makeText(this@MemoryActivity, "list failed: ${r?.errorMsg}", Toast.LENGTH_SHORT).show()
+            override fun onErr(code: Int, msg: String?) {
+                Toast.makeText(this@MemoryActivity, "list failed: $msg", Toast.LENGTH_SHORT).show()
             }
         })
     }
 
     private fun deleteOne(key: String) {
-        business.deleteMemory(devId, bindRoleType, roleId, false, key, object : Business.ResultListener<Boolean> {
-            override fun onSuccess(r: BusinessResponse?, result: Boolean?, api: String?) {
+        agent.deleteMemory(bindRoleType, roleId, false, key, object : Cb<Boolean> {
+            override fun onOk(data: Boolean?) {
                 loadMemory()
             }
 
-            override fun onFailure(r: BusinessResponse?, result: Boolean?, api: String?) {
-                Toast.makeText(this@MemoryActivity, "delete failed: ${r?.errorMsg}", Toast.LENGTH_SHORT).show()
+            override fun onErr(code: Int, msg: String?) {
+                Toast.makeText(this@MemoryActivity, "delete failed: $msg", Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -98,13 +97,13 @@ class MemoryActivity : AppCompatActivity() {
             .setMessage("Clear all memory for this role?")
             .setNegativeButton("Cancel", null)
             .setPositiveButton("Clear") { _, _ ->
-                business.deleteMemory(devId, bindRoleType, roleId, true, null, object : Business.ResultListener<Boolean> {
-                    override fun onSuccess(r: BusinessResponse?, result: Boolean?, api: String?) {
+                agent.deleteMemory(bindRoleType, roleId, true, null, object : Cb<Boolean> {
+                    override fun onOk(data: Boolean?) {
                         loadMemory()
                     }
 
-                    override fun onFailure(r: BusinessResponse?, result: Boolean?, api: String?) {
-                        Toast.makeText(this@MemoryActivity, "clear failed: ${r?.errorMsg}", Toast.LENGTH_SHORT).show()
+                    override fun onErr(code: Int, msg: String?) {
+                        Toast.makeText(this@MemoryActivity, "clear failed: $msg", Toast.LENGTH_SHORT).show()
                     }
                 })
             }
