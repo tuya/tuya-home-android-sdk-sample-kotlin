@@ -48,6 +48,7 @@ import com.thingclips.sdk.aistream.audio.AudioPlayCallback
 import com.thingclips.sdk.aistream.business.AgentTokenRequestParams
 import com.thingclips.sdk.aistream.helper.EventStartOptions
 import com.thingclips.smart.android.aistream.Constants
+import com.thingclips.smart.home.sdk.ThingHomeSdk
 import com.thingclips.smart.android.aistream.ThingStreamManager
 import com.thingclips.smart.android.aistream.data.StreamAudio
 import com.thingclips.smart.android.aistream.data.StreamEvent
@@ -120,6 +121,11 @@ class AiChatActivity : AppCompatActivity() {
     private lateinit var mMiniProgramId: String
     private lateinit var mDevId: String
 
+    private val business = AiAgentBusiness()
+    private var dbHelper: AiChatRecordDbHelper? = null
+    private var currentRoleId: String = "default"
+    private var currentBindRoleType: Int = 2 // 0=custom, 1=template, 2=single-scene default
+
     private data class SkillEmojiStep(val emoji: String, val startTime: Long, val endTime: Long)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -154,6 +160,9 @@ class AiChatActivity : AppCompatActivity() {
             finish()
             return
         }
+        val uid = ThingHomeSdk.getUserInstance().user?.uid ?: "0"
+        dbHelper = AiChatRecordDbHelper(this, uid)
+
         initViews()
         setupToolbar()
         initAiStream()
@@ -163,6 +172,7 @@ class AiChatActivity : AppCompatActivity() {
 
         connectToAiStream()
         updateUiForSessionState()
+        loadLocalHistory()
     }
 
     private fun initViews() {
@@ -1008,6 +1018,52 @@ class AiChatActivity : AppCompatActivity() {
             chatAdapter.notifyItemInserted(messageList.size - 1)
             rvChatMessages.scrollToPosition(messageList.size - 1)
         }
+        persistMessage(message)
+    }
+
+    private fun persistMessage(message: ChatMessage) {
+        val helper = dbHelper ?: return
+        val record = ChatMessageRecord(
+            devId = mDevId,
+            roleId = currentRoleId,
+            bizId = message.bizId,
+            sender = if (message.isSentByUser) 0 else 1,
+            msgType = message.messageType.name.lowercase(),
+            content = message.text,
+            imageUri = message.imageUri?.toString() ?: message.imageUrl,
+            ts = message.timestamp
+        )
+        Thread { helper.insert(record) }.start()
+    }
+
+    private fun loadLocalHistory() {
+        val helper = dbHelper ?: return
+        Thread {
+            val records = helper.query(mDevId, currentRoleId)
+            val restored = records.map { it.toChatMessage() }
+            runOnUiThread {
+                if (restored.isEmpty()) return@runOnUiThread
+                messageList.clear()
+                messageList.addAll(restored)
+                chatAdapter.notifyDataSetChanged()
+                rvChatMessages.scrollToPosition(messageList.size - 1)
+            }
+        }.start()
+    }
+
+    private fun ChatMessageRecord.toChatMessage(): ChatMessage {
+        val type = runCatching {
+            ChatMessage.MessageType.valueOf(msgType.uppercase())
+        }.getOrDefault(ChatMessage.MessageType.TEXT)
+        val isImageUrl = type == ChatMessage.MessageType.NLG_IMAGE
+        return ChatMessage(
+            text = content,
+            imageUri = if (!isImageUrl && imageUri != null) Uri.parse(imageUri) else null,
+            imageUrl = if (isImageUrl) imageUri else null,
+            isSentByUser = sender == 0,
+            messageType = type,
+            bizId = bizId
+        )
     }
 
     // --- AI Stream Listener Callbacks ---
@@ -1455,5 +1511,7 @@ class AiChatActivity : AppCompatActivity() {
         aiStream = null
         emojiRunnable?.let { emojiHandler.removeCallbacks(it) }
         dismissRecordingPopup()
+        dbHelper?.close()
+        dbHelper = null
     }
 }
