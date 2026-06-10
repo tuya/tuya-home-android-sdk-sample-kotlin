@@ -69,6 +69,39 @@ class AiChatRecordDbHelper(context: Context, uid: String) :
         }
     }
 
+    /**
+     * Upsert a streaming NLG reply by bizId: the cloud delivers it in append
+     * chunks sharing one bizId, so update the existing row's content instead of
+     * keeping only the first chunk.
+     */
+    fun upsertNlg(devId: String, roleId: String, bizId: String, content: String?, ts: Long): Long {
+        return try {
+            val db = writableDatabase
+            val v = ContentValues().apply {
+                put(C_CONTENT, content)
+                put(C_TS, ts)
+            }
+            val rows = db.update(
+                T, v,
+                "$C_DEV=? AND $C_ROLE=? AND $C_BIZ=? AND $C_SENDER=1 AND $C_TYPE=?",
+                arrayOf(devId, roleId, bizId, "nlg_text")
+            )
+            if (rows > 0) {
+                rows.toLong()
+            } else {
+                insert(
+                    ChatMessageRecord(
+                        devId = devId, roleId = roleId, bizId = bizId, sender = 1,
+                        msgType = "nlg_text", content = content, imageUri = null, ts = ts
+                    )
+                )
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "upsertNlg error: ${e.message}")
+            -1
+        }
+    }
+
     fun query(devId: String, roleId: String, limit: Int = 200): List<ChatMessageRecord> {
         val list = ArrayList<ChatMessageRecord>()
         try {

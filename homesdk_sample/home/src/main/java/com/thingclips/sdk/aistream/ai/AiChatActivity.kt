@@ -1028,6 +1028,10 @@ class AiChatActivity : AppCompatActivity() {
 
     private fun persistMessage(message: ChatMessage) {
         val helper = dbHelper ?: return
+        // Streaming NLG text arrives in append chunks sharing one bizId; it is
+        // upserted via persistNlg() instead so the full reply is saved, not just
+        // the first chunk.
+        if (message.messageType == ChatMessage.MessageType.NLG_TEXT && !message.bizId.isNullOrEmpty()) return
         val record = ChatMessageRecord(
             devId = mDevId,
             roleId = currentRoleId,
@@ -1039,6 +1043,19 @@ class AiChatActivity : AppCompatActivity() {
             ts = message.timestamp
         )
         Thread { helper.insert(record) }.start()
+    }
+
+    private fun persistNlg(bizId: String) {
+        val helper = dbHelper ?: return
+        if (bizId.isEmpty()) return
+        val msg = messageList.lastOrNull {
+            !it.isSentByUser && it.bizId == bizId && it.messageType == ChatMessage.MessageType.NLG_TEXT
+        } ?: return
+        val content = msg.text
+        val ts = msg.timestamp
+        val dev = mDevId
+        val role = currentRoleId
+        Thread { helper.upsertNlg(dev, role, bizId, content, ts) }.start()
     }
 
     private fun loadLocalHistory() {
@@ -1548,6 +1565,8 @@ class AiChatActivity : AppCompatActivity() {
                     )
                 )
             }
+            // Persist the full (appended) NLG text by bizId.
+            if (bizId.isNotEmpty()) persistNlg(bizId)
         }
 
         data.optJSONArray("images")?.let { imagesArray ->
