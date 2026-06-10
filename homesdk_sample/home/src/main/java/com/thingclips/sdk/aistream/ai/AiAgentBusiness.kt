@@ -1,9 +1,10 @@
 package com.thingclips.sdk.aistream.ai
 
 import android.text.TextUtils
+import com.alibaba.fastjson.JSONObject
 import com.thingclips.smart.android.base.ApiParams
 import com.thingclips.smart.android.network.Business
-import com.thingclips.smart.android.network.bean.PageList
+import com.thingclips.smart.android.network.http.BusinessResponse
 
 class AiAgentBusiness : Business() {
 
@@ -54,13 +55,24 @@ class AiAgentBusiness : Business() {
         if (v != null) putPostData(k, v)
     }
 
-    /** Adapt a paged response to the flat ArrayList<T> the callers expect. */
-    private fun <T> pageToList(outer: ResultListener<ArrayList<T>>): ResultListener<PageList<T>> =
-        object : ResultListener<PageList<T>> {
-            override fun onSuccess(r: com.thingclips.smart.android.network.http.BusinessResponse?, result: PageList<T>?, api: String?) =
-                outer.onSuccess(r, ArrayList(result?.data ?: emptyList()), api)
+    /**
+     * Paged endpoints return {list,page,total,...} which neither asyncArrayList
+     * nor asyncPageList parse (101001). Read the raw JSONObject and pull "list".
+     */
+    private fun <T> pageToList(clazz: Class<T>, outer: ResultListener<ArrayList<T>>): ResultListener<JSONObject> =
+        object : ResultListener<JSONObject> {
+            override fun onSuccess(r: BusinessResponse?, result: JSONObject?, api: String?) {
+                val list = ArrayList<T>()
+                val arr = result?.getJSONArray("list")
+                if (arr != null) {
+                    for (i in 0 until arr.size) {
+                        arr.getObject(i, clazz)?.let { list.add(it) }
+                    }
+                }
+                outer.onSuccess(r, list, api)
+            }
 
-            override fun onFailure(r: com.thingclips.smart.android.network.http.BusinessResponse?, result: PageList<T>?, api: String?) =
+            override fun onFailure(r: BusinessResponse?, result: JSONObject?, api: String?) =
                 outer.onFailure(r, ArrayList(), api)
         }
 
@@ -83,7 +95,7 @@ class AiAgentBusiness : Business() {
         p.putIfNotEmpty("keyWord", keyWord)
         p.putIfNotEmpty("lang", lang)
         // Cloud returns a paged object {list,page,total,...}, not a bare array.
-        asyncPageList(p, Timbre::class.java, pageToList(l))
+        asyncRequest(p, pageToList(Timbre::class.java, l))
     }
 
     // --- role ---
@@ -112,7 +124,7 @@ class AiAgentBusiness : Business() {
         p.putPostData("pageSize", pageSize)
         p.putIfNotEmpty("roleCategory", roleCategory)
         // Cloud returns a paged object {list,page,total,...}, not a bare array.
-        asyncPageList(p, RoleSummary::class.java, pageToList(l))
+        asyncRequest(p, pageToList(RoleSummary::class.java, l))
     }
 
     fun customRoleDetail(devId: String, roleId: String, l: ResultListener<RoleDetail>) {
