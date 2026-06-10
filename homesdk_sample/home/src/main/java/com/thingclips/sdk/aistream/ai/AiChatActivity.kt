@@ -513,19 +513,15 @@ class AiChatActivity : AppCompatActivity() {
             return
         }
         isSessionCreating = true
+        // Device-identity session: token request carries deviceId in extParams.
         val params = AgentTokenRequestParams.Builder()
             .api(API_GET_TOKEN)
             .apiVersion(API_VERSION)
             .ownerId(mOwnerId)
             .aiSolutionCode(mAiSolutionCode)
             .addExtParam("miniProgramId", mMiniProgramId)
-            .addExtParam(
-                "needTts",
-                "true"
-            ).addExtParam(
-                "onlyAsr",
-                "false"
-            ) // If you need TTS, please contact us to enable it for your program
+            .addExtParam("deviceId", mDevId)
+            .addExtParam("needTts", "true")
             .build()
 
         aiStream?.createSession(params, null, object : SessionCallback {
