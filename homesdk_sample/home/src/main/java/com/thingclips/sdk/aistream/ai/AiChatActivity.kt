@@ -1192,6 +1192,10 @@ class AiChatActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: android.view.Menu): Boolean {
         menu.add(0, MENU_SWITCH_ROLE, 0, "Switch Role")
         menu.add(0, MENU_NEW_ROLE, 1, "New Role")
+        menu.add(0, MENU_MEMORY, 2, "Memory")
+        menu.add(0, MENU_SUMMARY, 3, "Summary")
+        menu.add(0, MENU_CLEAR_CONTEXT, 4, "Clear Context")
+        menu.add(0, MENU_EMOTION, 5, "Emotion")
         return true
     }
 
@@ -1213,8 +1217,118 @@ class AiChatActivity : AppCompatActivity() {
                 true
             }
 
+            MENU_MEMORY -> {
+                if (!requireRole()) return true
+                startActivity(
+                    Intent(this, MemoryActivity::class.java)
+                        .putExtra("devId", mDevId)
+                        .putExtra("roleId", currentRoleId)
+                        .putExtra("bindRoleType", currentBindRoleType)
+                )
+                true
+            }
+
+            MENU_SUMMARY -> {
+                if (!requireRole()) return true
+                showSummaryDialog()
+                true
+            }
+
+            MENU_CLEAR_CONTEXT -> {
+                if (!requireRole()) return true
+                confirmClearContext()
+                true
+            }
+
+            MENU_EMOTION -> {
+                if (!isSessionActive()) { showToast("Session not active"); return true }
+                showCurrentEmotion()
+                true
+            }
+
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun requireRole(): Boolean {
+        if (!isSessionActive()) { showToast("Session not active"); return false }
+        if (currentRoleId == "default" || currentRoleId.isEmpty()) {
+            showToast("Role not resolved yet")
+            return false
+        }
+        return true
+    }
+
+    private fun showSummaryDialog() {
+        business.getSummary(mDevId, currentBindRoleType, currentRoleId, object : Business.ResultListener<String> {
+            override fun onSuccess(r: BusinessResponse?, result: String?, api: String?) {
+                runOnUiThread { buildSummaryEditor(result ?: "") }
+            }
+
+            override fun onFailure(r: BusinessResponse?, result: String?, api: String?) {
+                runOnUiThread { buildSummaryEditor("") }
+            }
+        })
+    }
+
+    private fun buildSummaryEditor(initial: String) {
+        val input = EditText(this).apply {
+            setText(initial)
+            setSelection(text.length)
+        }
+        AlertDialog.Builder(this)
+            .setTitle("Chat Summary")
+            .setView(input)
+            .setNegativeButton("Cancel", null)
+            .setPositiveButton("Save") { _, _ ->
+                business.updateSummary(
+                    mDevId, currentBindRoleType, currentRoleId, input.text.toString(),
+                    object : Business.ResultListener<Boolean> {
+                        override fun onSuccess(r: BusinessResponse?, result: Boolean?, api: String?) {
+                            showToast("Summary saved")
+                        }
+
+                        override fun onFailure(r: BusinessResponse?, result: Boolean?, api: String?) {
+                            showToast("Save summary failed: ${r?.errorMsg}")
+                        }
+                    }
+                )
+            }
+            .show()
+    }
+
+    private fun confirmClearContext() {
+        AlertDialog.Builder(this)
+            .setMessage("Clear conversation context for current role?")
+            .setNegativeButton("Cancel", null)
+            .setPositiveButton("Clear") { _, _ ->
+                business.clearContext(mDevId, currentBindRoleType, currentRoleId, object : Business.ResultListener<Boolean> {
+                    override fun onSuccess(r: BusinessResponse?, result: Boolean?, api: String?) {
+                        showToast("Context cleared")
+                    }
+
+                    override fun onFailure(r: BusinessResponse?, result: Boolean?, api: String?) {
+                        showToast("Clear context failed: ${r?.errorMsg}")
+                    }
+                })
+            }
+            .show()
+    }
+
+    private fun showCurrentEmotion() {
+        business.currentEmotion(mDevId, object : Business.ResultListener<ChatEmotion> {
+            override fun onSuccess(r: BusinessResponse?, result: ChatEmotion?, api: String?) {
+                result ?: return
+                runOnUiThread {
+                    if (!result.emotion.isNullOrEmpty()) tvEmoji.text = result.emotion
+                    showToast("Emotion: ${result.emotion} ${result.text ?: ""}")
+                }
+            }
+
+            override fun onFailure(r: BusinessResponse?, result: ChatEmotion?, api: String?) {
+                showToast("Get emotion failed: ${r?.errorMsg}")
+            }
+        })
     }
 
     // --- AI Stream Listener Callbacks ---
