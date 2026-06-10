@@ -1565,8 +1565,6 @@ class AiChatActivity : AppCompatActivity() {
                     )
                 )
             }
-            // Persist the full (appended) NLG text by bizId.
-            if (bizId.isNotEmpty()) persistNlg(bizId)
         }
 
         data.optJSONArray("images")?.let { imagesArray ->
@@ -1587,6 +1585,8 @@ class AiChatActivity : AppCompatActivity() {
 
         if (eof == 1) {
             Log.d(TAG, "NLG stream finished for bizId: $bizId")
+            // Persist the full reply once, when streaming completes (not per chunk).
+            if (bizId.isNotEmpty()) persistNlg(bizId)
         }
     }
 
