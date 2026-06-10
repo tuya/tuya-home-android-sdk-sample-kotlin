@@ -118,6 +118,7 @@ class AiChatActivity : AppCompatActivity() {
     private lateinit var mOwnerId: String
     private lateinit var mAiSolutionCode: String
     private lateinit var mMiniProgramId: String
+    private lateinit var mDevId: String
 
     private data class SkillEmojiStep(val emoji: String, val startTime: Long, val endTime: Long)
 
@@ -146,6 +147,13 @@ class AiChatActivity : AppCompatActivity() {
         }
         mAiSolutionCode = aiSolutionCode
         mMiniProgramId = miniProgramId
+        mDevId = intent.getStringExtra("devId") ?: ""
+        if (mDevId.isEmpty()) {
+            Log.e(TAG, "devId is required for device-identity connection.")
+            Toast.makeText(this, "devId is required", Toast.LENGTH_SHORT).show()
+            finish()
+            return
+        }
         initViews()
         setupToolbar()
         initAiStream()
@@ -435,7 +443,7 @@ class AiChatActivity : AppCompatActivity() {
 
     // --- AI Stream Connection & Session Management ---
     private fun connectToAiStream() {
-        if (aiStream?.isConnected(Constants.ClientType.APP, null) == true) {
+        if (aiStream?.isConnected(Constants.ClientType.DEVICE, mDevId) == true) {
             Log.i(TAG, "Already connected.")
             if (currentSessionId.isNullOrEmpty()) createNewSession()
             return
@@ -446,16 +454,16 @@ class AiChatActivity : AppCompatActivity() {
         }
         isConnecting = true
         tvStatus.text = "Status: Connecting..."
-        aiStream?.connectWithApp(object : ConnectCallback {
+        aiStream?.connectWithDevice(mDevId, object : ConnectCallback {
             override fun onSuccess(connectionId: String) {
                 isConnecting = false
-                Log.i(TAG, "connectWithApp onSuccess, connectionId: $connectionId")
+                Log.i(TAG, "connectWithDevice onSuccess, connectionId: $connectionId")
                 // State change will be handled by listener
             }
 
             override fun onError(code: Int, error: String) {
                 isConnecting = false
-                Log.e(TAG, "connectWithApp onError, code: $code, error: $error")
+                Log.e(TAG, "connectWithDevice onError, code: $code, error: $error")
                 runOnUiThread {
                     tvStatus.text = "Status: Connect failed ($error)"
                     Toast.makeText(
@@ -494,6 +502,9 @@ class AiChatActivity : AppCompatActivity() {
             .addExtParam("miniProgramId", mMiniProgramId)
             .addExtParam(
                 "needTts",
+                "true"
+            ).addExtParam(
+                "onlyAsr",
                 "false"
             ) // If you need TTS, please contact us to enable it for your program
             .build()
@@ -525,7 +536,7 @@ class AiChatActivity : AppCompatActivity() {
     }
 
     private fun isStreamConnected(): Boolean =
-        aiStream?.isConnected(Constants.ClientType.APP, null) == true
+        aiStream?.isConnected(Constants.ClientType.DEVICE, mDevId) == true
 
     private fun isSessionActive(): Boolean =
         isStreamConnected() && !currentSessionId.isNullOrEmpty()
@@ -668,25 +679,8 @@ class AiChatActivity : AppCompatActivity() {
         aiStream?.sendImageData(currentSessionId!!, imagePath, null, object : StreamResultCallback {
             override fun onSuccess() {
                 Log.i(TAG, "sendImageData success for event: $eventId")
-                aiStream?.sendEventPayloadsEnd(
-                    eventId,
-                    currentSessionId!!,
-                    ThingAiStream.DATA_CHANNEL_IMAGE,
-                    null,
-                    object : StreamResultCallback {
-                        override fun onSuccess() {
-                            Log.i(TAG, "sendEventPayloadsEnd for IMAGE success for event: $eventId")
-                            onCompletion?.invoke()
-                        }
-
-                        override fun onError(code: Int, message: String) {
-                            Log.e(
-                                TAG,
-                                "sendEventPayloadsEnd for IMAGE failed for event $eventId: $code $message"
-                            )
-                            onCompletion?.invoke()
-                        }
-                    })
+                Log.i(TAG, "sendEventPayloadsEnd for IMAGE success for event: $eventId")
+                onCompletion?.invoke()
             }
 
             override fun onError(code: Int, message: String) {
@@ -850,31 +844,14 @@ class AiChatActivity : AppCompatActivity() {
             object : StreamResultCallback {
                 override fun onSuccess() {
                     Log.d(TAG, "stopRecordAndSendAudioData success for event: $eventIdForAudio")
-                    aiStream?.sendEventPayloadsEnd(
-                        eventIdForAudio,
-                        currentSessionId!!,
-                        ThingAiStream.DATA_CHANNEL_AUDIO,
-                        null,
-                        object : StreamResultCallback {
-                            override fun onSuccess() {
-                                Log.i(
-                                    TAG,
-                                    "sendEventPayloadsEnd for AUDIO success for event: $eventIdForAudio"
-                                )
-                                finalizeEvent(eventIdForAudio) {
-                                    Log.d(TAG, "Event $eventIdForAudio finalized after voice.")
-                                    clearImagePreviewUI()
-                                }
-                            }
-
-                            override fun onError(code: Int, message: String) {
-                                Log.e(
-                                    TAG,
-                                    "sendEventPayloadsEnd for AUDIO failed for $eventIdForAudio: $code $message"
-                                )
-                                finalizeEvent(eventIdForAudio) { clearImagePreviewUI() }
-                            }
-                        })
+                    Log.i(
+                        TAG,
+                        "sendEventPayloadsEnd for AUDIO success for event: $eventIdForAudio"
+                    )
+                    finalizeEvent(eventIdForAudio) {
+                        Log.d(TAG, "Event $eventIdForAudio finalized after voice.")
+                        clearImagePreviewUI()
+                    }
                 }
 
                 override fun onError(code: Int, message: String) {
@@ -998,29 +975,13 @@ class AiChatActivity : AppCompatActivity() {
             aiStream?.sendTextData(currentSessionId!!, streamText, object : StreamResultCallback {
                 override fun onSuccess() {
                     Log.i(TAG, "sendTextData success for event: $eventId")
-                    aiStream?.sendEventPayloadsEnd(
-                        eventId,
-                        currentSessionId!!,
-                        ThingAiStream.DATA_CHANNEL_TEXT,
-                        null,
-                        object : StreamResultCallback {
-                            override fun onSuccess() {
-                                Log.i(
-                                    TAG,
-                                    "sendEventPayloadsEnd for TEXT success for event: $eventId"
-                                )
-                                finalizeLogic()
-                            }
-
-                            override fun onError(code: Int, message: String) {
-                                Log.e(
-                                    TAG,
-                                    "sendEventPayloadsEnd for TEXT failed for $eventId: $code $message"
-                                )
-                                finalizeLogic()
-                            }
-                        })
+                    Log.i(
+                        TAG,
+                        "sendEventPayloadsEnd for TEXT success for event: $eventId"
+                    )
+                    finalizeLogic()
                 }
+
 
                 override fun onError(code: Int, message: String) {
                     Log.e(TAG, "sendTextData failed for $eventId: $code $message")
@@ -1137,8 +1098,8 @@ class AiChatActivity : AppCompatActivity() {
                 Log.w(TAG, "Received empty text data, ignoring.")
                 return
             }
-            Log.i(TAG, "Text received: ${textData.text} for sessionIds: ${textData.sessionIdList}")
-            if (textData.sessionIdList?.contains(currentSessionId) == false) {
+            Log.i(TAG, "Text received: ${textData.text} for sessionIds: ${textData.sessionId}")
+            if (textData.sessionId != currentSessionId) {
                 Log.w(TAG, "Received text for an inactive or different session. Ignoring.")
                 return
             }

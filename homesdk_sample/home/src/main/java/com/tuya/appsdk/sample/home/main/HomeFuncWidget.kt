@@ -19,6 +19,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import com.thingclips.sdk.album.AlbumActivity
 import com.thingclips.sdk.aistream.ai.AiChatActivity
 import com.thingclips.smart.home.sdk.ThingHomeSdk
 import com.thingclips.smart.home.sdk.bean.HomeBean
@@ -77,6 +78,7 @@ class HomeFuncWidget {
             }
             val aiSolutionCode = getMetaDataValue(it.context, "AI_SOLUTION_CODE")
             val miniProgramId = getMetaDataValue(it.context, "MINI_PROGRAM_ID")
+            val devId = getMetaDataValue(it.context, "AI_DEVICE_ID")
             if (aiSolutionCode.isNullOrEmpty() || miniProgramId.isNullOrEmpty()) {
                 Toast.makeText(
                     it.context,
@@ -85,10 +87,30 @@ class HomeFuncWidget {
                 ).show()
                 return@setOnClickListener
             }
+            if (devId.isNullOrEmpty()) {
+                Toast.makeText(
+                    it.context,
+                    "AI_DEVICE_ID not found (required for device-identity connection)",
+                    Toast.LENGTH_SHORT
+                ).show()
+                return@setOnClickListener
+            }
             val intent = Intent(it.context, AiChatActivity::class.java)
             intent.putExtra("ownerId", currentHomeId.toString())
             intent.putExtra("aiSolutionCode", aiSolutionCode)
             intent.putExtra("miniProgramId", miniProgramId)
+            intent.putExtra("devId", devId)
+            it.context.startActivity(intent)
+        }
+
+        rootView.findViewById<TextView>(R.id.tvAlbumDemo).setOnClickListener {
+            val currentHomeId = HomeModel.INSTANCE.getCurrentHome(tvCurrentHomeName.context)
+            if (currentHomeId == 0L) {
+                Toast.makeText(it.context, "Please select a home", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            val intent = Intent(it.context, AlbumActivity::class.java)
+            intent.putExtra("homeId", currentHomeId)
             it.context.startActivity(intent)
         }
 
