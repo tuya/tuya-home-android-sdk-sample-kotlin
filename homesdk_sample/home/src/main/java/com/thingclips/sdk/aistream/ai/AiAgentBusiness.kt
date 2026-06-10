@@ -3,6 +3,7 @@ package com.thingclips.sdk.aistream.ai
 import android.text.TextUtils
 import com.thingclips.smart.android.base.ApiParams
 import com.thingclips.smart.android.network.Business
+import com.thingclips.smart.android.network.bean.PageList
 
 class AiAgentBusiness : Business() {
 
@@ -53,6 +54,16 @@ class AiAgentBusiness : Business() {
         if (v != null) putPostData(k, v)
     }
 
+    /** Adapt a paged response to the flat ArrayList<T> the callers expect. */
+    private fun <T> pageToList(outer: ResultListener<ArrayList<T>>): ResultListener<PageList<T>> =
+        object : ResultListener<PageList<T>> {
+            override fun onSuccess(r: com.thingclips.smart.android.network.http.BusinessResponse?, result: PageList<T>?, api: String?) =
+                outer.onSuccess(r, ArrayList(result?.data ?: emptyList()), api)
+
+            override fun onFailure(r: com.thingclips.smart.android.network.http.BusinessResponse?, result: PageList<T>?, api: String?) =
+                outer.onFailure(r, ArrayList(), api)
+        }
+
     // --- config / timbre ---
     fun listAvatars(devId: String, l: ResultListener<ArrayList<Avatar>>) =
         asyncArrayList(params(API_AVATARS, devId), Avatar::class.java, l)
@@ -71,7 +82,8 @@ class AiAgentBusiness : Business() {
         p.putIfNotEmpty("tag", tag)
         p.putIfNotEmpty("keyWord", keyWord)
         p.putIfNotEmpty("lang", lang)
-        asyncArrayList(p, Timbre::class.java, l)
+        // Cloud returns a paged object {list,page,total,...}, not a bare array.
+        asyncPageList(p, Timbre::class.java, pageToList(l))
     }
 
     // --- role ---
@@ -99,7 +111,8 @@ class AiAgentBusiness : Business() {
         p.putPostData("pageNo", pageNo)
         p.putPostData("pageSize", pageSize)
         p.putIfNotEmpty("roleCategory", roleCategory)
-        asyncArrayList(p, RoleSummary::class.java, l)
+        // Cloud returns a paged object {list,page,total,...}, not a bare array.
+        asyncPageList(p, RoleSummary::class.java, pageToList(l))
     }
 
     fun customRoleDetail(devId: String, roleId: String, l: ResultListener<RoleDetail>) {
