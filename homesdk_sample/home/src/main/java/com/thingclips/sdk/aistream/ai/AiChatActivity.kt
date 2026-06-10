@@ -48,6 +48,8 @@ import com.thingclips.sdk.aistream.audio.AudioPlayCallback
 import com.thingclips.sdk.aistream.business.AgentTokenRequestParams
 import com.thingclips.sdk.aistream.helper.EventStartOptions
 import com.thingclips.smart.android.aistream.Constants
+import com.thingclips.smart.android.network.Business
+import com.thingclips.smart.android.network.http.BusinessResponse
 import com.thingclips.smart.home.sdk.ThingHomeSdk
 import com.thingclips.smart.android.aistream.ThingStreamManager
 import com.thingclips.smart.android.aistream.data.StreamAudio
@@ -71,6 +73,13 @@ class AiChatActivity : AppCompatActivity() {
         private const val REQUEST_RECORD_AUDIO_PERMISSION = 200
         private const val REQUEST_READ_STORAGE_PERMISSION = 201
         private const val REQUEST_PICK_IMAGE = 202
+
+        private const val MENU_SWITCH_ROLE = 301
+        private const val MENU_NEW_ROLE = 302
+        private const val MENU_MEMORY = 303
+        private const val MENU_SUMMARY = 304
+        private const val MENU_CLEAR_CONTEXT = 305
+        private const val MENU_EMOTION = 306
 
         private const val API_GET_TOKEN = "m.life.ai.token.get"
         private const val API_VERSION = "1.0"
@@ -1066,6 +1075,148 @@ class AiChatActivity : AppCompatActivity() {
         )
     }
 
+    // --- Role management ---
+    private fun resolveBoundRole() {
+        business.initAgentRoleBinding(mDevId, object : Business.ResultListener<RoleDetail> {
+            override fun onSuccess(bizResponse: BusinessResponse?, result: RoleDetail?, apiName: String?) {
+                business.getBindRole(mDevId, object : Business.ResultListener<RoleDetail> {
+                    override fun onSuccess(r: BusinessResponse?, bind: RoleDetail?, api: String?) {
+                        applyRole(bind ?: result)
+                    }
+
+                    override fun onFailure(r: BusinessResponse?, bind: RoleDetail?, api: String?) {
+                        applyRole(result)
+                    }
+                })
+            }
+
+            override fun onFailure(bizResponse: BusinessResponse?, result: RoleDetail?, apiName: String?) {
+                Log.e(TAG, "initAgentRoleBinding failed: ${bizResponse?.errorMsg}")
+            }
+        })
+    }
+
+    private fun applyRole(detail: RoleDetail?) {
+        if (detail?.roleId.isNullOrEmpty()) return
+        currentRoleId = detail!!.roleId!!
+        currentBindRoleType = detail.bindRoleType
+        runOnUiThread {
+            supportActionBar?.title = detail.roleName ?: "AI Chat Demo"
+            messageList.clear()
+            chatAdapter.notifyDataSetChanged()
+        }
+        loadLocalHistory()
+        loadCloudHistory()
+    }
+
+    private fun switchRole(bindRoleType: Int, roleId: String) {
+        if (roleId.isEmpty()) return
+        business.bindRole(mDevId, bindRoleType, roleId, object : Business.ResultListener<Boolean> {
+            override fun onSuccess(r: BusinessResponse?, result: Boolean?, api: String?) {
+                currentRoleId = roleId
+                currentBindRoleType = bindRoleType
+                runOnUiThread {
+                    messageList.clear()
+                    chatAdapter.notifyDataSetChanged()
+                    showToast("Role switched")
+                }
+                loadLocalHistory()
+                loadCloudHistory()
+            }
+
+            override fun onFailure(r: BusinessResponse?, result: Boolean?, api: String?) {
+                showToast("Switch role failed: ${r?.errorMsg}")
+            }
+        })
+    }
+
+    private fun loadCloudHistory() {
+        if (currentRoleId == "default" || currentRoleId.isEmpty()) return
+        business.fetchHistory(
+            mDevId, currentBindRoleType, currentRoleId,
+            null, System.currentTimeMillis(), 50, true,
+            object : Business.ResultListener<ArrayList<ChatHistoryItem>> {
+                override fun onSuccess(r: BusinessResponse?, result: ArrayList<ChatHistoryItem>?, api: String?) {
+                    if (result.isNullOrEmpty()) return
+                    mergeCloudHistory(result)
+                }
+
+                override fun onFailure(r: BusinessResponse?, result: ArrayList<ChatHistoryItem>?, api: String?) {
+                    Log.w(TAG, "fetchHistory failed: ${r?.errorMsg}")
+                }
+            }
+        )
+    }
+
+    private fun mergeCloudHistory(items: List<ChatHistoryItem>) {
+        val seenBizIds = messageList.mapNotNull { it.bizId }.toMutableSet()
+        val toAdd = mutableListOf<ChatMessage>()
+        for (item in items) {
+            val key = item.requestId ?: item.gmtCreate.toString()
+            if (seenBizIds.contains(key)) continue
+            seenBizIds.add(key)
+            item.question?.forEach { part ->
+                part.context?.takeIf { it.isNotEmpty() }?.let {
+                    toAdd.add(
+                        ChatMessage(
+                            text = it,
+                            isSentByUser = true,
+                            messageType = ChatMessage.MessageType.TEXT,
+                            bizId = key
+                        )
+                    )
+                }
+            }
+            item.answer?.forEach { part ->
+                part.context?.takeIf { it.isNotEmpty() }?.let {
+                    toAdd.add(
+                        ChatMessage(
+                            text = it,
+                            isSentByUser = false,
+                            messageType = ChatMessage.MessageType.NLG_TEXT,
+                            bizId = key
+                        )
+                    )
+                }
+            }
+        }
+        if (toAdd.isEmpty()) return
+        runOnUiThread {
+            messageList.addAll(toAdd)
+            chatAdapter.notifyDataSetChanged()
+            rvChatMessages.scrollToPosition(messageList.size - 1)
+        }
+    }
+
+    // --- Options menu ---
+    override fun onCreateOptionsMenu(menu: android.view.Menu): Boolean {
+        menu.add(0, MENU_SWITCH_ROLE, 0, "Switch Role")
+        menu.add(0, MENU_NEW_ROLE, 1, "New Role")
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: android.view.MenuItem): Boolean {
+        return when (item.itemId) {
+            MENU_SWITCH_ROLE -> {
+                if (!isSessionActive()) { showToast("Session not active"); return true }
+                RolePickerSheet(mDevId) { bindRoleType, roleId ->
+                    switchRole(bindRoleType, roleId)
+                }.show(supportFragmentManager, "role_picker")
+                true
+            }
+
+            MENU_NEW_ROLE -> {
+                if (!isSessionActive()) { showToast("Session not active"); return true }
+                startActivity(
+                    Intent(this, RoleEditActivity::class.java).putExtra("devId", mDevId)
+                )
+                true
+            }
+
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
     // --- AI Stream Listener Callbacks ---
     private val aiStreamListener = object : ThingAiStreamListener {
         override fun onConnectStateChanged(connectionId: String, state: Int, errorCode: Int) {
@@ -1095,6 +1246,7 @@ class AiChatActivity : AppCompatActivity() {
                     Constants.SessionState.CREATE_SUCCESS -> {
                         currentSessionId = sessionId
                         updateStatusText("Status: Session Created ($sessionId)")
+                        resolveBoundRole()
                     }
 
                     Constants.SessionState.CREATE_FAILED -> {

@@ -24,6 +24,14 @@
         <activity
             android:name="com.thingclips.sdk.aistream.ai.AiChatActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
+            android:name="com.thingclips.sdk.aistream.ai.RoleEditActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.thingclips.sdk.album.AlbumActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
     </application>
 
 
