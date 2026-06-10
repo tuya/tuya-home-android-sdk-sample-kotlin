@@ -80,16 +80,48 @@ class RoleEditActivity : AppCompatActivity() {
     private fun loadLanguages() {
         agent.listLanguages(object : Cb<ArrayList<Language>> {
             override fun onOk(data: ArrayList<Language>?) {
-                languages.clear(); data?.let { languages.addAll(it) }
-                spLanguage.adapter = simpleAdapter(languages.map { it.langName ?: it.langCode ?: "" })
-                val def = languages.indexOfFirst { it.hasDefault }
-                if (def >= 0) spLanguage.setSelection(def)
+                if (data.isNullOrEmpty()) {
+                    loadLanguagesFromTemplates()
+                    return
+                }
+                languages.clear(); languages.addAll(data)
+                applyLanguageAdapter()
+            }
+
+            // list-support-languages may 500 on backend; fall back to languages
+            // advertised by role templates so role creation stays usable.
+            override fun onErr(code: Int, msg: String?) {
+                loadLanguagesFromTemplates()
+            }
+        })
+    }
+
+    private fun loadLanguagesFromTemplates() {
+        agent.listRoleTemplates(null, object : Cb<ArrayList<RoleTemplate>> {
+            override fun onOk(data: ArrayList<RoleTemplate>?) {
+                val seen = LinkedHashMap<String, String>()
+                data?.forEach { t ->
+                    val code = t.useLangCode
+                    if (!code.isNullOrEmpty() && !seen.containsKey(code)) {
+                        seen[code] = t.useLangName ?: code
+                    }
+                }
+                languages.clear()
+                seen.forEach { (code, name) -> languages.add(Language(langCode = code, langName = name)) }
+                applyLanguageAdapter()
+                if (languages.isEmpty()) showError("languages", "no fallback languages from templates")
             }
 
             override fun onErr(code: Int, msg: String?) {
                 showError("languages", msg)
             }
         })
+    }
+
+    private fun applyLanguageAdapter() {
+        spLanguage.adapter = simpleAdapter(languages.map { it.langName ?: it.langCode ?: "" })
+        val def = languages.indexOfFirst { it.hasDefault }
+        if (def >= 0) spLanguage.setSelection(def)
     }
 
     private fun loadTimbres() {
