@@ -133,7 +133,7 @@ class AiChatActivity : AppCompatActivity() {
     private val business = AiAgentBusiness()
     private var dbHelper: AiChatRecordDbHelper? = null
     private var currentRoleId: String = "default"
-    private var currentBindRoleType: Int = 2 // 0=custom, 1=template, 2=single-scene default
+    private var currentBindRoleType: Int = BindRoleType.DEFAULT
 
     private data class SkillEmojiStep(val emoji: String, val startTime: Long, val endTime: Long)
 

@@ -24,7 +24,7 @@ class MemoryActivity : AppCompatActivity() {
     private val business = AiAgentBusiness()
     private lateinit var devId: String
     private lateinit var roleId: String
-    private var bindRoleType: Int = 2
+    private var bindRoleType: Int = BindRoleType.DEFAULT
 
     private val items = mutableListOf<MemoryItem>()
     private lateinit var adapter: MemAdapter
@@ -36,7 +36,7 @@ class MemoryActivity : AppCompatActivity() {
         title = "Memory"
         devId = intent.getStringExtra("devId") ?: ""
         roleId = intent.getStringExtra("roleId") ?: ""
-        bindRoleType = intent.getIntExtra("bindRoleType", 2)
+        bindRoleType = intent.getIntExtra("bindRoleType", BindRoleType.DEFAULT)
         if (devId.isEmpty() || roleId.isEmpty()) {
             Toast.makeText(this, "devId/roleId required", Toast.LENGTH_SHORT).show()
             finish()

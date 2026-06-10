@@ -1,5 +1,12 @@
 package com.thingclips.sdk.aistream.ai
 
+/** Role binding type used across role/chat ATOP APIs. */
+object BindRoleType {
+    const val CUSTOM = 0   // user-defined custom role
+    const val TEMPLATE = 1 // role template
+    const val DEFAULT = 2  // single-scene default role
+}
+
 data class Avatar(val avatarId: String? = null, val url: String? = null)
 
 data class Language(

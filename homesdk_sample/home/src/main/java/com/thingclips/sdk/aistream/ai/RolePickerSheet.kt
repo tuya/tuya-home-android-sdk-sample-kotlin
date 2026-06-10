@@ -44,7 +44,7 @@ class RolePickerSheet(
             override fun onSuccess(r: BusinessResponse?, result: ArrayList<RoleTemplate>?, api: String?) {
                 result?.forEach {
                     val id = it.roleId ?: it.templateId ?: return@forEach
-                    rows.add(Row(1, id, "[Template] ${it.roleName ?: id}", it.roleIntroduce ?: it.roleDesc, it.roleImgUrl))
+                    rows.add(Row(BindRoleType.TEMPLATE, id, "[Template] ${it.roleName ?: id}", it.roleIntroduce ?: it.roleDesc, it.roleImgUrl))
                 }
                 adapter.notifyDataSetChanged()
             }
@@ -55,7 +55,7 @@ class RolePickerSheet(
             override fun onSuccess(r: BusinessResponse?, result: ArrayList<RoleSummary>?, api: String?) {
                 result?.forEach {
                     val id = it.roleId ?: return@forEach
-                    rows.add(Row(0, id, "[Custom] ${it.roleName ?: id}", it.roleIntroduce ?: it.roleDesc, it.roleImgUrl))
+                    rows.add(Row(BindRoleType.CUSTOM, id, "[Custom] ${it.roleName ?: id}", it.roleIntroduce ?: it.roleDesc, it.roleImgUrl))
                 }
                 adapter.notifyDataSetChanged()
             }
