@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ai_primary">#FFF35A21</color>
+    <color name="ai_primary_light">#FFFFF1E8</color>
+    <color name="ai_text_primary">#FF1A1A1A</color>
+    <color name="ai_text_secondary">#FF8A8F99</color>
+    <color name="ai_chip_bg">#FFF5F5F7</color>
+    <color name="ai_card_bg">#FFFFFFFF</color>
+    <color name="ai_gradient_start">#FFEFEDFB</color>
+    <color name="ai_gradient_center">#FFF8F2F4</color>
+    <color name="ai_gradient_end">#FFFBEFE9</color>
+</resources>

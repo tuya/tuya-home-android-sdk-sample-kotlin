@@ -1,134 +1,395 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/ai_bg_gradient"
+    android:orientation="vertical"
     tools:context="com.thingclips.sdk.aistream.ai.AiChatActivity">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
+    <!-- Top bar: back / title+status / more -->
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
-        app:titleTextColor="@android:color/white"
-        android:elevation="4dp"/>
+        android:layout_height="52dp"
+        android:paddingStart="8dp"
+            android:paddingEnd="8dp">
 
-    <TextView
-        android:id="@+id/tv_status"
+        <ImageView
+            android:id="@+id/iv_back"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/ai_chat_title"
+            android:padding="9dp"
+            android:src="@drawable/ai_ic_back" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="@string/ai_chat_title"
+                android:textColor="@color/ai_text_primary"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Status: Disconnected"
+                android:textColor="@color/ai_text_secondary"
+                android:textSize="10sp" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/iv_more"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/ai_chat_title"
+            android:padding="9dp"
+            android:src="@drawable/ai_ic_more" />
+    </RelativeLayout>
+
+    <!-- Role card (expandable) -->
+    <LinearLayout
+        android:id="@+id/card_role"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/toolbar"
-        android:background="#DDDDDD"
-        android:padding="4dp"
-        android:gravity="center"
-        android:text="Status: Disconnected"
-        android:textSize="12sp" />
+        android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/ai_bg_card"
+        android:orientation="vertical"
+        android:padding="14dp">
+
+        <!-- Expanded state -->
+        <LinearLayout
+            android:id="@+id/ll_role_expanded"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/iv_role_avatar"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:contentDescription="@string/ai_chat_title"
+                    android:scaleType="centerCrop"
+                    android:src="@android:drawable/sym_def_app_icon" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/tv_role_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:text="@string/ai_chat_title"
+                            android:textColor="@color/ai_text_primary"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tv_emoji"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:text="😀"
+                            android:textSize="18sp" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tv_chip_tag"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:background="@drawable/ai_bg_chip_accent"
+                        android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+                        android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+                        android:text="@string/ai_role_tag_default"
+                        android:textColor="@color/ai_primary"
+                        android:textSize="11sp" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/tv_chip_lang"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/ai_bg_chip"
+                            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+                            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+                            android:textColor="@color/ai_text_primary"
+                            android:textSize="11sp"
+                            android:visibility="gone"
+                            tools:text="粤语"
+                            tools:visibility="visible" />
+
+                        <TextView
+                            android:id="@+id/tv_chip_timbre"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:background="@drawable/ai_bg_chip"
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+                            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+                            android:textColor="@color/ai_text_primary"
+                            android:textSize="11sp"
+                            android:visibility="gone"
+                            tools:text="温柔女声"
+                            tools:visibility="visible" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/iv_role_collapse"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="@drawable/ai_bg_circle_accent"
+                    android:contentDescription="@string/ai_chat_title"
+                    android:padding="6dp"
+                    android:src="@drawable/ai_ic_chevron_up" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/btn_edit_role"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_marginEnd="6dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/ai_bg_btn_pill"
+                    android:drawableStart="@drawable/ai_ic_edit"
+                    android:drawablePadding="6dp"
+                    android:drawableTint="@color/ai_primary"
+                    android:gravity="center"
+                    android:paddingStart="18dp"
+            android:paddingEnd="18dp"
+                    android:text="@string/ai_edit_role"
+                    android:textColor="@color/ai_text_primary"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/btn_switch_role"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_marginStart="6dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/ai_bg_btn_pill"
+                    android:drawableStart="@drawable/ai_ic_swap"
+                    android:drawablePadding="6dp"
+                    android:drawableTint="@color/ai_primary"
+                    android:gravity="center"
+                    android:paddingStart="18dp"
+            android:paddingEnd="18dp"
+                    android:text="@string/ai_switch_role"
+                    android:textColor="@color/ai_text_primary"
+                    android:textSize="14sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Collapsed state -->
+        <LinearLayout
+            android:id="@+id/ll_role_collapsed"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/iv_role_avatar_small"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:contentDescription="@string/ai_chat_title"
+                android:scaleType="centerCrop"
+                android:src="@android:drawable/sym_def_app_icon" />
+
+            <TextView
+                android:id="@+id/tv_role_name_small"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="@string/ai_chat_title"
+                android:textColor="@color/ai_text_primary"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:contentDescription="@string/ai_chat_title"
+                android:src="@drawable/ai_ic_chevron_down" />
+        </LinearLayout>
+    </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_chat_messages"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/ll_preview_and_input"
-        android:layout_below="@id/tv_status"
-        android:padding="8dp"
-        android:clipToPadding="false"/>
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingTop="4dp"
+            android:paddingBottom="4dp" />
 
+    <FrameLayout
+        android:id="@+id/fl_image_preview_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="8dp"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/iv_image_preview"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:contentDescription="@string/ai_chat_title"
+            android:scaleType="centerCrop" />
+
+        <ImageView
+            android:id="@+id/iv_close_image_preview"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="top|end"
+            android:background="#80000000"
+            android:contentDescription="@string/ai_chat_title"
+            android:padding="4dp"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            app:tint="@android:color/white" />
+    </FrameLayout>
+
+    <!-- Input bar -->
     <LinearLayout
-        android:id="@+id/ll_preview_and_input"
+        android:id="@+id/ll_input_area"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_alignParentBottom="true">
+        android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/ai_bg_input_pill"
+        android:gravity="center_vertical"
+        android:minHeight="52dp"
+        android:orientation="horizontal"
+        android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+        android:paddingTop="4dp"
+            android:paddingBottom="4dp">
 
         <FrameLayout
-            android:id="@+id/fl_image_preview_container"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginBottom="8dp"
-            android:visibility="gone">
-
-            <ImageView
-                android:id="@+id/iv_image_preview"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:scaleType="centerCrop"
-                android:contentDescription="Image Preview" />
-
-            <ImageView
-                android:id="@+id/iv_close_image_preview"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_gravity="top|end"
-                android:src="@android:drawable/ic_menu_close_clear_cancel"
-                app:tint="@android:color/white"
-                android:background="#80000000"
-                android:padding="4dp"
-                android:contentDescription="Close Preview"/>
-        </FrameLayout>
-
-        <LinearLayout
-            android:id="@+id/ll_input_area"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="8dp"
-            android:gravity="center_vertical"
-            android:background="#F0F0F0">
-
-            <ImageView
-                android:id="@+id/iv_select_image"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@android:drawable/ic_menu_gallery"
-                android:padding="8dp"
-                android:contentDescription="Select Image"
-                android:background="?attr/selectableItemBackgroundBorderless"/>
+            android:layout_weight="1">
 
             <EditText
                 android:id="@+id/et_message_input"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:hint="Type a message"
+                android:background="@null"
+                android:hint="@string/ai_chat_input_hint"
+                android:importantForAutofill="no"
                 android:inputType="textMultiLine"
                 android:maxLines="4"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                android:background="@android:drawable/edit_text"
-                android:padding="10dp"/>
+                android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+                android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+                android:textColor="@color/ai_text_primary"
+                android:textColorHint="@color/ai_text_secondary"
+                android:textSize="15sp" />
 
             <FrameLayout
                 android:id="@+id/fl_voice_input_container"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
                 android:visibility="gone">
 
                 <Button
                     android:id="@+id/btn_hold_to_talk"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Hold to Talk"
-                    android:visibility="gone"/>
+                    android:layout_height="44dp"
+                    android:background="@drawable/ai_bg_btn_primary"
+                    android:text="@string/ai_hold_to_talk"
+                    android:textColor="@android:color/white"
+                    android:visibility="gone" />
 
                 <com.thingclips.sdk.aistream.ai.AudioAmplitudeView
                     android:id="@+id/audio_amplitude_view"
                     android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:visibility="gone"/>
+                    android:layout_height="44dp"
+                    android:visibility="gone" />
             </FrameLayout>
+        </FrameLayout>
 
-            <ImageView
-                android:id="@+id/iv_send_or_voice"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@android:drawable/ic_btn_speak_now"
-                android:padding="8dp"
-                android:contentDescription="Send or Record Voice"
-                android:background="?attr/selectableItemBackgroundBorderless"/>
-        </LinearLayout>
+        <ImageView
+            android:id="@+id/iv_send_or_voice"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/ai_chat_title"
+            android:padding="8dp"
+            android:src="@drawable/ai_ic_mic" />
+
+        <ImageView
+            android:id="@+id/iv_select_image"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/ai_chat_title"
+            android:padding="8dp"
+            android:src="@drawable/ai_ic_plus" />
     </LinearLayout>
-</RelativeLayout>
+</LinearLayout>

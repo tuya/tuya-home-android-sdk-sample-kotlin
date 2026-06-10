@@ -1,0 +1,78 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="6dp"
+            android:layout_marginBottom="6dp"
+    android:background="@drawable/ai_bg_card"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="14dp">
+
+    <ImageView
+        android:id="@+id/iv_role_avatar"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:contentDescription="@string/ai_switch_role"
+        android:scaleType="centerCrop"
+        android:src="@android:drawable/sym_def_app_icon" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_role_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/ai_text_primary"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            tools:text="杠精小丫" />
+
+        <TextView
+            android:id="@+id/tv_role_desc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:textColor="@color/ai_text_secondary"
+            android:textSize="12sp"
+            tools:text="我是一名心理医生，拥有丰富的临床经验" />
+
+        <TextView
+            android:id="@+id/tv_role_lang"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:background="@drawable/ai_bg_chip"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp"
+            android:textColor="@color/ai_text_primary"
+            android:textSize="11sp"
+            android:visibility="gone"
+            tools:text="中文"
+            tools:visibility="visible" />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/iv_role_edit"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:background="@drawable/ai_bg_circle_accent"
+        android:contentDescription="@string/ai_edit_role"
+        android:padding="9dp"
+        android:src="@drawable/ai_ic_edit"
+        android:visibility="gone"
+        app:tint="@android:color/white" />
+</LinearLayout>

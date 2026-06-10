@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ai_chat_title">AI 对话</string>
+    <string name="ai_chat_input_hint">你有什么想知道的问题吗</string>
+    <string name="ai_chat_input_hint_inactive">连接中…</string>
+    <string name="ai_hold_to_talk">按住说话</string>
+    <string name="ai_edit_role">编辑角色</string>
+    <string name="ai_switch_role">切换角色</string>
+    <string name="ai_create_role">创建角色</string>
+    <string name="ai_tab_recommend">推荐</string>
+    <string name="ai_tab_custom">自定义</string>
+    <string name="ai_role_tag_template">推荐角色</string>
+    <string name="ai_role_tag_custom">自定义角色</string>
+    <string name="ai_role_tag_default">默认角色</string>
+    <string name="ai_role_empty">暂无自定义角色</string>
+    <string name="ai_menu_memory">角色记忆</string>
+    <string name="ai_menu_summary">对话总结</string>
+    <string name="ai_menu_clear_context">清除上下文</string>
+    <string name="ai_menu_emotion">当前情绪</string>
+    <string name="ai_menu_diagnostics">API 诊断</string>
+</resources>

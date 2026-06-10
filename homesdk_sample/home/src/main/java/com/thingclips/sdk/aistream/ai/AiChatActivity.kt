@@ -7,6 +7,9 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.Drawable
+import android.widget.LinearLayout
+import androidx.appcompat.widget.PopupMenu
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
@@ -30,7 +33,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -60,7 +62,6 @@ import org.json.JSONException
 import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
-import java.util.Objects
 
 class AiChatActivity : AppCompatActivity() {
 
@@ -71,9 +72,8 @@ class AiChatActivity : AppCompatActivity() {
         private const val REQUEST_RECORD_AUDIO_PERMISSION = 200
         private const val REQUEST_READ_STORAGE_PERMISSION = 201
         private const val REQUEST_PICK_IMAGE = 202
+        private const val REQUEST_SWITCH_ROLE = 203
 
-        private const val MENU_SWITCH_ROLE = 301
-        private const val MENU_NEW_ROLE = 302
         private const val MENU_MEMORY = 303
         private const val MENU_SUMMARY = 304
         private const val MENU_CLEAR_CONTEXT = 305
@@ -99,6 +99,19 @@ class AiChatActivity : AppCompatActivity() {
     private lateinit var audioAmplitudeView: AudioAmplitudeView
     private lateinit var tvEmoji: TextView
 
+    // Role header card views
+    private lateinit var llRoleExpanded: LinearLayout
+    private lateinit var llRoleCollapsed: LinearLayout
+    private lateinit var ivRoleAvatar: ImageView
+    private lateinit var ivRoleAvatarSmall: ImageView
+    private lateinit var tvRoleName: TextView
+    private lateinit var tvRoleNameSmall: TextView
+    private lateinit var tvChipTag: TextView
+    private lateinit var tvChipLang: TextView
+    private lateinit var tvChipTimbre: TextView
+    private lateinit var btnEditRole: TextView
+    private lateinit var btnSwitchRole: TextView
+
     private lateinit var chatAdapter: ChatAdapter
     private val messageList = mutableListOf<ChatMessage>()
 
@@ -107,6 +120,7 @@ class AiChatActivity : AppCompatActivity() {
 
     private var selectedImageUri: Uri? = null
     private var tempAsrResult: String = ""
+    private var isVoiceMode: Boolean = false
     private var isRecordingAudio: Boolean = false
     private var isConnecting: Boolean = false
     private var isSessionCreating: Boolean = false
@@ -133,6 +147,7 @@ class AiChatActivity : AppCompatActivity() {
     private var dbHelper: AiChatRecordDbHelper? = null
     private var currentRoleId: String = "default"
     private var currentBindRoleType: Int = BindRoleType.DEFAULT
+    private var currentRoleDetail: RoleDetail? = null
 
     private data class SkillEmojiStep(val emoji: String, val startTime: Long, val endTime: Long)
 
@@ -173,7 +188,7 @@ class AiChatActivity : AppCompatActivity() {
         dbHelper = AiChatRecordDbHelper(this, uid)
 
         initViews()
-        setupToolbar()
+        setupHeader()
         initAiStream()
         setupChatRecyclerView()
         setupInputControls()
@@ -197,34 +212,58 @@ class AiChatActivity : AppCompatActivity() {
         btnHoldToTalk = findViewById(R.id.btn_hold_to_talk)
         audioAmplitudeView = findViewById(R.id.audio_amplitude_view)
         originalButtonBackground = btnHoldToTalk.background
+
+        tvEmoji = findViewById(R.id.tv_emoji)
+        llRoleExpanded = findViewById(R.id.ll_role_expanded)
+        llRoleCollapsed = findViewById(R.id.ll_role_collapsed)
+        ivRoleAvatar = findViewById(R.id.iv_role_avatar)
+        ivRoleAvatarSmall = findViewById(R.id.iv_role_avatar_small)
+        tvRoleName = findViewById(R.id.tv_role_name)
+        tvRoleNameSmall = findViewById(R.id.tv_role_name_small)
+        tvChipTag = findViewById(R.id.tv_chip_tag)
+        tvChipLang = findViewById(R.id.tv_chip_lang)
+        tvChipTimbre = findViewById(R.id.tv_chip_timbre)
+        btnEditRole = findViewById(R.id.btn_edit_role)
+        btnSwitchRole = findViewById(R.id.btn_switch_role)
     }
 
-    private fun setupToolbar() {
-        val toolbar = findViewById<Toolbar>(R.id.toolbar).apply {
-            setBackgroundColor(
-                ContextCompat.getColor(
-                    this@AiChatActivity,
-                    android.R.color.holo_blue_dark
-                )
+    private fun setupHeader() {
+        findViewById<ImageView>(R.id.iv_back).setOnClickListener { finish() }
+        findViewById<ImageView>(R.id.iv_more).setOnClickListener { showMoreMenu(it) }
+        findViewById<ImageView>(R.id.iv_role_collapse).setOnClickListener {
+            setRoleCardExpanded(false)
+        }
+        llRoleCollapsed.setOnClickListener { setRoleCardExpanded(true) }
+
+        btnSwitchRole.setOnClickListener {
+            if (!isSessionActive()) {
+                showToast("Session not active")
+                return@setOnClickListener
+            }
+            startActivityForResult(
+                Intent(this, RoleListActivity::class.java)
+                    .putExtra(RoleListActivity.EXTRA_DEV_ID, mDevId)
+                    .putExtra(RoleListActivity.EXTRA_CURRENT_ROLE_ID, currentRoleId),
+                REQUEST_SWITCH_ROLE
             )
-            setTitleTextColor(ContextCompat.getColor(this@AiChatActivity, android.R.color.white))
         }
-        setSupportActionBar(toolbar)
-
-        tvEmoji = TextView(this).apply {
-            textSize = 28f
-            setTextColor(Color.WHITE)
-            setPadding(0, 0, 32, 0)
-            text = "😀" // Default emoji
+        btnEditRole.setOnClickListener {
+            if (!requireRole()) return@setOnClickListener
+            if (currentBindRoleType != BindRoleType.CUSTOM) {
+                showToast("Only custom roles can be edited")
+                return@setOnClickListener
+            }
+            startActivity(
+                Intent(this, RoleEditActivity::class.java)
+                    .putExtra("devId", mDevId)
+                    .putExtra("roleId", currentRoleId)
+            )
         }
-        val params = Toolbar.LayoutParams(
-            Toolbar.LayoutParams.WRAP_CONTENT,
-            Toolbar.LayoutParams.WRAP_CONTENT,
-            Gravity.END or Gravity.CENTER_VERTICAL
-        )
-        toolbar.addView(tvEmoji, params)
+    }
 
-        supportActionBar?.title = "AI Chat Demo"
+    private fun setRoleCardExpanded(expanded: Boolean) {
+        llRoleExpanded.visibility = if (expanded) View.VISIBLE else View.GONE
+        llRoleCollapsed.visibility = if (expanded) View.GONE else View.VISIBLE
     }
 
     private fun initAiStream() {
@@ -296,21 +335,12 @@ class AiChatActivity : AppCompatActivity() {
 
     private fun handleSendOrVoiceClick() {
         hideKeyboard()
-        if (etMessageInput.visibility == View.VISIBLE) { // Text input mode
-            val currentIcon = ivSendOrVoice.drawable
-            val sendIcon = ContextCompat.getDrawable(this, android.R.drawable.ic_menu_send)
-
-            if (currentIcon != null && sendIcon != null && Objects.equals(
-                    currentIcon.constantState,
-                    sendIcon.constantState
-                )
-            ) {
-                sendMessageFlow()
-            } else { // Mic icon
-                updateInputMode(true) // Switch to voice input
-            }
-        } else { // Voice input mode (showing cancel button)
-            updateInputMode(false) // Switch to text input
+        if (!isVoiceMode) {
+            val hasContent =
+                etMessageInput.text.toString().trim().isNotEmpty() || selectedImageUri != null
+            if (hasContent) sendMessageFlow() else updateInputMode(true)
+        } else {
+            updateInputMode(false) // Back to keyboard input
         }
     }
 
@@ -379,30 +409,32 @@ class AiChatActivity : AppCompatActivity() {
     }
 
     private fun updateSendButtonIcon() {
-        if (etMessageInput.visibility != View.VISIBLE) return
-
+        if (isVoiceMode) {
+            ivSendOrVoice.setImageResource(R.drawable.ai_ic_keyboard)
+            return
+        }
         val hasText = etMessageInput.text.toString().trim().isNotEmpty()
         val hasImage = selectedImageUri != null
 
         if (hasText || hasImage) {
-            ivSendOrVoice.setImageResource(android.R.drawable.ic_menu_send)
+            ivSendOrVoice.setImageResource(R.drawable.ai_ic_send)
         } else {
-            ivSendOrVoice.setImageResource(android.R.drawable.ic_btn_speak_now)
+            ivSendOrVoice.setImageResource(R.drawable.ai_ic_mic)
         }
     }
 
     private fun updateInputMode(enableVoice: Boolean) {
+        isVoiceMode = enableVoice
         if (enableVoice) {
             etMessageInput.visibility = View.GONE
             flVoiceInputContainer.visibility = View.VISIBLE
             btnHoldToTalk.visibility = View.VISIBLE
             audioAmplitudeView.visibility = View.GONE
-            ivSendOrVoice.setImageResource(android.R.drawable.ic_menu_close_clear_cancel)
         } else {
             etMessageInput.visibility = View.VISIBLE
             flVoiceInputContainer.visibility = View.GONE
-            updateSendButtonIcon() // Correctly sets mic or send based on text/image
         }
+        updateSendButtonIcon()
     }
 
     private fun showVoiceRecordingUI() {
@@ -650,6 +682,14 @@ class AiChatActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_PICK_IMAGE && resultCode == RESULT_OK && data?.data != null) {
             handleImageSelectionResult(data.data!!)
+        }
+        if (requestCode == REQUEST_SWITCH_ROLE && resultCode == RESULT_OK && data != null) {
+            val bindRoleType =
+                data.getIntExtra(RoleListActivity.EXTRA_BIND_ROLE_TYPE, BindRoleType.TEMPLATE)
+            val roleId = data.getStringExtra(RoleListActivity.EXTRA_ROLE_ID)
+            if (!roleId.isNullOrEmpty() && roleId != currentRoleId) {
+                switchRole(bindRoleType, roleId)
+            }
         }
     }
 
@@ -1113,8 +1153,9 @@ class AiChatActivity : AppCompatActivity() {
         if (detail?.roleId.isNullOrEmpty()) return
         currentRoleId = detail!!.roleId!!
         currentBindRoleType = detail.bindRoleType
+        currentRoleDetail = detail
         runOnUiThread {
-            supportActionBar?.title = detail.roleName ?: "AI Chat Demo"
+            updateRoleHeader(detail)
             messageList.clear()
             chatAdapter.notifyDataSetChanged()
         }
@@ -1122,25 +1163,72 @@ class AiChatActivity : AppCompatActivity() {
         loadCloudHistory()
     }
 
+    private fun updateRoleHeader(detail: RoleDetail) {
+        val name = detail.roleName ?: detail.roleId ?: ""
+        tvRoleName.text = name
+        tvRoleNameSmall.text = name
+
+        tvChipTag.setText(
+            when (detail.bindRoleType) {
+                BindRoleType.CUSTOM -> R.string.ai_role_tag_custom
+                BindRoleType.TEMPLATE -> R.string.ai_role_tag_template
+                else -> R.string.ai_role_tag_default
+            }
+        )
+
+        val lang = detail.useLangName ?: detail.useLangCode
+        tvChipLang.text = lang ?: ""
+        tvChipLang.visibility = if (lang.isNullOrEmpty()) View.GONE else View.VISIBLE
+        tvChipTimbre.text = detail.useTimbreName ?: ""
+        tvChipTimbre.visibility =
+            if (detail.useTimbreName.isNullOrEmpty()) View.GONE else View.VISIBLE
+
+        if (!detail.roleImgUrl.isNullOrEmpty()) {
+            Glide.with(this).load(detail.roleImgUrl)
+                .transform(RoundedCorners(resources.displayMetrics.density.times(14).toInt()))
+                .into(ivRoleAvatar)
+            Glide.with(this).load(detail.roleImgUrl).circleCrop().into(ivRoleAvatarSmall)
+        }
+
+        btnEditRole.visibility =
+            if (detail.bindRoleType == BindRoleType.CUSTOM) View.VISIBLE else View.GONE
+    }
+
     private fun switchRole(bindRoleType: Int, roleId: String) {
         if (roleId.isEmpty()) return
         agent.bindRole(bindRoleType, roleId, object : Cb<Boolean> {
             override fun onOk(data: Boolean?) {
+                showToast("Role switched")
                 currentRoleId = roleId
                 currentBindRoleType = bindRoleType
-                runOnUiThread {
-                    messageList.clear()
-                    chatAdapter.notifyDataSetChanged()
-                    showToast("Role switched")
-                }
-                loadLocalHistory()
-                loadCloudHistory()
+                // Re-fetch the bound role so the header card reflects the new role.
+                agent.getBindRole(object : Cb<RoleDetail> {
+                    override fun onOk(bind: RoleDetail?) {
+                        if (bind?.roleId.isNullOrEmpty()) refreshAfterRoleChange()
+                        else applyRole(bind)
+                    }
+
+                    override fun onErr(code: Int, msg: String?) {
+                        refreshAfterRoleChange()
+                    }
+                })
             }
 
             override fun onErr(code: Int, msg: String?) {
                 showToast("Switch role failed: $msg")
             }
         })
+    }
+
+    private fun refreshAfterRoleChange() {
+        runOnUiThread {
+            tvRoleName.text = currentRoleId
+            tvRoleNameSmall.text = currentRoleId
+            messageList.clear()
+            chatAdapter.notifyDataSetChanged()
+        }
+        loadLocalHistory()
+        loadCloudHistory()
     }
 
     private fun loadCloudHistory() {
@@ -1201,73 +1289,61 @@ class AiChatActivity : AppCompatActivity() {
         }
     }
 
-    // --- Options menu ---
-    override fun onCreateOptionsMenu(menu: android.view.Menu): Boolean {
-        menu.add(0, MENU_SWITCH_ROLE, 0, "Switch Role")
-        menu.add(0, MENU_NEW_ROLE, 1, "New Role")
-        menu.add(0, MENU_MEMORY, 2, "Memory")
-        menu.add(0, MENU_SUMMARY, 3, "Summary")
-        menu.add(0, MENU_CLEAR_CONTEXT, 4, "Clear Context")
-        menu.add(0, MENU_EMOTION, 5, "Emotion")
-        menu.add(0, MENU_TEST_ALL, 6, "Test All APIs")
-        return true
-    }
+    // --- "..." popup menu ---
+    private fun showMoreMenu(anchor: View) {
+        val popup = PopupMenu(this, anchor)
+        popup.menu.add(0, MENU_MEMORY, 0, getString(R.string.ai_menu_memory))
+        popup.menu.add(0, MENU_SUMMARY, 1, getString(R.string.ai_menu_summary))
+        popup.menu.add(0, MENU_CLEAR_CONTEXT, 2, getString(R.string.ai_menu_clear_context))
+        popup.menu.add(0, MENU_EMOTION, 3, getString(R.string.ai_menu_emotion))
+        popup.menu.add(0, MENU_TEST_ALL, 4, getString(R.string.ai_menu_diagnostics))
+        popup.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                MENU_MEMORY -> {
+                    if (!requireRole()) return@setOnMenuItemClickListener true
+                    startActivity(
+                        Intent(this, MemoryActivity::class.java)
+                            .putExtra("devId", mDevId)
+                            .putExtra("roleId", currentRoleId)
+                            .putExtra("bindRoleType", currentBindRoleType)
+                    )
+                    true
+                }
 
-    override fun onOptionsItemSelected(item: android.view.MenuItem): Boolean {
-        return when (item.itemId) {
-            MENU_SWITCH_ROLE -> {
-                if (!isSessionActive()) { showToast("Session not active"); return true }
-                RolePickerSheet(mDevId) { bindRoleType, roleId ->
-                    switchRole(bindRoleType, roleId)
-                }.show(supportFragmentManager, "role_picker")
-                true
+                MENU_SUMMARY -> {
+                    if (!requireRole()) return@setOnMenuItemClickListener true
+                    showSummaryDialog()
+                    true
+                }
+
+                MENU_CLEAR_CONTEXT -> {
+                    if (!requireRole()) return@setOnMenuItemClickListener true
+                    confirmClearContext()
+                    true
+                }
+
+                MENU_EMOTION -> {
+                    if (!isSessionActive()) {
+                        showToast("Session not active")
+                        return@setOnMenuItemClickListener true
+                    }
+                    showCurrentEmotion()
+                    true
+                }
+
+                MENU_TEST_ALL -> {
+                    if (!isSessionActive()) {
+                        showToast("Session not active")
+                        return@setOnMenuItemClickListener true
+                    }
+                    runDiagnostics()
+                    true
+                }
+
+                else -> false
             }
-
-            MENU_NEW_ROLE -> {
-                if (!isSessionActive()) { showToast("Session not active"); return true }
-                startActivity(
-                    Intent(this, RoleEditActivity::class.java).putExtra("devId", mDevId)
-                )
-                true
-            }
-
-            MENU_MEMORY -> {
-                if (!requireRole()) return true
-                startActivity(
-                    Intent(this, MemoryActivity::class.java)
-                        .putExtra("devId", mDevId)
-                        .putExtra("roleId", currentRoleId)
-                        .putExtra("bindRoleType", currentBindRoleType)
-                )
-                true
-            }
-
-            MENU_SUMMARY -> {
-                if (!requireRole()) return true
-                showSummaryDialog()
-                true
-            }
-
-            MENU_CLEAR_CONTEXT -> {
-                if (!requireRole()) return true
-                confirmClearContext()
-                true
-            }
-
-            MENU_EMOTION -> {
-                if (!isSessionActive()) { showToast("Session not active"); return true }
-                showCurrentEmotion()
-                true
-            }
-
-            MENU_TEST_ALL -> {
-                if (!isSessionActive()) { showToast("Session not active"); return true }
-                runDiagnostics()
-                true
-            }
-
-            else -> super.onOptionsItemSelected(item)
         }
+        popup.show()
     }
 
     private fun requireRole(): Boolean {
@@ -1683,7 +1759,9 @@ class AiChatActivity : AppCompatActivity() {
         ivSendOrVoice.isEnabled = active
         btnHoldToTalk.isEnabled = active
 
-        etMessageInput.hint = if (active) "Type a message" else "Session not active"
+        etMessageInput.hint = getString(
+            if (active) R.string.ai_chat_input_hint else R.string.ai_chat_input_hint_inactive
+        )
         updateSendButtonIcon()
     }
 

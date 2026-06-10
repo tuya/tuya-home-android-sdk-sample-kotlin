@@ -2,7 +2,10 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="8dp">
+    android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+    android:paddingTop="6dp"
+            android:paddingBottom="6dp">
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -10,7 +13,7 @@
         android:layout_alignParentStart="true"
         android:background="@drawable/bg_chat_received"
         android:orientation="vertical"
-        android:padding="10dp">
+        android:padding="12dp">
 
         <ImageView
             android:id="@+id/iv_message_image_received"
@@ -25,8 +28,9 @@
             android:id="@+id/tv_message_text_received"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:maxWidth="250dp"
-            android:textColor="@android:color/black"
+            android:maxWidth="280dp"
+            android:lineSpacingExtra="3dp"
+            android:textColor="@color/ai_text_primary"
             android:textSize="16sp" />
     </LinearLayout>
 </RelativeLayout>
