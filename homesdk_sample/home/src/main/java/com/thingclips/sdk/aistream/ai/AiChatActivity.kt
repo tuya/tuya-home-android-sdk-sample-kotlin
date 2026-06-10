@@ -78,6 +78,7 @@ class AiChatActivity : AppCompatActivity() {
         private const val MENU_SUMMARY = 304
         private const val MENU_CLEAR_CONTEXT = 305
         private const val MENU_EMOTION = 306
+        private const val MENU_TEST_ALL = 307
 
         private const val API_GET_TOKEN = "m.life.ai.token.get"
         private const val API_VERSION = "1.0"
@@ -1195,6 +1196,7 @@ class AiChatActivity : AppCompatActivity() {
         menu.add(0, MENU_SUMMARY, 3, "Summary")
         menu.add(0, MENU_CLEAR_CONTEXT, 4, "Clear Context")
         menu.add(0, MENU_EMOTION, 5, "Emotion")
+        menu.add(0, MENU_TEST_ALL, 6, "Test All APIs")
         return true
     }
 
@@ -1242,6 +1244,12 @@ class AiChatActivity : AppCompatActivity() {
             MENU_EMOTION -> {
                 if (!isSessionActive()) { showToast("Session not active"); return true }
                 showCurrentEmotion()
+                true
+            }
+
+            MENU_TEST_ALL -> {
+                if (!isSessionActive()) { showToast("Session not active"); return true }
+                runDiagnostics()
                 true
             }
 
@@ -1312,6 +1320,20 @@ class AiChatActivity : AppCompatActivity() {
                 })
             }
             .show()
+    }
+
+    private fun runDiagnostics() {
+        showToast("Running API diagnostics...")
+        AiAgentDiagnostics(this, mDevId, currentBindRoleType, currentRoleId).runAll { file ->
+            runOnUiThread {
+                val path = file?.absolutePath ?: "(write failed, see logcat tag ai_stream_Diag)"
+                AlertDialog.Builder(this)
+                    .setTitle("Diagnostics done")
+                    .setMessage("Saved to:\n$path\n\nAlso logged to logcat (tag: ai_stream_Diag).")
+                    .setPositiveButton("OK", null)
+                    .show()
+            }
+        }
     }
 
     private fun showCurrentEmotion() {
