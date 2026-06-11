@@ -1,4 +1,9 @@
-package com.thingclips.sdk.aistream.ai
+package com.thingclips.sdk.aistream.ai.call
+
+import com.thingclips.sdk.aistream.ai.AiIdentityConfig
+import com.thingclips.sdk.aistream.ai.chat.AudioAmplitudeView
+import com.thingclips.sdk.aistream.ai.chat.ChatAdapter
+import com.thingclips.sdk.aistream.ai.chat.ChatMessage
 
 import android.os.Handler
 import android.os.HandlerThread

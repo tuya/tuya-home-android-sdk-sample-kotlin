@@ -1,4 +1,6 @@
-package com.thingclips.sdk.aistream.ai
+package com.thingclips.sdk.aistream.ai.memory
+
+import com.thingclips.sdk.aistream.ai.data.*
 
 import android.os.Bundle
 import android.view.LayoutInflater

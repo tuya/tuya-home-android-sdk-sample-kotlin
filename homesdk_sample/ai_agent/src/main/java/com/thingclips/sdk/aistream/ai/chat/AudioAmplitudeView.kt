@@ -1,4 +1,11 @@
-package com.thingclips.sdk.aistream.ai
+package com.thingclips.sdk.aistream.ai.chat
+
+import com.thingclips.sdk.aistream.ai.AiIdentityConfig
+import com.thingclips.sdk.aistream.ai.call.AiCallActivity
+import com.thingclips.sdk.aistream.ai.data.*
+import com.thingclips.sdk.aistream.ai.memory.MemoryActivity
+import com.thingclips.sdk.aistream.ai.role.RoleEditActivity
+import com.thingclips.sdk.aistream.ai.role.RoleListActivity
 
 import android.content.Context
 import android.graphics.Canvas

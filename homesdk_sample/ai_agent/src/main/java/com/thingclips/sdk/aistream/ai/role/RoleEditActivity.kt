@@ -1,4 +1,6 @@
-package com.thingclips.sdk.aistream.ai
+package com.thingclips.sdk.aistream.ai.role
+
+import com.thingclips.sdk.aistream.ai.data.*
 
 import android.annotation.SuppressLint
 import android.os.Bundle

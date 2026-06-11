@@ -1,4 +1,4 @@
-package com.thingclips.sdk.aistream.ai
+package com.thingclips.sdk.aistream.ai.data
 
 /** Role binding type used across role/chat ATOP APIs. */
 object BindRoleType {

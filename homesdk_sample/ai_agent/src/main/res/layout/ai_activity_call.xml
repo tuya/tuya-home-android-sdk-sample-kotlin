@@ -57,7 +57,7 @@
         android:paddingTop="4dp"
         android:paddingBottom="8dp" />
 
-    <com.thingclips.sdk.aistream.ai.AudioAmplitudeView
+    <com.thingclips.sdk.aistream.ai.chat.AudioAmplitudeView
         android:id="@+id/audio_amplitude_view"
         android:layout_width="match_parent"
         android:layout_height="48dp"

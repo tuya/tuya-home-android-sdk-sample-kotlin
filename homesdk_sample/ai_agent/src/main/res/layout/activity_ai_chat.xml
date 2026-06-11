@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/ai_bg_gradient"
     android:orientation="vertical"
-    tools:context="com.thingclips.sdk.aistream.ai.AiDeviceChatActivity">
+    tools:context="com.thingclips.sdk.aistream.ai.chat.AiDeviceChatActivity">
 
     <!-- Top bar: back / title+status / more -->
     <RelativeLayout
@@ -377,7 +377,7 @@
                     android:textColor="@android:color/white"
                     android:visibility="gone" />
 
-                <com.thingclips.sdk.aistream.ai.AudioAmplitudeView
+                <com.thingclips.sdk.aistream.ai.chat.AudioAmplitudeView
                     android:id="@+id/audio_amplitude_view"
                     android:layout_width="match_parent"
                     android:layout_height="44dp"

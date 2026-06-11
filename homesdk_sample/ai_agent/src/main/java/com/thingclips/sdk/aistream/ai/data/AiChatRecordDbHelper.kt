@@ -1,4 +1,4 @@
-package com.thingclips.sdk.aistream.ai
+package com.thingclips.sdk.aistream.ai.data
 
 import android.content.ContentValues
 import android.content.Context

@@ -1,5 +1,8 @@
 package com.thingclips.sdk.aistream.ai
 
+import com.thingclips.sdk.aistream.ai.chat.AiAppChatActivity
+import com.thingclips.sdk.aistream.ai.chat.AiDeviceChatActivity
+
 import android.content.Intent
 import android.os.Bundle
 import android.view.View

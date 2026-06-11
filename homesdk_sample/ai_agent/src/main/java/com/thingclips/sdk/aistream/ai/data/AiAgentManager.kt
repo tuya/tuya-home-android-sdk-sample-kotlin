@@ -1,4 +1,4 @@
-package com.thingclips.sdk.aistream.ai
+package com.thingclips.sdk.aistream.ai.data
 
 import com.thingclips.smart.android.network.Business
 import com.thingclips.smart.android.network.http.BusinessResponse
