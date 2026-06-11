@@ -14,7 +14,6 @@
     <string name="ai_role_tag_default">默认角色</string>
     <string name="ai_role_empty">暂无自定义角色</string>
     <string name="ai_menu_memory">角色记忆</string>
-    <string name="ai_menu_emotion">当前情绪</string>
     <string name="ai_menu_diagnostics">API 诊断</string>
 
     <!-- Role memory pages -->

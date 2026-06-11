@@ -76,7 +76,6 @@ class AiChatActivity : AppCompatActivity() {
         private const val REQUEST_MEMORY = 204
 
         private const val MENU_MEMORY = 303
-        private const val MENU_EMOTION = 306
         private const val MENU_TEST_ALL = 307
 
         private const val API_GET_TOKEN = "m.life.ai.token.get"
@@ -1372,8 +1371,7 @@ class AiChatActivity : AppCompatActivity() {
     private fun showMoreMenu(anchor: View) {
         val popup = PopupMenu(this, anchor)
         popup.menu.add(0, MENU_MEMORY, 0, getString(R.string.ai_menu_memory))
-        popup.menu.add(0, MENU_EMOTION, 1, getString(R.string.ai_menu_emotion))
-        popup.menu.add(0, MENU_TEST_ALL, 2, getString(R.string.ai_menu_diagnostics))
+        popup.menu.add(0, MENU_TEST_ALL, 1, getString(R.string.ai_menu_diagnostics))
         popup.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 MENU_MEMORY -> {
@@ -1385,15 +1383,6 @@ class AiChatActivity : AppCompatActivity() {
                             .putExtra("bindRoleType", currentBindRoleType),
                         REQUEST_MEMORY
                     )
-                    true
-                }
-
-                MENU_EMOTION -> {
-                    if (!isSessionActive()) {
-                        showToast("Session not active")
-                        return@setOnMenuItemClickListener true
-                    }
-                    showCurrentEmotion()
                     true
                 }
 
@@ -1433,22 +1422,6 @@ class AiChatActivity : AppCompatActivity() {
                     .show()
             }
         }
-    }
-
-    private fun showCurrentEmotion() {
-        agent.currentEmotion(object : Cb<ChatEmotion> {
-            override fun onOk(data: ChatEmotion?) {
-                data ?: return
-                runOnUiThread {
-                    if (!data.emotion.isNullOrEmpty()) tvEmoji.text = data.emotion
-                    showToast("Emotion: ${data.emotion} ${data.text ?: ""}")
-                }
-            }
-
-            override fun onErr(code: Int, msg: String?) {
-                showToast("Get emotion failed: $msg")
-            }
-        })
     }
 
     // --- AI Stream Listener Callbacks ---
