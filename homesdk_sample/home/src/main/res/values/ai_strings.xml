@@ -62,4 +62,23 @@
     <string name="ai_confirm_delete_role">确定删除该角色？</string>
     <string name="ai_role_required_hint">请填写头像、名称、描述和语言</string>
     <string name="ai_role_select_hint">请选择</string>
+
+    <!-- AI identity entry & key config -->
+    <string name="ai_entry_title">AI 助手</string>
+    <string name="ai_entry_app_title">App 身份对话</string>
+    <string name="ai_entry_app_desc">以 App（账号）身份连接 AI 服务，无需选择设备</string>
+    <string name="ai_entry_device_title">设备身份对话</string>
+    <string name="ai_entry_device_desc">以设备身份连接，需选择当前家庭中的设备；aiSolutionCode 需发布到设备 PID</string>
+    <string name="ai_entry_configured">已配置</string>
+    <string name="ai_entry_not_configured">未配置</string>
+    <string name="ai_config_title">身份配置</string>
+    <string name="ai_config_desc">aiSolutionCode / miniProgramId 为密钥，不会提交到代码仓库。\n读取优先级：本页覆盖值 ＞ assets/ai_identity.properties ＞ local.properties（仅设备身份）。\n留空并保存即恢复默认值。</string>
+    <string name="ai_config_app_section">App 身份</string>
+    <string name="ai_config_device_section">设备身份</string>
+    <string name="ai_config_solution_hint">aiSolutionCode</string>
+    <string name="ai_config_mini_hint">miniProgramId</string>
+    <string name="ai_config_saved">已保存</string>
+    <string name="ai_config_keys_missing">密钥未配置，请先在身份配置页填写</string>
+    <string name="ai_select_device">选择设备</string>
+    <string name="ai_identity_app_chat_title">AI 助手（App 身份）</string>
 </resources>

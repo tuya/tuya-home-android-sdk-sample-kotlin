@@ -14,14 +14,12 @@ package com.tuya.appsdk.sample.home.main
 
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import com.thingclips.sdk.album.AlbumActivity
-import com.thingclips.sdk.aistream.ai.AiChatActivity
+import com.thingclips.sdk.aistream.ai.AiEntryActivity
 import com.thingclips.smart.home.sdk.ThingHomeSdk
 import com.thingclips.smart.home.sdk.bean.HomeBean
 import com.thingclips.smart.home.sdk.callback.IThingHomeResultCallback
@@ -77,17 +75,10 @@ class HomeFuncWidget {
                 Toast.makeText(it.context, "Please select a home", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            val aiSolutionCode = getMetaDataValue(it.context, "AI_SOLUTION_CODE")
-            val miniProgramId = getMetaDataValue(it.context, "MINI_PROGRAM_ID")
-            if (aiSolutionCode.isNullOrEmpty() || miniProgramId.isNullOrEmpty()) {
-                Toast.makeText(
-                    it.context,
-                    "AI solution code or mini program ID not found",
-                    Toast.LENGTH_SHORT
-                ).show()
-                return@setOnClickListener
-            }
-            pickDeviceThenLaunchAiChat(it.context, currentHomeId, aiSolutionCode, miniProgramId)
+            // Identity choice (App / device) and key checks live in AiEntryActivity.
+            val intent = Intent(it.context, AiEntryActivity::class.java)
+            intent.putExtra("homeId", currentHomeId)
+            it.context.startActivity(intent)
         }
 
         rootView.findViewById<TextView>(R.id.tvAlbumDemo).setOnClickListener {
@@ -101,53 +92,6 @@ class HomeFuncWidget {
             it.context.startActivity(intent)
         }
 
-    }
-
-    private fun pickDeviceThenLaunchAiChat(
-        context: Context,
-        homeId: Long,
-        aiSolutionCode: String,
-        miniProgramId: String
-    ) {
-        ThingHomeSdk.newHomeInstance(homeId).getHomeDetail(object : IThingHomeResultCallback {
-            override fun onSuccess(bean: HomeBean?) {
-                val devices = bean?.deviceList ?: emptyList()
-                if (devices.isEmpty()) {
-                    Toast.makeText(context, "No devices in this home", Toast.LENGTH_SHORT).show()
-                    return
-                }
-                val names = devices.map { it.name ?: it.devId }.toTypedArray()
-                AlertDialog.Builder(context)
-                    .setTitle("Select Device")
-                    .setItems(names) { _, which ->
-                        val devId = devices[which].devId
-                        val intent = Intent(context, AiChatActivity::class.java)
-                        intent.putExtra("ownerId", homeId.toString())
-                        intent.putExtra("aiSolutionCode", aiSolutionCode)
-                        intent.putExtra("miniProgramId", miniProgramId)
-                        intent.putExtra("devId", devId)
-                        context.startActivity(intent)
-                    }
-                    .show()
-            }
-
-            override fun onError(errorCode: String?, errorMsg: String?) {
-                Toast.makeText(context, "Load devices failed: $errorMsg", Toast.LENGTH_SHORT).show()
-            }
-        })
-    }
-
-    fun getMetaDataValue(context: Context, key: String): String? {
-        try {
-            val appInfo = context.packageManager.getApplicationInfo(
-                context.packageName,
-                PackageManager.GET_META_DATA
-            )
-            return appInfo.metaData?.getString(key)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        return null
     }
 
     fun refresh() {

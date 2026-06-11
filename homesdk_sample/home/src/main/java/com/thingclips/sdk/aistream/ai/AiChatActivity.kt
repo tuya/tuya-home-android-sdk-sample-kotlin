@@ -142,7 +142,17 @@ class AiChatActivity : AppCompatActivity() {
     private lateinit var mOwnerId: String
     private lateinit var mAiSolutionCode: String
     private lateinit var mMiniProgramId: String
+
+    /**
+     * Device identity: the picked device id (stream + role APIs).
+     * App identity: a local surrogate ("app:<solutionCode>") used only as the
+     * chat-history DB key — stream connects via connectWithApp and role
+     * management is unavailable (those ATOP APIs are devId-scoped).
+     */
     private lateinit var mDevId: String
+    private var mIdentity: Int = AiIdentityConfig.IDENTITY_DEVICE
+    private val isAppIdentity: Boolean
+        get() = mIdentity == AiIdentityConfig.IDENTITY_APP
 
     private lateinit var agent: AiAgentManager
     private var dbHelper: AiChatRecordDbHelper? = null
@@ -177,12 +187,19 @@ class AiChatActivity : AppCompatActivity() {
         }
         mAiSolutionCode = aiSolutionCode
         mMiniProgramId = miniProgramId
-        mDevId = intent.getStringExtra("devId") ?: ""
-        if (mDevId.isEmpty()) {
-            Log.e(TAG, "devId is required for device-identity connection.")
-            Toast.makeText(this, "devId is required", Toast.LENGTH_SHORT).show()
-            finish()
-            return
+        mIdentity = intent.getIntExtra(
+            AiIdentityConfig.EXTRA_IDENTITY, AiIdentityConfig.IDENTITY_DEVICE
+        )
+        if (isAppIdentity) {
+            mDevId = "app:$mAiSolutionCode" // local history key only
+        } else {
+            mDevId = intent.getStringExtra("devId") ?: ""
+            if (mDevId.isEmpty()) {
+                Log.e(TAG, "devId is required for device-identity connection.")
+                Toast.makeText(this, "devId is required", Toast.LENGTH_SHORT).show()
+                finish()
+                return
+            }
         }
         agent = AiAgentManager(mDevId)
         val uid = ThingHomeSdk.getUserInstance().user?.uid ?: "0"
@@ -197,9 +214,17 @@ class AiChatActivity : AppCompatActivity() {
 
         connectToAiStream()
         updateUiForSessionState()
-        // Render the cached role + local history immediately; the network
-        // chain (connect -> session -> getBindRole) only refreshes later.
-        loadCachedRole()
+        if (isAppIdentity) {
+            // No role concept for app identity: hide the role card and the
+            // role/memory menu; chat history persists under the surrogate key.
+            findViewById<View>(R.id.card_role).visibility = View.GONE
+            findViewById<ImageView>(R.id.iv_more).visibility = View.GONE
+            findViewById<TextView>(R.id.tv_title).setText(R.string.ai_identity_app_chat_title)
+        } else {
+            // Render the cached role + local history immediately; the network
+            // chain (connect -> session -> getBindRole) only refreshes later.
+            loadCachedRole()
+        }
         loadLocalHistory()
     }
 
@@ -498,7 +523,7 @@ class AiChatActivity : AppCompatActivity() {
 
     // --- AI Stream Connection & Session Management ---
     private fun connectToAiStream() {
-        if (aiStream?.isConnected(Constants.ClientType.DEVICE, mDevId) == true) {
+        if (isStreamConnected()) {
             Log.i(TAG, "Already connected.")
             if (currentSessionId.isNullOrEmpty()) createNewSession()
             return
@@ -509,16 +534,16 @@ class AiChatActivity : AppCompatActivity() {
         }
         isConnecting = true
         tvStatus.text = "Status: Connecting..."
-        aiStream?.connectWithDevice(mDevId, object : ConnectCallback {
+        val callback = object : ConnectCallback {
             override fun onSuccess(connectionId: String) {
                 isConnecting = false
-                Log.i(TAG, "connectWithDevice onSuccess, connectionId: $connectionId")
+                Log.i(TAG, "connect onSuccess, connectionId: $connectionId")
                 // State change will be handled by listener
             }
 
             override fun onError(code: Int, error: String) {
                 isConnecting = false
-                Log.e(TAG, "connectWithDevice onError, code: $code, error: $error")
+                Log.e(TAG, "connect onError, code: $code, error: $error")
                 runOnUiThread {
                     tvStatus.text = "Status: Connect failed ($error)"
                     Toast.makeText(
@@ -528,7 +553,12 @@ class AiChatActivity : AppCompatActivity() {
                     ).show()
                 }
             }
-        })
+        }
+        if (isAppIdentity) {
+            aiStream?.connectWithApp(callback)
+        } else {
+            aiStream?.connectWithDevice(mDevId, callback)
+        }
     }
 
     private fun createNewSession() {
@@ -549,16 +579,17 @@ class AiChatActivity : AppCompatActivity() {
             return
         }
         isSessionCreating = true
-        // Device-identity session: token request carries deviceId in extParams.
-        val params = AgentTokenRequestParams.Builder()
+        // Device-identity sessions carry deviceId in extParams; app-identity
+        // sessions are account-scoped and must not send one.
+        val builder = AgentTokenRequestParams.Builder()
             .api(API_GET_TOKEN)
             .apiVersion(API_VERSION)
             .ownerId(mOwnerId)
             .aiSolutionCode(mAiSolutionCode)
             .addExtParam("miniProgramId", mMiniProgramId)
-            .addExtParam("deviceId", mDevId)
             .addExtParam("needTts", "true")
-            .build()
+        if (!isAppIdentity) builder.addExtParam("deviceId", mDevId)
+        val params = builder.build()
 
         aiStream?.createSession(params, null, object : SessionCallback {
             override fun onSuccess(
@@ -586,8 +617,11 @@ class AiChatActivity : AppCompatActivity() {
         })
     }
 
-    private fun isStreamConnected(): Boolean =
+    private fun isStreamConnected(): Boolean = if (isAppIdentity) {
+        aiStream?.isConnected(Constants.ClientType.APP, null) == true
+    } else {
         aiStream?.isConnected(Constants.ClientType.DEVICE, mDevId) == true
+    }
 
     private fun isSessionActive(): Boolean =
         isStreamConnected() && !currentSessionId.isNullOrEmpty()
@@ -1446,7 +1480,7 @@ class AiChatActivity : AppCompatActivity() {
                     Constants.SessionState.CREATE_SUCCESS -> {
                         currentSessionId = sessionId
                         updateStatusText("Status: Session Created ($sessionId)")
-                        resolveBoundRole()
+                        if (!isAppIdentity) resolveBoundRole()
                     }
 
                     Constants.SessionState.CREATE_FAILED -> {

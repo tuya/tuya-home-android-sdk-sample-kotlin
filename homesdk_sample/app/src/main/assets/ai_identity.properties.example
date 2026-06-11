@@ -1,0 +1,11 @@
+# AI identity keys (DO NOT commit the real file).
+# Copy this file to ai_identity.properties in the same directory and fill in
+# your own values. ai_identity.properties is gitignored.
+#
+# App identity: solution created on the platform and published to this app.
+app.aiSolutionCode=
+app.miniProgramId=
+# Device identity: solution published to the device PID.
+# (Falls back to aiSolutionCode/miniProgramId in local.properties when empty.)
+device.aiSolutionCode=
+device.miniProgramId=

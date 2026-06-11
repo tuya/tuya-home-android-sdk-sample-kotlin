@@ -22,6 +22,16 @@
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
+            android:name="com.thingclips.sdk.aistream.ai.AiEntryActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
+            android:name="com.thingclips.sdk.aistream.ai.AiConfigActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
             android:name="com.thingclips.sdk.aistream.ai.AiChatActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity
