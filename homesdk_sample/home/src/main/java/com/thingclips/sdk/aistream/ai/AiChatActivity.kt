@@ -677,7 +677,14 @@ class AiChatActivity : AppCompatActivity() {
                 revDataCodes: Map<String, Int>
             ) {
                 isSessionCreating = false
-                Log.i(TAG, "createSession onSuccess: $sessionId")
+                // revDataCodes shows which downlink data types the cloud will
+                // send — no "audio" entry means TTS is off for this session
+                // (solution/timbre config), not a local playback issue.
+                Log.i(
+                    TAG,
+                    "createSession onSuccess: $sessionId identity=$mIdentity " +
+                        "sendDataCodes=$sendDataCodes revDataCodes=$revDataCodes"
+                )
                 // State change will be handled by listener
             }
 
