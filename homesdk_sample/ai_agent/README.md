@@ -119,14 +119,7 @@ The entry page offers the two identities:
   instantly while the network chain (connect → session → role binding)
   refreshes in the background.
 
-## Token Billing / Quota
-
-- **Device identity** — billing is bound to the **device license**; there is
-  no separate token billing for device-identity conversations.
-- **App identity** — there is currently no dedicated consumer-side (C-end)
-  billing. Usage is billed **pay-as-you-go** and topped up on
-  [iot.tuya.com](https://iot.tuya.com); recharge the account that owns the AI
-  solution.
+## Token Billing
 
 📖 **Metering & billing reference:**
 [developer.tuya.com — Agent deployment & billing](https://developer.tuya.com/en/docs/iot/agent-deploy?id=Kfnx3351272vh)
@@ -241,10 +234,6 @@ startActivity(
   （连接 → 会话 → 角色绑定）在后台刷新。
 
 ## Token 计费策略
-
-- **设备身份**：计费**绑定设备 license**，设备身份对话没有单独的 token 计费。
-- **App 身份**：目前没有专门的 C 端计费，按量计费，在
-  [iot.tuya.com](https://iot.tuya.com) 对持有 AI 方案的账号进行充值。
 
 📖 **计量计费说明文档：**
 [developer.tuya.com — 智能体部署与计费](https://developer.tuya.com/cn/docs/iot/agent-deploy?id=Kfnx3351272vh)

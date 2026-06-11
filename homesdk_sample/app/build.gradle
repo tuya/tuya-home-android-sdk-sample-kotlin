@@ -22,9 +22,7 @@ android {
         properties.load(project.rootProject.file('local.properties').newDataInputStream())
         manifestPlaceholders = [
                 TUYA_SMART_APPKEY: "${properties.getProperty("appKey")}",
-                TUYA_SMART_SECRET: "${properties.getProperty("appSecret")}",
-                AI_SOLUTION_CODE : "${properties.getProperty("aiSolutionCode", "")}",
-                MINI_PROGRAM_ID  : "${properties.getProperty("miniProgramId", "")}"
+                TUYA_SMART_SECRET: "${properties.getProperty("appSecret")}"
         ]
 
         ndk {

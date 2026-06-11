@@ -17,6 +17,8 @@ buildscript {
 allprojects {
     configurations.all {
         exclude group: "com.thingclips.smart" ,module: 'thingsmart-modularCampAnno'
+        exclude group: "com.thingclips.android.module", module: "thingmodule-annotation"
+        exclude group: "com.thingclips.smart", module: "thingplugin-annotation"
     }
     repositories {
 //
