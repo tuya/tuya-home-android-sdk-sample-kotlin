@@ -44,4 +44,22 @@
     <string name="ai_action_confirm">确定</string>
     <string name="ai_action_delete">删除</string>
     <string name="ai_action_save">保存</string>
+
+    <!-- Role create/edit page -->
+    <string name="ai_role_create_title">创建新角色</string>
+    <string name="ai_role_edit_title">编辑角色</string>
+    <string name="ai_role_avatar">角色头像</string>
+    <string name="ai_role_name">角色名称</string>
+    <string name="ai_role_name_hint">请输入角色名称</string>
+    <string name="ai_role_desc_label">角色描述</string>
+    <string name="ai_role_desc_hint">举例：你是一名天文学家，你有着丰富的知识储备。你善于激发孩子对太空的好奇心和兴趣，你会耐心的解答孩子关于太空的问题。你幽默风趣，受孩子们的欢迎。</string>
+    <string name="ai_role_language">语言</string>
+    <string name="ai_role_timbre">音色</string>
+    <string name="ai_role_timbre_none">无</string>
+    <string name="ai_role_save">保存修改</string>
+    <string name="ai_role_delete">删除角色</string>
+    <string name="ai_role_default_avatars">默认的头像</string>
+    <string name="ai_confirm_delete_role">确定删除该角色？</string>
+    <string name="ai_role_required_hint">请填写头像、名称、描述和语言</string>
+    <string name="ai_role_select_hint">请选择</string>
 </resources>

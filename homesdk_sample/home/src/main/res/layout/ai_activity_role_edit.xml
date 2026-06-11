@@ -1,66 +1,262 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/ai_bg_gradient"
+    android:orientation="vertical">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:layout_height="52dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp">
 
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Role Name *" />
-        <EditText
-            android:id="@+id/et_role_name"
+        <ImageView
+            android:id="@+id/iv_back"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/ai_role_create_title"
+            android:padding="9dp"
+            android:src="@drawable/ai_ic_back" />
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="@string/ai_role_create_title"
+            android:textColor="@color/ai_text_primary"
+            android:textSize="17sp"
+            android:textStyle="bold" />
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Role name" />
+            android:orientation="vertical"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="16dp">
 
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Role Introduce *" />
-        <EditText
-            android:id="@+id/et_role_introduce"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Role introduce" />
+            <!-- Avatar row -->
+            <LinearLayout
+                android:id="@+id/row_avatar"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/ai_bg_card"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="14dp"
+                android:paddingEnd="10dp">
 
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Role Desc" />
-        <EditText
-            android:id="@+id/et_role_desc"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Role description (optional)" />
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/ai_role_avatar"
+                    android:textColor="@color/ai_text_primary"
+                    android:textSize="15sp" />
 
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Avatar *" />
-        <Spinner
-            android:id="@+id/sp_avatar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+                <ImageView
+                    android:id="@+id/iv_avatar_preview"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/ai_bg_chip"
+                    android:contentDescription="@string/ai_role_avatar"
+                    android:scaleType="centerCrop" />
 
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Language *" />
-        <Spinner
-            android:id="@+id/sp_language"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="4dp"
+                    android:contentDescription="@string/ai_role_avatar"
+                    android:src="@drawable/ai_ic_chevron_right" />
+            </LinearLayout>
 
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Timbre" />
-        <Spinner
-            android:id="@+id/sp_timbre"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            <!-- Name row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/ai_bg_card"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp">
 
-        <Button
-            android:id="@+id/btn_submit"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="Save" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/ai_role_name"
+                    android:textColor="@color/ai_text_primary"
+                    android:textSize="15sp" />
 
-        <Button
-            android:id="@+id/btn_delete"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Delete"
-            android:visibility="gone" />
-    </LinearLayout>
-</ScrollView>
+                <EditText
+                    android:id="@+id/et_role_name"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:gravity="end"
+                    android:hint="@string/ai_role_name_hint"
+                    android:importantForAutofill="no"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:textColor="@color/ai_text_primary"
+                    android:textColorHint="@color/ai_text_secondary"
+                    android:textSize="15sp" />
+            </LinearLayout>
+
+            <!-- Description card -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/ai_bg_card"
+                android:orientation="vertical"
+                android:padding="14dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/ai_role_desc_label"
+                    android:textColor="@color/ai_text_primary"
+                    android:textSize="15sp" />
+
+                <EditText
+                    android:id="@+id/et_role_introduce"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@null"
+                    android:gravity="top"
+                    android:hint="@string/ai_role_desc_hint"
+                    android:importantForAutofill="no"
+                    android:inputType="textMultiLine"
+                    android:maxLength="3000"
+                    android:minLines="5"
+                    android:textColor="@color/ai_text_primary"
+                    android:textColorHint="@color/ai_text_secondary"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tv_desc_counter"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:gravity="start"
+                    android:text="0/3000"
+                    android:textColor="@color/ai_text_secondary"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
+            <!-- Language row -->
+            <LinearLayout
+                android:id="@+id/row_language"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/ai_bg_card"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="14dp"
+                android:paddingEnd="10dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/ai_role_language"
+                    android:textColor="@color/ai_text_primary"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/tv_language_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/ai_role_select_hint"
+                    android:textColor="@color/ai_text_secondary"
+                    android:textSize="14sp" />
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="4dp"
+                    android:contentDescription="@string/ai_role_language"
+                    android:src="@drawable/ai_ic_chevron_right" />
+            </LinearLayout>
+
+            <!-- Timbre row -->
+            <LinearLayout
+                android:id="@+id/row_timbre"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/ai_bg_card"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="14dp"
+                android:paddingEnd="10dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/ai_role_timbre"
+                    android:textColor="@color/ai_text_primary"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/tv_timbre_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/ai_role_timbre_none"
+                    android:textColor="@color/ai_text_secondary"
+                    android:textSize="14sp" />
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="4dp"
+                    android:contentDescription="@string/ai_role_timbre"
+                    android:src="@drawable/ai_ic_chevron_right" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/btn_delete"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="14dp"
+                android:gravity="center"
+                android:text="@string/ai_role_delete"
+                android:textColor="#FFE53935"
+                android:textSize="15sp"
+                android:visibility="gone" />
+        </LinearLayout>
+    </ScrollView>
+
+    <TextView
+        android:id="@+id/btn_submit"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/ai_bg_btn_primary"
+        android:gravity="center"
+        android:text="@string/ai_create_role"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+</LinearLayout>

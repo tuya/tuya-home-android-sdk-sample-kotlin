@@ -81,6 +81,8 @@ class AiChatActivity : AppCompatActivity() {
 
         private const val API_GET_TOKEN = "m.life.ai.token.get"
         private const val API_VERSION = "1.0"
+
+        private const val PREFS_ROLE_CACHE = "ai_role_cache"
     }
 
     private var aiStream: IThingAiStream? = null
@@ -195,6 +197,9 @@ class AiChatActivity : AppCompatActivity() {
 
         connectToAiStream()
         updateUiForSessionState()
+        // Render the cached role + local history immediately; the network
+        // chain (connect -> session -> getBindRole) only refreshes later.
+        loadCachedRole()
         loadLocalHistory()
     }
 
@@ -1156,16 +1161,51 @@ class AiChatActivity : AppCompatActivity() {
 
     private fun applyRole(detail: RoleDetail?) {
         if (detail?.roleId.isNullOrEmpty()) return
-        currentRoleId = detail!!.roleId!!
+        // Same role as the one rendered from cache: refresh the header and
+        // merge cloud history without clearing the visible conversation.
+        val sameRole = detail!!.roleId == currentRoleId
+        currentRoleId = detail.roleId!!
         currentBindRoleType = detail.bindRoleType
         currentRoleDetail = detail
+        saveRoleCache(detail)
         runOnUiThread {
             updateRoleHeader(detail)
-            messageList.clear()
-            chatAdapter.notifyDataSetChanged()
+            if (!sameRole) {
+                messageList.clear()
+                chatAdapter.notifyDataSetChanged()
+            }
         }
-        loadLocalHistory()
+        if (!sameRole) loadLocalHistory()
         loadCloudHistory()
+    }
+
+    // --- Role cache: render last known role/header before any network IO ---
+    private fun saveRoleCache(detail: RoleDetail) {
+        getSharedPreferences(PREFS_ROLE_CACHE, Context.MODE_PRIVATE).edit()
+            .putString("$mDevId.roleId", detail.roleId)
+            .putInt("$mDevId.bindRoleType", detail.bindRoleType)
+            .putString("$mDevId.roleName", detail.roleName)
+            .putString("$mDevId.roleImgUrl", detail.roleImgUrl)
+            .putString("$mDevId.useLangName", detail.useLangName ?: detail.useLangCode)
+            .putString("$mDevId.useTimbreName", detail.useTimbreName)
+            .apply()
+    }
+
+    private fun loadCachedRole() {
+        val sp = getSharedPreferences(PREFS_ROLE_CACHE, Context.MODE_PRIVATE)
+        val roleId = sp.getString("$mDevId.roleId", null) ?: return
+        currentRoleId = roleId
+        currentBindRoleType = sp.getInt("$mDevId.bindRoleType", BindRoleType.DEFAULT)
+        updateRoleHeader(
+            RoleDetail(
+                roleId = roleId,
+                roleName = sp.getString("$mDevId.roleName", null),
+                roleImgUrl = sp.getString("$mDevId.roleImgUrl", null),
+                useLangName = sp.getString("$mDevId.useLangName", null),
+                useTimbreName = sp.getString("$mDevId.useTimbreName", null),
+                bindRoleType = currentBindRoleType
+            )
+        )
     }
 
     private fun updateRoleHeader(detail: RoleDetail) {
