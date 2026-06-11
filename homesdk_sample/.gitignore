@@ -92,10 +92,3 @@ key.store
 app/release
 # AI identity keys (local only)
 app/src/main/assets/ai_identity.properties
-
-# Local-only vendored jars for untracked album WIP (internal artifacts)
-home/libs/
-app/libs/tunip2pfilemanager-*.jar
-app/libs/thingsmart-TUNIP2PKit-*.jar
-app/libs/thingsmart-universal-base-*.jar
-app/libs/thingsmart-live-eventbus-*.jar

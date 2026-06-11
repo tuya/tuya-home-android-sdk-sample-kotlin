@@ -32,13 +32,6 @@ android {
     }
 }
 
-// Match the app module's pin; otherwise this module resolves a p2p sdk
-// version whose album plugin API differs.
-configurations.all {
-    exclude group: "com.thingclips.smart", module: 'thingsmart-modularCampAnno'
-    resolutionStrategy.force 'com.thingclips.smart:thingsmart-p2p-file-trans-sdk:1.7.1'
-}
-
 dependencies {
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
@@ -49,13 +42,8 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     implementation "androidx.constraintlayout:constraintlayout:2.0.4"
 
+    // AiAgentBusiness parses page payloads with fastjson.
     implementation 'com.alibaba:fastjson:1.1.67.android'
-
-    // Local-only jars (gitignored home/libs). The P2P album demo sources are
-    // untracked WIP whose plugin artifacts are not on the public maven repos;
-    // their classes.jar files are vendored locally for compile, and the same
-    // jars sit in app/libs for runtime packaging.
-    compileOnly fileTree(dir: 'libs', include: ['*.jar'])
 
     implementation project(':base_res')
 }
