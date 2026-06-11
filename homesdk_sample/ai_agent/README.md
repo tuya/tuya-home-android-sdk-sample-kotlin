@@ -128,6 +128,9 @@ The entry page offers the two identities:
   [iot.tuya.com](https://iot.tuya.com); recharge the account that owns the AI
   solution.
 
+📖 **Metering & billing reference:**
+[developer.tuya.com — Agent deployment & billing](https://developer.tuya.com/en/docs/iot/agent-deploy?id=Kfnx3351272vh)
+
 ---
 
 # 中文说明
@@ -242,3 +245,6 @@ startActivity(
 - **设备身份**：计费**绑定设备 license**，设备身份对话没有单独的 token 计费。
 - **App 身份**：目前没有专门的 C 端计费，按量计费，在
   [iot.tuya.com](https://iot.tuya.com) 对持有 AI 方案的账号进行充值。
+
+📖 **计量计费说明文档：**
+[developer.tuya.com — 智能体部署与计费](https://developer.tuya.com/cn/docs/iot/agent-deploy?id=Kfnx3351272vh)
