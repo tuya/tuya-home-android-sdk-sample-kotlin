@@ -188,15 +188,7 @@ class AiCallActivity : AppCompatActivity(), AiCallEngine.CallListener {
     override fun onListeningStopped() {}
 
     override fun onNlgInterrupted() {
-        runOnUiThread {
-            addMessage(
-                ChatMessage(
-                    text = "—— ${getString(R.string.ai_call_interrupted)} ——",
-                    isSentByUser = false,
-                    messageType = ChatMessage.MessageType.NLG_TEXT
-                )
-            )
-        }
+        // Playback already stops in the engine; no transcript marker needed.
     }
 
     override fun onAsrResult(text: String, bizId: String) {

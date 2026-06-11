@@ -89,6 +89,5 @@
     <string name="ai_call_status_ready">已接通，点击麦克风开始对话</string>
     <string name="ai_call_status_listening">通话中，请说话…</string>
     <string name="ai_call_status_error">连接出错</string>
-    <string name="ai_call_interrupted">已打断</string>
     <string name="ai_call_mic_permission">语音通话需要录音权限</string>
 </resources>
