@@ -123,6 +123,7 @@ class AiChatActivity : AppCompatActivity() {
     // plus whether NLG text is still streaming / TTS is still playing. While
     // either is true the send button becomes a stop button.
     private var respondingEventId: String? = null
+    private var isAwaitingReply = false
     private var isNlgStreaming = false
     private var isTtsPlaying = false
 
@@ -408,6 +409,7 @@ class AiChatActivity : AppCompatActivity() {
     private fun interruptResponse() {
         val eventId = respondingEventId
         respondingEventId = null
+        isAwaitingReply = false
         isNlgStreaming = false
         isTtsPlaying = false
         aiStream?.stopPlayAudio()
@@ -502,17 +504,21 @@ class AiChatActivity : AppCompatActivity() {
     }
 
     private val isResponding: Boolean
-        get() = isNlgStreaming || isTtsPlaying
+        get() = isAwaitingReply || isNlgStreaming || isTtsPlaying
 
     private fun updateSendButtonIcon() {
         if (isVoiceMode) {
             ivSendOrVoice.setImageResource(R.drawable.ai_ic_keyboard)
+            ivSelectImage.visibility = if (isRecordingAudio) View.GONE else View.VISIBLE
             return
         }
         if (isResponding) {
+            // Stop button takes over the "+" slot while the reply is in flight.
             ivSendOrVoice.setImageResource(R.drawable.ai_ic_stop)
+            ivSelectImage.visibility = View.GONE
             return
         }
+        ivSelectImage.visibility = View.VISIBLE
         val hasText = etMessageInput.text.toString().trim().isNotEmpty()
         val hasImage = selectedImageUri != null
 
@@ -541,12 +547,14 @@ class AiChatActivity : AppCompatActivity() {
         btnHoldToTalk.visibility = View.GONE
         audioAmplitudeView.visibility = View.VISIBLE
         audioAmplitudeView.setBackgroundColor(Color.TRANSPARENT)
+        ivSelectImage.visibility = View.GONE
     }
 
     private fun hideVoiceRecordingUI() {
         btnHoldToTalk.visibility = View.VISIBLE
         audioAmplitudeView.visibility = View.GONE
         originalButtonBackground?.let { btnHoldToTalk.background = it }
+        updateSendButtonIcon() // restores the "+" per the current state
     }
 
     private fun hideKeyboard() {
@@ -732,7 +740,10 @@ class AiChatActivity : AppCompatActivity() {
         }
         Log.i(TAG, "Finalizing event: $eventIdToFinalize")
         // The cloud answers this event; keep its id so the reply can be broken.
+        // The stop button shows as soon as the message is sent.
         respondingEventId = eventIdToFinalize
+        isAwaitingReply = true
+        runOnUiThread { updateSendButtonIcon() }
         aiStream?.sendEventEnd(
             eventIdToFinalize,
             currentSessionId!!,
@@ -1736,6 +1747,7 @@ class AiChatActivity : AppCompatActivity() {
 
         if (eof == 1) {
             Log.d(TAG, "NLG stream finished for bizId: $bizId")
+            isAwaitingReply = false
             isNlgStreaming = false
             updateSendButtonIcon()
             // Persist the full reply once, when streaming completes (not per chunk).
