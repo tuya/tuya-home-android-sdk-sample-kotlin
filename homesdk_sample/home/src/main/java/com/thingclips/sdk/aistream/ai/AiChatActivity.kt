@@ -8,7 +8,9 @@ import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.widget.LinearLayout
+import android.widget.RelativeLayout
 import androidx.appcompat.widget.PopupMenu
+import androidx.core.view.updateLayoutParams
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import android.net.Uri
 import android.os.Bundle
@@ -218,6 +220,12 @@ class AiChatActivity : AppCompatActivity() {
             // role/memory menu; chat history persists under the surrogate key.
             findViewById<View>(R.id.card_role).visibility = View.GONE
             findViewById<ImageView>(R.id.iv_more).visibility = View.GONE
+            // The call icon anchors to iv_more (toStartOf); with that anchor
+            // GONE the rule resolves wrong, so pin it to the parent end.
+            findViewById<ImageView>(R.id.iv_call).updateLayoutParams<RelativeLayout.LayoutParams> {
+                removeRule(RelativeLayout.START_OF)
+                addRule(RelativeLayout.ALIGN_PARENT_END)
+            }
             findViewById<TextView>(R.id.tv_title).setText(R.string.ai_identity_app_chat_title)
         } else {
             // Render the cached role + local history immediately; the network
