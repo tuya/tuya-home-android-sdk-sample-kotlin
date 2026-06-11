@@ -21,26 +21,56 @@ include ':ai_agent'
 implementation project(':ai_agent')
 ```
 
-### 2. Configure the identity keys
+### 2. Configure the identity keys (read this first)
 
-Each chat identity needs an `aiSolutionCode` + `miniProgramId` pair. These are
-secrets — **never commit them**. They resolve in this order
-(`AiIdentityConfig`):
+Each chat identity needs its own `aiSolutionCode` + `miniProgramId` pair,
+obtained from the AI solution you created on the Tuya developer platform
+([iot.tuya.com](https://iot.tuya.com)):
 
-1. **In-app overrides** — the gear icon on the entry page opens
-   `AiConfigActivity`; values are stored in device-local SharedPreferences.
-   Blank-and-save falls back to the layers below.
-2. **`app/src/main/assets/ai_identity.properties`** — gitignored; copy
-   `ai_identity.properties.example` and fill in your values:
+- **App identity pair** — from a solution created on the platform and
+  **published to this app**.
+- **Device identity pair** — from a solution **published to the device PID**;
+  it only works with devices of that PID, the values are not interchangeable.
 
-   ```properties
-   app.aiSolutionCode=...
-   app.miniProgramId=...
-   device.aiSolutionCode=...
-   device.miniProgramId=...
-   ```
-3. **Manifest meta-data** (`AI_SOLUTION_CODE` / `MINI_PROGRAM_ID`, injected
-   from `local.properties`) — legacy path, device identity only.
+The keys are secrets — **never commit them to git**. Pick ONE of the three
+places below to put them. At runtime `AiIdentityConfig` resolves them in this
+priority order (a higher layer overrides the lower ones):
+
+| Priority | Where | File / page | Scope |
+|---|---|---|---|
+| 1 (highest) | **In-app config page** | Entry page → gear icon (top-right) → `AiConfigActivity` | This phone only (SharedPreferences). Blank-and-save reverts to layer 2/3. The current defaults show as input hints. |
+| 2 | **Assets file** | `app/src/main/assets/ai_identity.properties` | This checkout. The file is gitignored; a committed template sits next to it. |
+| 3 (lowest) | **local.properties** | `<project root>/local.properties` → manifest meta-data | This checkout. Legacy path, **device identity only**. |
+
+**Recommended setup (layer 2):** copy the template and fill in all four
+values —
+
+```bash
+cp app/src/main/assets/ai_identity.properties.example \
+   app/src/main/assets/ai_identity.properties
+```
+
+```properties
+# app/src/main/assets/ai_identity.properties  (gitignored)
+app.aiSolutionCode=aipt_xxxxxxxxxxxx      # solution published to this app
+app.miniProgramId=tyxxxxxxxxxxxxxxxx
+device.aiSolutionCode=aipt_xxxxxxxxxxxx   # solution published to the device PID
+device.miniProgramId=tyxxxxxxxxxxxxxx
+```
+
+**Layer 3 alternative (device identity only):** add to
+`<project root>/local.properties` (also gitignored) —
+
+```properties
+aiSolutionCode=aipt_xxxxxxxxxxxx
+miniProgramId=tyxxxxxxxxxxxxxx
+```
+
+**No build-time setup at all?** Run the app, open the entry page, tap the
+gear and type the keys into the config page (layer 1).
+
+The entry page shows a 已配置/未配置 (configured / not configured) chip per
+identity; tapping an unconfigured identity jumps straight to the config page.
 
 ### 3. Launch
 
@@ -136,24 +166,52 @@ include ':ai_agent'
 implementation project(':ai_agent')
 ```
 
-### 2. 配置身份密钥
+### 2. 配置身份密钥（重点，先读这节）
 
-每种对话身份需要一对 `aiSolutionCode` + `miniProgramId`，属于密钥，**禁止提交
-到代码仓库**。解析优先级（见 `AiIdentityConfig`）：
+每种对话身份需要各自的一对 `aiSolutionCode` + `miniProgramId`，来源于你在涂鸦
+开发者平台（[iot.tuya.com](https://iot.tuya.com)）创建的 AI 方案：
 
-1. **App 内配置页** —— 入口页右上角齿轮打开 `AiConfigActivity`，值保存在本机
-   SharedPreferences；留空保存即回退到下层默认值。
-2. **`app/src/main/assets/ai_identity.properties`** —— 已 gitignore；复制同目录
-   `ai_identity.properties.example` 模板填入：
+- **App 身份密钥对**：平台创建并**发布到本 App** 的方案。
+- **设备身份密钥对**：**发布到设备 PID** 的方案，只对该 PID 的设备生效，
+  两套密钥不可混用。
 
-   ```properties
-   app.aiSolutionCode=...
-   app.miniProgramId=...
-   device.aiSolutionCode=...
-   device.miniProgramId=...
-   ```
-3. **Manifest meta-data**（`AI_SOLUTION_CODE` / `MINI_PROGRAM_ID`，由
-   `local.properties` 注入）—— 兼容旧链路，仅设备身份。
+密钥**禁止提交到代码仓库**。从下面三个位置任选其一填写；运行时
+`AiIdentityConfig` 按以下优先级解析（高层覆盖低层）：
+
+| 优先级 | 位置 | 文件/页面 | 作用范围 |
+|---|---|---|---|
+| 1（最高） | **App 内配置页** | 入口页右上角齿轮 → `AiConfigActivity` | 仅本手机（SharedPreferences）。留空保存即回退到第 2/3 层；当前默认值会显示为输入框提示。 |
+| 2 | **assets 文件** | `app/src/main/assets/ai_identity.properties` | 本工作区。文件已 gitignore，旁边有已提交的模板。 |
+| 3（最低） | **local.properties** | `<工程根目录>/local.properties` → manifest meta-data | 本工作区。旧链路，**仅设备身份**。 |
+
+**推荐做法（第 2 层）**：复制模板，四个值填全——
+
+```bash
+cp app/src/main/assets/ai_identity.properties.example \
+   app/src/main/assets/ai_identity.properties
+```
+
+```properties
+# app/src/main/assets/ai_identity.properties（已 gitignore）
+app.aiSolutionCode=aipt_xxxxxxxxxxxx      # 发布到本 App 的方案
+app.miniProgramId=tyxxxxxxxxxxxxxxxx
+device.aiSolutionCode=aipt_xxxxxxxxxxxx   # 发布到设备 PID 的方案
+device.miniProgramId=tyxxxxxxxxxxxxxx
+```
+
+**第 3 层备选（仅设备身份）**：写入 `<工程根目录>/local.properties`
+（同样已 gitignore）——
+
+```properties
+aiSolutionCode=aipt_xxxxxxxxxxxx
+miniProgramId=tyxxxxxxxxxxxxxx
+```
+
+**完全不想动构建文件？** 直接装机运行，入口页点齿轮，在配置页里手输密钥
+（第 1 层）。
+
+入口页每种身份都有「已配置/未配置」状态标签；点击未配置的身份会直接跳到
+配置页。
 
 ### 3. 启动入口
 
