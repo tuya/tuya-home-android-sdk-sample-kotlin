@@ -119,6 +119,13 @@ class AiChatActivity : AppCompatActivity() {
     private var currentSessionId: String? = null
     private var mCurrentEventId: String? = null // Represents the active event being constructed
 
+    // Reply-in-flight tracking: the finalized event the cloud is answering,
+    // plus whether NLG text is still streaming / TTS is still playing. While
+    // either is true the send button becomes a stop button.
+    private var respondingEventId: String? = null
+    private var isNlgStreaming = false
+    private var isTtsPlaying = false
+
     private var selectedImageUri: Uri? = null
     private var tempAsrResult: String = ""
     private var isVoiceMode: Boolean = false
@@ -381,6 +388,10 @@ class AiChatActivity : AppCompatActivity() {
 
     private fun handleSendOrVoiceClick() {
         hideKeyboard()
+        if (!isVoiceMode && isResponding) {
+            interruptResponse()
+            return
+        }
         if (!isVoiceMode) {
             val hasContent =
                 etMessageInput.text.toString().trim().isNotEmpty() || selectedImageUri != null
@@ -390,11 +401,47 @@ class AiChatActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Breaks the in-flight reply: stops TTS playback and sends a chat-break
+     * for the answered event so the cloud stops streaming NLG text too.
+     */
+    private fun interruptResponse() {
+        val eventId = respondingEventId
+        respondingEventId = null
+        isNlgStreaming = false
+        isTtsPlaying = false
+        aiStream?.stopPlayAudio()
+        if (!eventId.isNullOrEmpty() && !currentSessionId.isNullOrEmpty()) {
+            Log.i(TAG, "Sending chat break for replying event: $eventId")
+            aiStream?.sendEventChatBreak(
+                eventId,
+                currentSessionId!!,
+                null,
+                object : StreamResultCallback {
+                    override fun onSuccess() {
+                        Log.i(TAG, "Chat break sent for event: $eventId")
+                    }
+
+                    override fun onError(errorCode: Int, errorMessage: String) {
+                        Log.e(TAG, "Chat break failed for $eventId: $errorCode $errorMessage")
+                    }
+                })
+        }
+        // The interrupted reply is final now — persist what arrived.
+        messageList.lastOrNull {
+            !it.isSentByUser && it.messageType == ChatMessage.MessageType.NLG_TEXT &&
+                !it.bizId.isNullOrEmpty()
+        }?.bizId?.let { persistNlg(it) }
+        updateSendButtonIcon()
+    }
+
     private fun handleVoiceTouchDown(event: MotionEvent): Boolean {
         if (!isSessionActive()) {
             showToast("Session not active, cannot start recording.")
             return false
         }
+        // Talking over an in-flight reply breaks it first.
+        if (isResponding) interruptResponse()
         isFingerOutsideButton = false
         initialTouchY = event.rawY
         showVoiceRecordingUI()
@@ -454,9 +501,16 @@ class AiChatActivity : AppCompatActivity() {
         return true
     }
 
+    private val isResponding: Boolean
+        get() = isNlgStreaming || isTtsPlaying
+
     private fun updateSendButtonIcon() {
         if (isVoiceMode) {
             ivSendOrVoice.setImageResource(R.drawable.ai_ic_keyboard)
+            return
+        }
+        if (isResponding) {
+            ivSendOrVoice.setImageResource(R.drawable.ai_ic_stop)
             return
         }
         val hasText = etMessageInput.text.toString().trim().isNotEmpty()
@@ -643,6 +697,15 @@ class AiChatActivity : AppCompatActivity() {
     private fun isSessionActive(): Boolean =
         isStreamConnected() && !currentSessionId.isNullOrEmpty()
 
+    private fun canUpdateUi(): Boolean = !isFinishing && !isDestroyed
+
+    private inline fun runOnUiThreadIfActive(crossinline action: () -> Unit) {
+        if (!canUpdateUi()) return
+        runOnUiThread {
+            if (canUpdateUi()) action()
+        }
+    }
+
     private fun updateStatusText(status: String) {
         tvStatus.text = status
     }
@@ -668,6 +731,8 @@ class AiChatActivity : AppCompatActivity() {
             return
         }
         Log.i(TAG, "Finalizing event: $eventIdToFinalize")
+        // The cloud answers this event; keep its id so the reply can be broken.
+        respondingEventId = eventIdToFinalize
         aiStream?.sendEventEnd(
             eventIdToFinalize,
             currentSessionId!!,
@@ -1214,6 +1279,7 @@ class AiChatActivity : AppCompatActivity() {
 
     private fun applyRole(detail: RoleDetail?) {
         if (detail?.roleId.isNullOrEmpty()) return
+        if (!canUpdateUi()) return
         // Same role as the one rendered from cache: refresh the header and
         // merge cloud history without clearing the visible conversation.
         val sameRole = detail!!.roleId == currentRoleId
@@ -1221,7 +1287,7 @@ class AiChatActivity : AppCompatActivity() {
         currentBindRoleType = detail.bindRoleType
         currentRoleDetail = detail
         saveRoleCache(detail)
-        runOnUiThread {
+        runOnUiThreadIfActive {
             updateRoleHeader(detail)
             if (!sameRole) {
                 messageList.clear()
@@ -1262,6 +1328,7 @@ class AiChatActivity : AppCompatActivity() {
     }
 
     private fun updateRoleHeader(detail: RoleDetail) {
+        if (!canUpdateUi()) return
         val name = detail.roleName ?: detail.roleId ?: ""
         tvRoleName.text = name
         tvRoleNameSmall.text = name
@@ -1620,6 +1687,11 @@ class AiChatActivity : AppCompatActivity() {
         val content = data.optString("content")
         val appendMode = data.optString("appendMode")
 
+        if (eof != 1 && content.isNotEmpty() && !isNlgStreaming) {
+            isNlgStreaming = true
+            updateSendButtonIcon()
+        }
+
         if (content.isNotEmpty()) {
             var appended = false
             if ("append".equals(appendMode, ignoreCase = true) && bizId.isNotEmpty()) {
@@ -1664,6 +1736,8 @@ class AiChatActivity : AppCompatActivity() {
 
         if (eof == 1) {
             Log.d(TAG, "NLG stream finished for bizId: $bizId")
+            isNlgStreaming = false
+            updateSendButtonIcon()
             // Persist the full reply once, when streaming completes (not per chunk).
             if (bizId.isNotEmpty()) persistNlg(bizId)
         }
@@ -1729,14 +1803,26 @@ class AiChatActivity : AppCompatActivity() {
     private val audioPlayCallback = object : AudioPlayCallback {
         override fun onPlayStart() {
             Log.i(TAG, "Audio playback started")
+            runOnUiThread {
+                isTtsPlaying = true
+                updateSendButtonIcon()
+            }
         }
 
         override fun onPlayFinish() {
             Log.i(TAG, "Audio playback finished")
+            runOnUiThread {
+                isTtsPlaying = false
+                updateSendButtonIcon()
+            }
         }
 
         override fun onPlayError(errorCode: Int, errorMessage: String) {
             Log.e(TAG, "Audio playback error: $errorMessage")
+            runOnUiThread {
+                isTtsPlaying = false
+                updateSendButtonIcon()
+            }
         }
     }
 
