@@ -1,7 +1,6 @@
 package com.thingclips.sdk.aistream.ai
 
 import android.content.Context
-import android.content.pm.PackageManager
 import java.util.Properties
 
 /**
@@ -11,8 +10,6 @@ import java.util.Properties
  *  1. In-app override saved from AiConfigActivity (SharedPreferences).
  *  2. assets/ai_identity.properties — gitignored; see the committed
  *     ai_identity.properties.example template.
- *  3. Manifest meta-data AI_SOLUTION_CODE / MINI_PROGRAM_ID, injected from
- *     local.properties (legacy path, device identity only).
  *
  * Device identity codes are published to the device PID; app identity codes
  * come from a solution created on the platform and published to this app.
@@ -32,13 +29,11 @@ object AiIdentityConfig {
     fun resolve(context: Context, identity: Int): Keys? {
         val solution = firstNonEmpty(
             prefs(context).getString(prefKey(identity, "solution"), null),
-            assetProps(context).getProperty(assetKey(identity, "aiSolutionCode")),
-            if (identity == IDENTITY_DEVICE) metaData(context, "AI_SOLUTION_CODE") else null
+            assetProps(context).getProperty(assetKey(identity, "aiSolutionCode"))
         )
         val mini = firstNonEmpty(
             prefs(context).getString(prefKey(identity, "mini"), null),
-            assetProps(context).getProperty(assetKey(identity, "miniProgramId")),
-            if (identity == IDENTITY_DEVICE) metaData(context, "MINI_PROGRAM_ID") else null
+            assetProps(context).getProperty(assetKey(identity, "miniProgramId"))
         )
         if (solution.isNullOrEmpty() || mini.isNullOrEmpty()) return null
         return Keys(solution, mini)
@@ -64,14 +59,10 @@ object AiIdentityConfig {
     /** Defaults below the override layer, shown as hints in the editor. */
     fun defaultsOf(context: Context, identity: Int): Pair<String, String> {
         val props = assetProps(context)
-        val solution = firstNonEmpty(
-            props.getProperty(assetKey(identity, "aiSolutionCode")),
-            if (identity == IDENTITY_DEVICE) metaData(context, "AI_SOLUTION_CODE") else null
-        ) ?: ""
-        val mini = firstNonEmpty(
-            props.getProperty(assetKey(identity, "miniProgramId")),
-            if (identity == IDENTITY_DEVICE) metaData(context, "MINI_PROGRAM_ID") else null
-        ) ?: ""
+        val solution =
+            firstNonEmpty(props.getProperty(assetKey(identity, "aiSolutionCode"))) ?: ""
+        val mini =
+            firstNonEmpty(props.getProperty(assetKey(identity, "miniProgramId"))) ?: ""
         return Pair(solution, mini)
     }
 
@@ -94,14 +85,6 @@ object AiIdentityConfig {
             context.assets.open(ASSET_FILE).use { props.load(it) }
         }
         return props
-    }
-
-    private fun metaData(context: Context, key: String): String? = try {
-        context.packageManager
-            .getApplicationInfo(context.packageName, PackageManager.GET_META_DATA)
-            .metaData?.getString(key)
-    } catch (e: Exception) {
-        null
     }
 
     private fun firstNonEmpty(vararg values: String?): String? =
