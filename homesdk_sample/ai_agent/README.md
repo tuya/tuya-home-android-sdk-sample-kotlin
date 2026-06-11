@@ -21,6 +21,21 @@ include ':ai_agent'
 implementation project(':ai_agent')
 ```
 
+The module declares its own audio stack (required by hold-to-talk, the voice
+call and TTS playback), so integrators get them transitively:
+
+```gradle
+// recording
+api 'com.thingclips.smart:thingsmart-audio-engine-sdk:7.5.3'
+api 'com.thingclips.smart:thingsmart-avlogger-sdk:7.5.3'
+// audio codecs
+api 'com.thingclips.smart:thingsmart-mp3-codec-sdk:7.5.3'
+api 'com.thingclips.smart:thingsmart-opus-utils:6.7.2'
+```
+
+The host project must also provide the ThingSmart base SDK (here via the
+`:base_res` module).
+
 ### 2. Configure the identity keys (read this first)
 
 Each chat identity needs its own `aiSolutionCode` + `miniProgramId` pair,
@@ -156,6 +171,20 @@ include ':ai_agent'
 // 业务模块 build.gradle
 implementation project(':ai_agent')
 ```
+
+模块自带音频依赖（按住说话、语音通话、TTS 播放都需要），接入方无需重复声明，
+会随模块传递引入：
+
+```gradle
+// 录音组件
+api 'com.thingclips.smart:thingsmart-audio-engine-sdk:7.5.3'
+api 'com.thingclips.smart:thingsmart-avlogger-sdk:7.5.3'
+// 音频编解码组件
+api 'com.thingclips.smart:thingsmart-mp3-codec-sdk:7.5.3'
+api 'com.thingclips.smart:thingsmart-opus-utils:6.7.2'
+```
+
+宿主工程还需提供 ThingSmart 基础 SDK（本工程通过 `:base_res` 模块引入）。
 
 ### 2. 配置身份密钥（重点，先读这节）
 

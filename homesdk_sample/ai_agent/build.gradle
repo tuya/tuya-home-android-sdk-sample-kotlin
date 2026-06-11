@@ -42,5 +42,15 @@ dependencies {
     // AiAgentBusiness parses page payloads with fastjson.
     implementation 'com.alibaba:fastjson:1.1.67.android'
 
+    // Audio stack required by the AI stream record/playback paths
+    // (hold-to-talk, voice call, TTS). Declared here so the component is
+    // self-contained instead of riding on the host's transitive deps.
+    // 录音组件
+    api 'com.thingclips.smart:thingsmart-audio-engine-sdk:7.5.3'
+    api 'com.thingclips.smart:thingsmart-avlogger-sdk:7.5.3'
+    // 音频编解码组件
+    api 'com.thingclips.smart:thingsmart-mp3-codec-sdk:7.5.3'
+    api 'com.thingclips.smart:thingsmart-opus-utils:6.7.2'
+
     implementation project(':base_res')
 }
