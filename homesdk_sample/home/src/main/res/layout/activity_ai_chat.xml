@@ -64,6 +64,17 @@
             android:contentDescription="@string/ai_chat_title"
             android:padding="9dp"
             android:src="@drawable/ai_ic_more" />
+
+        <ImageView
+            android:id="@+id/iv_call"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@id/iv_more"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/ai_call_title"
+            android:padding="9dp"
+            android:src="@drawable/ai_ic_call" />
     </RelativeLayout>
 
     <!-- Role card (expandable) -->

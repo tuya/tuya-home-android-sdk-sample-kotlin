@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/ai_bg_gradient"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp">
+
+        <ImageView
+            android:id="@+id/iv_back"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/ai_call_title"
+            android:padding="9dp"
+            android:src="@drawable/ai_ic_back" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/ai_call_title"
+                android:textColor="@color/ai_text_primary"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/ai_call_status_idle"
+                android:textColor="@color/ai_text_secondary"
+                android:textSize="10sp" />
+        </LinearLayout>
+    </RelativeLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_chat_messages"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingTop="4dp"
+        android:paddingBottom="8dp" />
+
+    <com.thingclips.sdk.aistream.ai.AudioAmplitudeView
+        android:id="@+id/audio_amplitude_view"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="8dp"
+        android:visibility="invisible" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingBottom="32dp">
+
+        <ImageView
+            android:id="@+id/iv_mic_toggle"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginEnd="40dp"
+            android:background="@drawable/ai_bg_circle_white"
+            android:contentDescription="@string/ai_call_status_listening"
+            android:elevation="2dp"
+            android:padding="16dp"
+            android:src="@drawable/ai_ic_mic" />
+
+        <ImageView
+            android:id="@+id/iv_hang_up"
+            android:layout_width="68dp"
+            android:layout_height="68dp"
+            android:background="@drawable/ai_bg_circle_red"
+            android:contentDescription="@string/ai_call_title"
+            android:elevation="2dp"
+            android:padding="18dp"
+            android:src="@drawable/ai_ic_call_end" />
+    </LinearLayout>
+</LinearLayout>

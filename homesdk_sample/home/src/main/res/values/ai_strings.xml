@@ -80,4 +80,15 @@
     <string name="ai_config_keys_missing">密钥未配置，请先在身份配置页填写</string>
     <string name="ai_select_device">选择设备</string>
     <string name="ai_identity_app_chat_title">AI 助手（App 身份）</string>
+
+    <!-- Voice call (free talk) -->
+    <string name="ai_call_title">语音通话</string>
+    <string name="ai_call_status_idle">未连接</string>
+    <string name="ai_call_status_connecting">正在接通…</string>
+    <string name="ai_call_status_creating">正在建立会话…</string>
+    <string name="ai_call_status_ready">已接通，点击麦克风开始对话</string>
+    <string name="ai_call_status_listening">通话中，请说话…</string>
+    <string name="ai_call_status_error">连接出错</string>
+    <string name="ai_call_interrupted">已打断</string>
+    <string name="ai_call_mic_permission">语音通话需要录音权限</string>
 </resources>

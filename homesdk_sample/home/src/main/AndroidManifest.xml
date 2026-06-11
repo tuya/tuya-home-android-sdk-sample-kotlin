@@ -35,6 +35,11 @@
             android:name="com.thingclips.sdk.aistream.ai.AiChatActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity
+            android:name="com.thingclips.sdk.aistream.ai.AiCallActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
             android:name="com.thingclips.sdk.aistream.ai.RoleListActivity"
             android:exported="false"
             android:screenOrientation="portrait"

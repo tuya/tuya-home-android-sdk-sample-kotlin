@@ -258,6 +258,7 @@ class AiChatActivity : AppCompatActivity() {
     private fun setupHeader() {
         findViewById<ImageView>(R.id.iv_back).setOnClickListener { finish() }
         findViewById<ImageView>(R.id.iv_more).setOnClickListener { showMoreMenu(it) }
+        findViewById<ImageView>(R.id.iv_call).setOnClickListener { startCall() }
         findViewById<ImageView>(R.id.iv_role_collapse).setOnClickListener {
             setRoleCardExpanded(false)
         }
@@ -287,6 +288,17 @@ class AiChatActivity : AppCompatActivity() {
                     .putExtra("roleId", currentRoleId)
             )
         }
+    }
+
+    private fun startCall() {
+        startActivity(
+            Intent(this, AiCallActivity::class.java)
+                .putExtra(AiIdentityConfig.EXTRA_IDENTITY, mIdentity)
+                .putExtra("ownerId", mOwnerId)
+                .putExtra("aiSolutionCode", mAiSolutionCode)
+                .putExtra("miniProgramId", mMiniProgramId)
+                .putExtra("devId", if (isAppIdentity) null else mDevId)
+        )
     }
 
     private fun setRoleCardExpanded(expanded: Boolean) {
