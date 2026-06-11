@@ -116,33 +116,6 @@ The entry page offers the two identities:
   instantly while the network chain (connect → session → role binding)
   refreshes in the background.
 
-## Design Notes
-
-```
-BaseAiChatActivity        (abstract: stream/session/event lifecycle, send
- ├── AiDeviceChatActivity  flows, NLG/ASR/SKILL parsing, interruption,
- └── AiAppChatActivity     local persistence)
-AiCallEngine + AiCallActivity   (long-event voice call)
-AiIdentityConfig                (layered key resolution)
-AiAgentManager / AiAgentBusiness / AiAgentModels   (ATOP facade)
-AiChatRecordDbHelper            (SQLite chat history)
-```
-
-- **Identity split by class, not by branch.** `BaseAiChatActivity` holds
-  everything both identities share; the device subclass owns all
-  role-related code, so role APIs are unreachable from the app identity at
-  compile time. Each subclass brings its own layout (the app layout simply
-  has no role card or overflow menu).
-- **One event per user message.** Send = `sendEventStart` → payload(s) →
-  `sendEventEnd`. The finalized event id is kept as the "responding" event so
-  the in-flight reply can be broken with `sendEventChatBreak`.
-- **Streaming persistence.** NLG text arrives as append chunks sharing one
-  bizId; the reply is upserted to SQLite once, on `eof == 1` or on
-  interruption — not per chunk.
-- **The call engine mirrors the production free-talk configuration**: the
-  recorder only enables ANC + rnnoise; VAD segmentation, reply START/END and
-  CHAT_BREAK all come from the cloud as events.
-
 ## Token Billing / Quota
 
 - **Device identity** — billing is bound to the **device license**; there is
@@ -257,29 +230,6 @@ startActivity(
 - **本地优先的聊天历史**：消息按（设备, 角色）维度持久化到本地 SQLite；
   上次绑定的角色有本地缓存，进入页面立即渲染，网络链路
   （连接 → 会话 → 角色绑定）在后台刷新。
-
-## 设计思路
-
-```
-BaseAiChatActivity        （抽象基类：连接/会话/事件生命周期、发送流程、
- ├── AiDeviceChatActivity   NLG/ASR/SKILL 解析、打断、本地持久化）
- └── AiAppChatActivity
-AiCallEngine + AiCallActivity   （长事件语音通话）
-AiIdentityConfig                （密钥分层解析）
-AiAgentManager / AiAgentBusiness / AiAgentModels   （ATOP 门面）
-AiChatRecordDbHelper            （SQLite 聊天历史）
-```
-
-- **身份按类拆分，而不是按分支**。基类只放两种身份共用的逻辑；角色相关代码
-  全部在设备子类中，App 身份从编译层面就接触不到角色 API。两个子类各自持有
-  布局（App 布局没有角色卡片和溢出菜单）。
-- **一条消息一个事件**。发送 = `sendEventStart` → 数据载荷 → `sendEventEnd`；
-  已结束的事件 id 被记录为"响应中事件"，以便用 `sendEventChatBreak` 打断
-  进行中的回复。
-- **流式持久化**。NLG 文本以共享同一 bizId 的 append 块到达；完整回复在
-  `eof == 1` 或被打断时一次性 upsert 入库，而非逐块写。
-- **通话引擎对齐生产配置**：录音侧只开 ANC + rnnoise；断句、回复 START/END、
-  CHAT_BREAK 全部由云端以事件形式下发。
 
 ## Token 计费策略
 
