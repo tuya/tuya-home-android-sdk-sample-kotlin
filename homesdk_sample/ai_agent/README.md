@@ -7,6 +7,9 @@ ThingSmart Android SDK. It wraps the AI Stream SDK (realtime streaming
 connection) and the AI Agent ATOP APIs (role / memory / history management)
 behind ready-to-use pages styled after the production app.
 
+📖 **AI Stream SDK API reference:**
+[developer.tuya.com — AI Stream](https://developer.tuya.com/en/docs/app-development/ai-stream?id=Keuc9siy3q0if)
+
 ---
 
 ## Getting Started
@@ -132,6 +135,9 @@ The entry page offers the two identities:
 基于 ThingSmart Android SDK 的 AI 智能体对话基座组件。封装了 AI Stream SDK
 （实时流式连接）与 AI Agent ATOP 接口（角色/记忆/历史管理），提供一套对齐公版
 App 风格的现成页面。
+
+📖 **AI Stream SDK API 说明文档：**
+[developer.tuya.com — AI Stream](https://developer.tuya.com/cn/docs/app-development/ai-stream?id=Keuc9siy3q0if)
 
 ## 快速开始
 
