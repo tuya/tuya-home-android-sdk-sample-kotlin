@@ -880,7 +880,6 @@ class AiChatActivity : AppCompatActivity() {
         aiStream?.sendImageData(currentSessionId!!, imagePath, null, object : StreamResultCallback {
             override fun onSuccess() {
                 Log.i(TAG, "sendImageData success for event: $eventId")
-                Log.i(TAG, "sendEventPayloadsEnd for IMAGE success for event: $eventId")
                 onCompletion?.invoke()
             }
 
@@ -1045,10 +1044,6 @@ class AiChatActivity : AppCompatActivity() {
             object : StreamResultCallback {
                 override fun onSuccess() {
                     Log.d(TAG, "stopRecordAndSendAudioData success for event: $eventIdForAudio")
-                    Log.i(
-                        TAG,
-                        "sendEventPayloadsEnd for AUDIO success for event: $eventIdForAudio"
-                    )
                     finalizeEvent(eventIdForAudio) {
                         Log.d(TAG, "Event $eventIdForAudio finalized after voice.")
                         clearImagePreviewUI()
@@ -1176,10 +1171,6 @@ class AiChatActivity : AppCompatActivity() {
             aiStream?.sendTextData(currentSessionId!!, streamText, object : StreamResultCallback {
                 override fun onSuccess() {
                     Log.i(TAG, "sendTextData success for event: $eventId")
-                    Log.i(
-                        TAG,
-                        "sendEventPayloadsEnd for TEXT success for event: $eventId"
-                    )
                     finalizeLogic()
                 }
 
