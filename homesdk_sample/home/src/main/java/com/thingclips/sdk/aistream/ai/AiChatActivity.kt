@@ -72,7 +72,6 @@ class AiChatActivity : AppCompatActivity() {
         const val AMPLITUDES_LENGTH = 50
 
         private const val REQUEST_RECORD_AUDIO_PERMISSION = 200
-        private const val REQUEST_READ_STORAGE_PERMISSION = 201
         private const val REQUEST_PICK_IMAGE = 202
         private const val REQUEST_SWITCH_ROLE = 203
         private const val REQUEST_MEMORY = 204
@@ -128,7 +127,6 @@ class AiChatActivity : AppCompatActivity() {
     private var isSessionCreating: Boolean = false
 
     private val audioPermissions = arrayOf(Manifest.permission.RECORD_AUDIO)
-    private val storagePermissions_LEGACY = arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
 
     private val emojiSteps = mutableListOf<SkillEmojiStep>()
     private val emojiHandler = Handler(Looper.getMainLooper())
@@ -729,7 +727,9 @@ class AiChatActivity : AppCompatActivity() {
 
     // --- Image Handling ---
     private fun pickImageFromGallery() {
-        if (!checkAndRequestStoragePermission()) return
+        // The system picker grants read access to the returned URI, so no
+        // storage permission is needed (READ_EXTERNAL_STORAGE is also a
+        // permanent deny on Android 13+ with targetSdk 33+).
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         startActivityForResult(intent, REQUEST_PICK_IMAGE)
     }
@@ -1810,23 +1810,6 @@ class AiChatActivity : AppCompatActivity() {
         }
     }
 
-    private fun checkAndRequestStoragePermission(): Boolean {
-        return if (ContextCompat.checkSelfPermission(
-                this,
-                storagePermissions_LEGACY[0]
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            ActivityCompat.requestPermissions(
-                this,
-                storagePermissions_LEGACY,
-                REQUEST_READ_STORAGE_PERMISSION
-            )
-            false
-        } else {
-            true
-        }
-    }
-
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -1842,14 +1825,6 @@ class AiChatActivity : AppCompatActivity() {
                 }
             }
 
-            REQUEST_READ_STORAGE_PERMISSION -> {
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    showToast("Storage permission granted.")
-                    pickImageFromGallery()
-                } else {
-                    showToast("Storage permission denied.")
-                }
-            }
         }
     }
 
