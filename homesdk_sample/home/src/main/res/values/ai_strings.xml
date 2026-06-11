@@ -14,8 +14,34 @@
     <string name="ai_role_tag_default">默认角色</string>
     <string name="ai_role_empty">暂无自定义角色</string>
     <string name="ai_menu_memory">角色记忆</string>
-    <string name="ai_menu_summary">对话总结</string>
-    <string name="ai_menu_clear_context">清除上下文</string>
     <string name="ai_menu_emotion">当前情绪</string>
     <string name="ai_menu_diagnostics">API 诊断</string>
+
+    <!-- Role memory pages -->
+    <string name="ai_memory_title">角色记忆</string>
+    <string name="ai_memory_clear_history">清除聊天记录</string>
+    <string name="ai_memory_clear_history_desc">清空对话页面所有聊天记录，不包括记忆内容</string>
+    <string name="ai_memory_clear_context">清除上下文</string>
+    <string name="ai_memory_clear_context_desc">基于最近对话产生的短期记忆，会随对话实时更新</string>
+    <string name="ai_memory_longterm_section">长期记忆：基于对话，由AI自动生成的长期记忆内容</string>
+    <string name="ai_memory_switch_off">当前智能体未开启长期记忆</string>
+    <string name="ai_memory_format">格式记忆</string>
+    <string name="ai_memory_format_desc">同个维度的记忆会以最新内容覆盖更新</string>
+    <string name="ai_memory_role_section">角色的记忆</string>
+    <string name="ai_memory_datasheet">数据表记忆</string>
+    <string name="ai_memory_datasheet_desc">数据表记忆为当前智能体按照一组关系记录的记忆，不同角色会共享对应的记忆数据，删除时会按照整组一起删除。</string>
+    <string name="ai_memory_summary">对话总结</string>
+    <string name="ai_memory_summary_desc">超出容量保存上限后，按照从旧到新自动删除</string>
+    <string name="ai_memory_clear_longterm">清除长期记忆</string>
+    <string name="ai_memory_empty">暂无记忆内容</string>
+    <string name="ai_summary_empty">暂无对话总结</string>
+    <string name="ai_summary_edit">编辑总结</string>
+    <string name="ai_confirm_clear_history">确定清空当前角色的所有聊天记录？</string>
+    <string name="ai_confirm_clear_context">确定清除当前角色的对话上下文？</string>
+    <string name="ai_confirm_clear_longterm">确定清除当前角色的全部长期记忆？</string>
+    <string name="ai_confirm_delete_memory">删除该条记忆？</string>
+    <string name="ai_action_cancel">取消</string>
+    <string name="ai_action_confirm">确定</string>
+    <string name="ai_action_delete">删除</string>
+    <string name="ai_action_save">保存</string>
 </resources>

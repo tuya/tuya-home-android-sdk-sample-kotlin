@@ -73,10 +73,9 @@ class AiChatActivity : AppCompatActivity() {
         private const val REQUEST_READ_STORAGE_PERMISSION = 201
         private const val REQUEST_PICK_IMAGE = 202
         private const val REQUEST_SWITCH_ROLE = 203
+        private const val REQUEST_MEMORY = 204
 
         private const val MENU_MEMORY = 303
-        private const val MENU_SUMMARY = 304
-        private const val MENU_CLEAR_CONTEXT = 305
         private const val MENU_EMOTION = 306
         private const val MENU_TEST_ALL = 307
 
@@ -691,6 +690,12 @@ class AiChatActivity : AppCompatActivity() {
                 switchRole(bindRoleType, roleId)
             }
         }
+        if (requestCode == REQUEST_MEMORY && resultCode == RESULT_OK &&
+            data?.getBooleanExtra(MemoryActivity.EXTRA_HISTORY_CLEARED, false) == true
+        ) {
+            messageList.clear()
+            chatAdapter.notifyDataSetChanged()
+        }
     }
 
     private fun handleImageSelectionResult(imageUri: Uri) {
@@ -1293,32 +1298,19 @@ class AiChatActivity : AppCompatActivity() {
     private fun showMoreMenu(anchor: View) {
         val popup = PopupMenu(this, anchor)
         popup.menu.add(0, MENU_MEMORY, 0, getString(R.string.ai_menu_memory))
-        popup.menu.add(0, MENU_SUMMARY, 1, getString(R.string.ai_menu_summary))
-        popup.menu.add(0, MENU_CLEAR_CONTEXT, 2, getString(R.string.ai_menu_clear_context))
-        popup.menu.add(0, MENU_EMOTION, 3, getString(R.string.ai_menu_emotion))
-        popup.menu.add(0, MENU_TEST_ALL, 4, getString(R.string.ai_menu_diagnostics))
+        popup.menu.add(0, MENU_EMOTION, 1, getString(R.string.ai_menu_emotion))
+        popup.menu.add(0, MENU_TEST_ALL, 2, getString(R.string.ai_menu_diagnostics))
         popup.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 MENU_MEMORY -> {
                     if (!requireRole()) return@setOnMenuItemClickListener true
-                    startActivity(
+                    startActivityForResult(
                         Intent(this, MemoryActivity::class.java)
                             .putExtra("devId", mDevId)
                             .putExtra("roleId", currentRoleId)
-                            .putExtra("bindRoleType", currentBindRoleType)
+                            .putExtra("bindRoleType", currentBindRoleType),
+                        REQUEST_MEMORY
                     )
-                    true
-                }
-
-                MENU_SUMMARY -> {
-                    if (!requireRole()) return@setOnMenuItemClickListener true
-                    showSummaryDialog()
-                    true
-                }
-
-                MENU_CLEAR_CONTEXT -> {
-                    if (!requireRole()) return@setOnMenuItemClickListener true
-                    confirmClearContext()
                     true
                 }
 
@@ -1353,62 +1345,6 @@ class AiChatActivity : AppCompatActivity() {
             return false
         }
         return true
-    }
-
-    private fun showSummaryDialog() {
-        agent.getSummary(currentBindRoleType, currentRoleId, object : Cb<String> {
-            override fun onOk(data: String?) {
-                runOnUiThread { buildSummaryEditor(data ?: "") }
-            }
-
-            override fun onErr(code: Int, msg: String?) {
-                runOnUiThread { buildSummaryEditor("") }
-            }
-        })
-    }
-
-    private fun buildSummaryEditor(initial: String) {
-        val input = EditText(this).apply {
-            setText(initial)
-            setSelection(text.length)
-        }
-        AlertDialog.Builder(this)
-            .setTitle("Chat Summary")
-            .setView(input)
-            .setNegativeButton("Cancel", null)
-            .setPositiveButton("Save") { _, _ ->
-                agent.updateSummary(
-                    currentBindRoleType, currentRoleId, input.text.toString(),
-                    object : Cb<Boolean> {
-                        override fun onOk(data: Boolean?) {
-                            showToast("Summary saved")
-                        }
-
-                        override fun onErr(code: Int, msg: String?) {
-                            showToast("Save summary failed: $msg")
-                        }
-                    }
-                )
-            }
-            .show()
-    }
-
-    private fun confirmClearContext() {
-        AlertDialog.Builder(this)
-            .setMessage("Clear conversation context for current role?")
-            .setNegativeButton("Cancel", null)
-            .setPositiveButton("Clear") { _, _ ->
-                agent.clearContext(currentBindRoleType, currentRoleId, object : Cb<Boolean> {
-                    override fun onOk(data: Boolean?) {
-                        showToast("Context cleared")
-                    }
-
-                    override fun onErr(code: Int, msg: String?) {
-                        showToast("Clear context failed: $msg")
-                    }
-                })
-            }
-            .show()
     }
 
     private fun runDiagnostics() {

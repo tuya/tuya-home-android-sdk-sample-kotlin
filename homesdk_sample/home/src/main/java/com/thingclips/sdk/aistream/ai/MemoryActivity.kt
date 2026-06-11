@@ -1,37 +1,38 @@
 package com.thingclips.sdk.aistream.ai
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import com.thingclips.smart.home.sdk.ThingHomeSdk
 import com.tuya.appsdk.sample.user.R
 
 /**
- * Lists agent role memory and supports per-item / full deletion. Requires
- * "devId", "roleId", "bindRoleType" extras.
+ * "角色记忆" hub mirroring the official app: clear chat history, clear
+ * context, and long-term memory entries (format memory / datasheet memory /
+ * chat summary / clear all). Requires "devId", "roleId", "bindRoleType"
+ * extras. Returns RESULT_OK with "historyCleared"=true after the chat
+ * history is wiped so the chat page can refresh.
  */
 class MemoryActivity : AppCompatActivity() {
+
+    companion object {
+        const val EXTRA_HISTORY_CLEARED = "historyCleared"
+    }
 
     private lateinit var agent: AiAgentManager
     private lateinit var devId: String
     private lateinit var roleId: String
     private var bindRoleType: Int = BindRoleType.DEFAULT
 
-    private val items = mutableListOf<MemoryItem>()
-    private lateinit var adapter: MemAdapter
-    private lateinit var tvSwitch: TextView
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.ai_activity_memory)
-        title = "Memory"
         devId = intent.getStringExtra("devId") ?: ""
         roleId = intent.getStringExtra("roleId") ?: ""
         bindRoleType = intent.getIntExtra("bindRoleType", BindRoleType.DEFAULT)
@@ -42,95 +43,121 @@ class MemoryActivity : AppCompatActivity() {
         }
         agent = AiAgentManager(devId)
 
-        tvSwitch = findViewById(R.id.tv_memory_switch)
-        val rv = findViewById<RecyclerView>(R.id.rv_memory)
-        rv.layoutManager = LinearLayoutManager(this)
-        adapter = MemAdapter()
-        rv.adapter = adapter
+        findViewById<ImageView>(R.id.iv_back).setOnClickListener { finish() }
+        findViewById<View>(R.id.row_clear_history).setOnClickListener {
+            confirm(R.string.ai_confirm_clear_history) { clearHistory() }
+        }
+        findViewById<View>(R.id.row_clear_context).setOnClickListener {
+            confirm(R.string.ai_confirm_clear_context) { clearContext() }
+        }
+        findViewById<View>(R.id.row_format_memory).setOnClickListener {
+            openMemoryList(MemoryListActivity.MODE_FORMAT)
+        }
+        findViewById<View>(R.id.row_datasheet_memory).setOnClickListener {
+            openMemoryList(MemoryListActivity.MODE_DATASHEET)
+        }
+        findViewById<View>(R.id.row_summary).setOnClickListener {
+            startActivity(withRoleExtras(Intent(this, SummaryActivity::class.java)))
+        }
+        findViewById<View>(R.id.row_clear_longterm).setOnClickListener {
+            confirm(R.string.ai_confirm_clear_longterm) { clearLongTermMemory() }
+        }
 
-        findViewById<Button>(R.id.btn_clear_all_memory).setOnClickListener { confirmClearAll() }
-
-        loadSwitch()
-        loadMemory()
+        loadMemorySwitch()
     }
 
-    private fun loadSwitch() {
+    private fun withRoleExtras(intent: Intent): Intent = intent
+        .putExtra("devId", devId)
+        .putExtra("roleId", roleId)
+        .putExtra("bindRoleType", bindRoleType)
+
+    private fun openMemoryList(mode: Int) {
+        startActivity(
+            withRoleExtras(Intent(this, MemoryListActivity::class.java))
+                .putExtra(MemoryListActivity.EXTRA_MODE, mode)
+        )
+    }
+
+    private fun loadMemorySwitch() {
         agent.getMemorySwitch(object : Cb<MemorySwitch> {
             override fun onOk(data: MemorySwitch?) {
-                tvSwitch.text = "memoryOpen=${data?.memoryOpen} summaryOpen=${data?.summaryOpen}"
+                if (data?.memoryOpen == false) {
+                    runOnUiThread {
+                        findViewById<TextView>(R.id.tv_longterm_section).text =
+                            getString(R.string.ai_memory_longterm_section) +
+                                "（" + getString(R.string.ai_memory_switch_off) + "）"
+                    }
+                }
             }
 
-            override fun onErr(code: Int, msg: String?) {
-                tvSwitch.text = "Memory switch: failed ($msg)"
-            }
+            override fun onErr(code: Int, msg: String?) {}
         })
     }
 
-    private fun loadMemory() {
-        agent.listMemory(bindRoleType, roleId, object : Cb<ArrayList<MemoryGroup>> {
-            override fun onOk(data: ArrayList<MemoryGroup>?) {
-                items.clear()
-                data?.forEach { g -> g.memoryList?.let { items.addAll(it) } }
-                adapter.notifyDataSetChanged()
-            }
-
-            override fun onErr(code: Int, msg: String?) {
-                Toast.makeText(this@MemoryActivity, "list failed: $msg", Toast.LENGTH_SHORT).show()
-            }
-        })
-    }
-
-    private fun deleteOne(key: String) {
-        agent.deleteMemory(bindRoleType, roleId, false, key, object : Cb<Boolean> {
-            override fun onOk(data: Boolean?) {
-                loadMemory()
-            }
-
-            override fun onErr(code: Int, msg: String?) {
-                Toast.makeText(this@MemoryActivity, "delete failed: $msg", Toast.LENGTH_SHORT).show()
-            }
-        })
-    }
-
-    private fun confirmClearAll() {
+    private fun confirm(messageRes: Int, action: () -> Unit) {
         AlertDialog.Builder(this)
-            .setMessage("Clear all memory for this role?")
-            .setNegativeButton("Cancel", null)
-            .setPositiveButton("Clear") { _, _ ->
-                agent.deleteMemory(bindRoleType, roleId, true, null, object : Cb<Boolean> {
-                    override fun onOk(data: Boolean?) {
-                        loadMemory()
-                    }
-
-                    override fun onErr(code: Int, msg: String?) {
-                        Toast.makeText(this@MemoryActivity, "clear failed: $msg", Toast.LENGTH_SHORT).show()
-                    }
-                })
-            }
+            .setMessage(messageRes)
+            .setNegativeButton(R.string.ai_action_cancel, null)
+            .setPositiveButton(R.string.ai_action_confirm) { _, _ -> action() }
             .show()
     }
 
-    private inner class MemAdapter : RecyclerView.Adapter<MemVH>() {
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MemVH {
-            val v = LayoutInflater.from(parent.context).inflate(R.layout.ai_item_memory, parent, false)
-            return MemVH(v)
-        }
-
-        override fun getItemCount() = items.size
-
-        override fun onBindViewHolder(holder: MemVH, position: Int) {
-            val m = items[position]
-            holder.name.text = m.memoryName ?: m.memoryKey ?: ""
-            holder.value.text = m.memoryValue ?: ""
-            holder.delete.setOnClickListener {
-                m.memoryKey?.let { deleteOne(it) }
+    private fun clearHistory() {
+        agent.deleteHistory(bindRoleType, roleId, true, null, object : Cb<Boolean> {
+            override fun onOk(data: Boolean?) {
+                clearLocalHistory()
+                runOnUiThread {
+                    setResult(
+                        Activity.RESULT_OK,
+                        Intent().putExtra(EXTRA_HISTORY_CLEARED, true)
+                    )
+                }
+                toast(getString(R.string.ai_memory_clear_history) + " OK")
             }
-        }
+
+            override fun onErr(code: Int, msg: String?) {
+                toast("Clear history failed: $msg")
+            }
+        })
     }
 
-    private inner class MemVH(v: View) : RecyclerView.ViewHolder(v) {
-        val name: TextView = v.findViewById(R.id.tv_memory_name)
-        val value: TextView = v.findViewById(R.id.tv_memory_value)
-        val delete: Button = v.findViewById(R.id.btn_delete_memory)
+    private fun clearLocalHistory() {
+        val uid = ThingHomeSdk.getUserInstance().user?.uid ?: "0"
+        Thread {
+            val helper = AiChatRecordDbHelper(applicationContext, uid)
+            try {
+                helper.deleteByRole(devId, roleId)
+            } finally {
+                helper.close()
+            }
+        }.start()
+    }
+
+    private fun clearContext() {
+        agent.clearContext(bindRoleType, roleId, object : Cb<Boolean> {
+            override fun onOk(data: Boolean?) {
+                toast(getString(R.string.ai_memory_clear_context) + " OK")
+            }
+
+            override fun onErr(code: Int, msg: String?) {
+                toast("Clear context failed: $msg")
+            }
+        })
+    }
+
+    private fun clearLongTermMemory() {
+        agent.deleteMemory(bindRoleType, roleId, true, null, object : Cb<Boolean> {
+            override fun onOk(data: Boolean?) {
+                toast(getString(R.string.ai_memory_clear_longterm) + " OK")
+            }
+
+            override fun onErr(code: Int, msg: String?) {
+                toast("Clear memory failed: $msg")
+            }
+        })
+    }
+
+    private fun toast(msg: String) {
+        runOnUiThread { Toast.makeText(this, msg, Toast.LENGTH_SHORT).show() }
     }
 }

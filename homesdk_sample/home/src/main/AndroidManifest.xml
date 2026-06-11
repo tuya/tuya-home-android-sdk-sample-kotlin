@@ -36,7 +36,18 @@
         <activity
             android:name="com.thingclips.sdk.aistream.ai.MemoryActivity"
             android:exported="false"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
+            android:name="com.thingclips.sdk.aistream.ai.MemoryListActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
+            android:name="com.thingclips.sdk.aistream.ai.SummaryActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity
             android:name="com.thingclips.sdk.album.AlbumActivity"
             android:exported="false"
