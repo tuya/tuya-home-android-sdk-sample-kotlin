@@ -158,7 +158,8 @@ class AiCallEngine(
         needStopPlayAudio: Boolean = false
     ) {
         if (needStopPlayAudio) {
-            aiStream.stopPlayAudio()
+            // Break the in-flight reply, not just the local playback.
+            interruptNlgResponse()
         }
         if (currentState != State.LISTENING) return
 
@@ -173,7 +174,7 @@ class AiCallEngine(
 
     fun destroy() {
         isMicOpen = false
-        aiStream.stopPlayAudio()
+        interruptNlgResponse()
         closeLongEvent()
         if (isAudioInit) {
             AudioDetectManager.getInstance().stopRecord()
@@ -293,6 +294,22 @@ class AiCallEngine(
         listener.onListeningStarted()
     }
 
+    /**
+     * Actively breaks the agent's in-flight reply: stops local playback and
+     * sends a chat-break event for the current NLG event so the cloud stops
+     * generating/streaming it (production stopNlgRecord parity).
+     */
+    private fun interruptNlgResponse() {
+        aiStream.stopPlayAudio()
+        val eventToBreak = currentNlgEventId ?: return
+        currentNlgEventId = null
+        Log.i(TAG, "Sending chat break for NLG event: $eventToBreak")
+        sessionId?.let {
+            aiStream.sendEventChatBreak(eventToBreak, it, null, null)
+        }
+        listener.onNlgInterrupted()
+    }
+
     // --- Data parsing ---
 
     private fun parseAndProcessText(sessionId: String?, jsonText: String) {
@@ -307,9 +324,9 @@ class AiCallEngine(
             when {
                 "ASR".equals(bizType, ignoreCase = true) -> {
                     val asrText = data.optString("text", "").trim()
-                    // The user talking over the agent stops its playback.
+                    // The user talking over the agent breaks its reply.
                     if (asrText.isNotEmpty()) {
-                        aiStream.stopPlayAudio()
+                        interruptNlgResponse()
                     }
                     if (asrText.isNotEmpty() && eof == 1) {
                         listener.onAsrResult(asrText, bizId)
