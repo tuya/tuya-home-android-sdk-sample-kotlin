@@ -3,6 +3,7 @@ include ':device_management'
 include ':device_config'
 include ':app'
 include ':home'
+include ':ai_agent'
 include ':sweeper'
 
 rootProject.name = "TuyaSDKSample"

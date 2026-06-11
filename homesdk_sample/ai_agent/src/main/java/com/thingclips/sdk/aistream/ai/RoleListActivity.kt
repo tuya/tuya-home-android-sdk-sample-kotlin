@@ -15,7 +15,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.tuya.appsdk.sample.user.R
+import com.thingclips.sdk.aistream.R
 
 /**
  * Full-page role switcher mirroring the official app's "切换角色" page:

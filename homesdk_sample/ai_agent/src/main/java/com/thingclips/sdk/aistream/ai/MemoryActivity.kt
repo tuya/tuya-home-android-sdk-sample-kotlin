@@ -10,7 +10,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.thingclips.smart.home.sdk.ThingHomeSdk
-import com.tuya.appsdk.sample.user.R
+import com.thingclips.sdk.aistream.R
 
 /**
  * "角色记忆" hub mirroring the official app: clear chat history, clear

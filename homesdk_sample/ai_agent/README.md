@@ -1,0 +1,219 @@
+# AI Agent Component / AI 智能体基座组件
+
+English | [中文](#中文说明)
+
+A self-contained demo component for building AI-agent chat experiences on the
+ThingSmart Android SDK. It wraps the AI Stream SDK (realtime streaming
+connection) and the AI Agent ATOP APIs (role / memory / history management)
+behind ready-to-use pages styled after the production app.
+
+---
+
+## Getting Started
+
+### 1. Include the module
+
+```gradle
+// settings.gradle
+include ':ai_agent'
+
+// your module's build.gradle
+implementation project(':ai_agent')
+```
+
+### 2. Configure the identity keys
+
+Each chat identity needs an `aiSolutionCode` + `miniProgramId` pair. These are
+secrets — **never commit them**. They resolve in this order
+(`AiIdentityConfig`):
+
+1. **In-app overrides** — the gear icon on the entry page opens
+   `AiConfigActivity`; values are stored in device-local SharedPreferences.
+   Blank-and-save falls back to the layers below.
+2. **`app/src/main/assets/ai_identity.properties`** — gitignored; copy
+   `ai_identity.properties.example` and fill in your values:
+
+   ```properties
+   app.aiSolutionCode=...
+   app.miniProgramId=...
+   device.aiSolutionCode=...
+   device.miniProgramId=...
+   ```
+3. **Manifest meta-data** (`AI_SOLUTION_CODE` / `MINI_PROGRAM_ID`, injected
+   from `local.properties`) — legacy path, device identity only.
+
+### 3. Launch
+
+```kotlin
+startActivity(
+    Intent(context, AiEntryActivity::class.java)
+        .putExtra("homeId", currentHomeId)
+)
+```
+
+The entry page offers the two identities:
+
+| | App identity | Device identity |
+|---|---|---|
+| Connection | `connectWithApp()` (account-scoped) | `connectWithDevice(devId)` |
+| Device required | No | Yes — pick one from the current home |
+| Solution code | Created on the platform, published to this app | Published to the **device PID** |
+| Role / memory management | Not available (those ATOP APIs are devId-scoped) | Full: switch/create/edit roles, role memory, chat summary |
+
+### Features
+
+- **Chat page** — streaming text replies with TTS playback, image and
+  hold-to-talk voice input, ASR captions, reply interruption (the send button
+  becomes a stop button while a reply is in flight; tapping it stops playback
+  and chat-breaks the event so the cloud stops streaming).
+- **Voice call** (phone icon, both identities) — hands-free free talk in
+  cloud long-event mode: one session, one long event with
+  `enableVad + enableInterrupt`; the cloud segments speech and handles
+  barge-in, so no local VAD/AEC model files are needed.
+- **Role management** (device identity) — production-style role card,
+  role switching (recommended templates / custom), creation and editing with
+  cloud avatars, languages and timbres.
+- **Role memory** (device identity) — clear chat history / context, format
+  memory, datasheet memory, conversation summaries.
+- **Offline-first chat history** — messages persist to a local SQLite store
+  keyed by (device, role); the last bound role is cached so the page renders
+  instantly while the network chain (connect → session → role binding)
+  refreshes in the background.
+
+## Design Notes
+
+```
+BaseAiChatActivity        (abstract: stream/session/event lifecycle, send
+ ├── AiDeviceChatActivity  flows, NLG/ASR/SKILL parsing, interruption,
+ └── AiAppChatActivity     local persistence)
+AiCallEngine + AiCallActivity   (long-event voice call)
+AiIdentityConfig                (layered key resolution)
+AiAgentManager / AiAgentBusiness / AiAgentModels   (ATOP facade)
+AiChatRecordDbHelper            (SQLite chat history)
+```
+
+- **Identity split by class, not by branch.** `BaseAiChatActivity` holds
+  everything both identities share; the device subclass owns all
+  role-related code, so role APIs are unreachable from the app identity at
+  compile time. Each subclass brings its own layout (the app layout simply
+  has no role card or overflow menu).
+- **One event per user message.** Send = `sendEventStart` → payload(s) →
+  `sendEventEnd`. The finalized event id is kept as the "responding" event so
+  the in-flight reply can be broken with `sendEventChatBreak`.
+- **Streaming persistence.** NLG text arrives as append chunks sharing one
+  bizId; the reply is upserted to SQLite once, on `eof == 1` or on
+  interruption — not per chunk.
+- **The call engine mirrors the production free-talk configuration**: the
+  recorder only enables ANC + rnnoise; VAD segmentation, reply START/END and
+  CHAT_BREAK all come from the cloud as events.
+
+## Token Billing / Quota
+
+- **Device identity** — billing is bound to the **device license**; there is
+  no separate token billing for device-identity conversations.
+- **App identity** — there is currently no dedicated consumer-side (C-end)
+  billing. Usage is billed **pay-as-you-go** and topped up on
+  [iot.tuya.com](https://iot.tuya.com); recharge the account that owns the AI
+  solution.
+
+---
+
+# 中文说明
+
+基于 ThingSmart Android SDK 的 AI 智能体对话基座组件。封装了 AI Stream SDK
+（实时流式连接）与 AI Agent ATOP 接口（角色/记忆/历史管理），提供一套对齐公版
+App 风格的现成页面。
+
+## 快速开始
+
+### 1. 引入模块
+
+```gradle
+// settings.gradle
+include ':ai_agent'
+
+// 业务模块 build.gradle
+implementation project(':ai_agent')
+```
+
+### 2. 配置身份密钥
+
+每种对话身份需要一对 `aiSolutionCode` + `miniProgramId`，属于密钥，**禁止提交
+到代码仓库**。解析优先级（见 `AiIdentityConfig`）：
+
+1. **App 内配置页** —— 入口页右上角齿轮打开 `AiConfigActivity`，值保存在本机
+   SharedPreferences；留空保存即回退到下层默认值。
+2. **`app/src/main/assets/ai_identity.properties`** —— 已 gitignore；复制同目录
+   `ai_identity.properties.example` 模板填入：
+
+   ```properties
+   app.aiSolutionCode=...
+   app.miniProgramId=...
+   device.aiSolutionCode=...
+   device.miniProgramId=...
+   ```
+3. **Manifest meta-data**（`AI_SOLUTION_CODE` / `MINI_PROGRAM_ID`，由
+   `local.properties` 注入）—— 兼容旧链路，仅设备身份。
+
+### 3. 启动入口
+
+```kotlin
+startActivity(
+    Intent(context, AiEntryActivity::class.java)
+        .putExtra("homeId", currentHomeId)
+)
+```
+
+入口页提供两种身份：
+
+| | App 身份 | 设备身份 |
+|---|---|---|
+| 连接方式 | `connectWithApp()`（账号级） | `connectWithDevice(devId)` |
+| 是否需要设备 | 否 | 是——从当前家庭选择设备 |
+| 方案码来源 | 平台创建并发布到本 App | 发布到**设备 PID** |
+| 角色/记忆管理 | 不可用（相关 ATOP 接口为 devId 维度） | 完整：切换/创建/编辑角色、角色记忆、对话总结 |
+
+### 功能
+
+- **对话页**：流式文本回复 + TTS 播放、图片与按住说话语音输入、ASR 字幕、
+  响应中打断（回复进行中发送键变为停止键，点击同时停止播放并对事件发
+  chat-break，云端停止继续推流）。
+- **语音通话**（右上角电话图标，双身份可用）：云端长事件模式的免提自由对话
+  ——单 session、单长事件（`enableVad + enableInterrupt`），断句与插话打断
+  全部由云端完成，**无需本地 VAD/AEC 模型文件**。
+- **角色管理**（设备身份）：公版样式角色卡片，角色切换（推荐模板/自定义）、
+  创建与编辑（云端头像、语言、音色）。
+- **角色记忆**（设备身份）：清除聊天记录/上下文、格式记忆、数据表记忆、
+  对话总结。
+- **本地优先的聊天历史**：消息按（设备, 角色）维度持久化到本地 SQLite；
+  上次绑定的角色有本地缓存，进入页面立即渲染，网络链路
+  （连接 → 会话 → 角色绑定）在后台刷新。
+
+## 设计思路
+
+```
+BaseAiChatActivity        （抽象基类：连接/会话/事件生命周期、发送流程、
+ ├── AiDeviceChatActivity   NLG/ASR/SKILL 解析、打断、本地持久化）
+ └── AiAppChatActivity
+AiCallEngine + AiCallActivity   （长事件语音通话）
+AiIdentityConfig                （密钥分层解析）
+AiAgentManager / AiAgentBusiness / AiAgentModels   （ATOP 门面）
+AiChatRecordDbHelper            （SQLite 聊天历史）
+```
+
+- **身份按类拆分，而不是按分支**。基类只放两种身份共用的逻辑；角色相关代码
+  全部在设备子类中，App 身份从编译层面就接触不到角色 API。两个子类各自持有
+  布局（App 布局没有角色卡片和溢出菜单）。
+- **一条消息一个事件**。发送 = `sendEventStart` → 数据载荷 → `sendEventEnd`；
+  已结束的事件 id 被记录为"响应中事件"，以便用 `sendEventChatBreak` 打断
+  进行中的回复。
+- **流式持久化**。NLG 文本以共享同一 bizId 的 append 块到达；完整回复在
+  `eof == 1` 或被打断时一次性 upsert 入库，而非逐块写。
+- **通话引擎对齐生产配置**：录音侧只开 ANC + rnnoise；断句、回复 START/END、
+  CHAT_BREAK 全部由云端以事件形式下发。
+
+## Token 计费策略
+
+- **设备身份**：计费**绑定设备 license**，设备身份对话没有单独的 token 计费。
+- **App 身份**：目前没有专门的 C 端计费，按量计费，在
+  [iot.tuya.com](https://iot.tuya.com) 对持有 AI 方案的账号进行充值。

@@ -12,7 +12,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.PopupMenu
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.tuya.appsdk.sample.user.R
+import com.thingclips.sdk.aistream.R
 
 /**
  * Device-identity chat. On top of the shared chat surface it owns everything

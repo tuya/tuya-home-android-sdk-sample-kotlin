@@ -1,6 +1,6 @@
 package com.thingclips.sdk.aistream.ai
 
-import com.tuya.appsdk.sample.user.R
+import com.thingclips.sdk.aistream.R
 
 /**
  * App-identity chat: a plain conversation surface. There is no role concept

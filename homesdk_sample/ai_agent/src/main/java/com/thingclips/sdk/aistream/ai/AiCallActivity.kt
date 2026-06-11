@@ -12,7 +12,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.tuya.appsdk.sample.user.R
+import com.thingclips.sdk.aistream.R
 import org.json.JSONException
 import org.json.JSONObject
 

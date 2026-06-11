@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.tuya.appsdk.sample.user.R
+import com.thingclips.sdk.aistream.R
 
 /**
  * Create / edit a custom agent role, mirroring the official app's 创建新角色

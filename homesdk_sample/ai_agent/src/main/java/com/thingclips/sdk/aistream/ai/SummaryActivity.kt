@@ -13,7 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.tuya.appsdk.sample.user.R
+import com.thingclips.sdk.aistream.R
 import org.json.JSONArray
 
 /**

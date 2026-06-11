@@ -11,7 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.thingclips.smart.home.sdk.ThingHomeSdk
 import com.thingclips.smart.home.sdk.bean.HomeBean
 import com.thingclips.smart.home.sdk.callback.IThingHomeResultCallback
-import com.tuya.appsdk.sample.user.R
+import com.thingclips.sdk.aistream.R
 
 /**
  * AI assistant entry: choose between App identity chat (account-level, no

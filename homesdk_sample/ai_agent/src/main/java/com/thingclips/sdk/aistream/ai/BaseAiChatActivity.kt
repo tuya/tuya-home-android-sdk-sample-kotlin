@@ -54,7 +54,7 @@ import com.thingclips.smart.android.aistream.data.StreamImage
 import com.thingclips.smart.android.aistream.data.StreamText
 import com.thingclips.smart.android.aistream.data.StreamVideo
 import com.thingclips.smart.home.sdk.ThingHomeSdk
-import com.tuya.appsdk.sample.user.R
+import com.thingclips.sdk.aistream.R
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.File

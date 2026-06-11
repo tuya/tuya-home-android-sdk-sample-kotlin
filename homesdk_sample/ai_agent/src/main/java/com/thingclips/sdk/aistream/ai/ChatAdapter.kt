@@ -9,7 +9,7 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.tuya.appsdk.sample.user.R
+import com.thingclips.sdk.aistream.R
 
 class ChatAdapter(
     private val context: Context,
