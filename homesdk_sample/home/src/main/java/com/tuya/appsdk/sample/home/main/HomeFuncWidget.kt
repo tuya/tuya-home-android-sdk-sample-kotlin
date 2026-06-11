@@ -18,7 +18,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
-import com.thingclips.sdk.album.AlbumActivity
 import com.thingclips.sdk.aistream.ai.AiEntryActivity
 import com.thingclips.smart.home.sdk.ThingHomeSdk
 import com.thingclips.smart.home.sdk.bean.HomeBean
@@ -77,17 +76,6 @@ class HomeFuncWidget {
             }
             // Identity choice (App / device) and key checks live in AiEntryActivity.
             val intent = Intent(it.context, AiEntryActivity::class.java)
-            intent.putExtra("homeId", currentHomeId)
-            it.context.startActivity(intent)
-        }
-
-        rootView.findViewById<TextView>(R.id.tvAlbumDemo).setOnClickListener {
-            val currentHomeId = HomeModel.INSTANCE.getCurrentHome(tvCurrentHomeName.context)
-            if (currentHomeId == 0L) {
-                Toast.makeText(it.context, "Please select a home", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-            val intent = Intent(it.context, AlbumActivity::class.java)
             intent.putExtra("homeId", currentHomeId)
             it.context.startActivity(intent)
         }

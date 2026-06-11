@@ -64,10 +64,6 @@
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
-        <activity
-            android:name="com.thingclips.sdk.album.AlbumActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
     </application>
 
 
