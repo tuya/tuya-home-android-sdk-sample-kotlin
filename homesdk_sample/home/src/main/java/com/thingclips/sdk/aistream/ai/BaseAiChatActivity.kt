@@ -7,11 +7,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.Drawable
-import android.widget.LinearLayout
-import android.widget.RelativeLayout
-import androidx.appcompat.widget.PopupMenu
-import androidx.core.view.updateLayoutParams
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
@@ -52,20 +47,30 @@ import com.thingclips.sdk.aistream.audio.AudioPlayCallback
 import com.thingclips.sdk.aistream.business.AgentTokenRequestParams
 import com.thingclips.sdk.aistream.helper.EventStartOptions
 import com.thingclips.smart.android.aistream.Constants
-import com.thingclips.smart.home.sdk.ThingHomeSdk
 import com.thingclips.smart.android.aistream.ThingStreamManager
 import com.thingclips.smart.android.aistream.data.StreamAudio
 import com.thingclips.smart.android.aistream.data.StreamEvent
 import com.thingclips.smart.android.aistream.data.StreamImage
 import com.thingclips.smart.android.aistream.data.StreamText
 import com.thingclips.smart.android.aistream.data.StreamVideo
+import com.thingclips.smart.home.sdk.ThingHomeSdk
 import com.tuya.appsdk.sample.user.R
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
 
-class AiChatActivity : AppCompatActivity() {
+/**
+ * Shared chat surface for both AI identities: stream connection, session and
+ * event lifecycle, text/image/voice sending, NLG/ASR/SKILL parsing, the
+ * in-flight reply interruption and local history persistence.
+ *
+ * Identity-specific behavior lives in the subclasses:
+ *  - [AiDeviceChatActivity] — device identity; role card, role management
+ *    and memory APIs (those ATOP APIs are devId-scoped).
+ *  - [AiAppChatActivity] — app identity; plain conversation, no role concept.
+ */
+abstract class BaseAiChatActivity : AppCompatActivity() {
 
     companion object {
         const val TAG = "ai_stream_ChatActivity"
@@ -73,51 +78,33 @@ class AiChatActivity : AppCompatActivity() {
 
         private const val REQUEST_RECORD_AUDIO_PERMISSION = 200
         private const val REQUEST_PICK_IMAGE = 202
-        private const val REQUEST_SWITCH_ROLE = 203
-        private const val REQUEST_MEMORY = 204
-
-        private const val MENU_MEMORY = 303
-        private const val MENU_TEST_ALL = 307
 
         private const val API_GET_TOKEN = "m.life.ai.token.get"
         private const val API_VERSION = "1.0"
-
-        private const val PREFS_ROLE_CACHE = "ai_role_cache"
     }
 
-    private var aiStream: IThingAiStream? = null
+    protected var aiStream: IThingAiStream? = null
 
-    private lateinit var tvStatus: TextView
-    private lateinit var rvChatMessages: RecyclerView
-    private lateinit var etMessageInput: EditText
-    private lateinit var ivSelectImage: ImageView
-    private lateinit var ivSendOrVoice: ImageView
+    protected lateinit var tvStatus: TextView
+    protected lateinit var rvChatMessages: RecyclerView
+    protected lateinit var etMessageInput: EditText
+    protected lateinit var ivSelectImage: ImageView
+    protected lateinit var ivSendOrVoice: ImageView
     private lateinit var flImagePreviewContainer: FrameLayout
     private lateinit var ivImagePreview: ImageView
     private lateinit var ivClosePreview: ImageView
     private lateinit var btnHoldToTalk: Button
     private lateinit var flVoiceInputContainer: FrameLayout
     private lateinit var audioAmplitudeView: AudioAmplitudeView
-    private lateinit var tvEmoji: TextView
 
-    // Role header card views
-    private lateinit var llRoleExpanded: LinearLayout
-    private lateinit var llRoleCollapsed: LinearLayout
-    private lateinit var ivRoleAvatar: ImageView
-    private lateinit var ivRoleAvatarSmall: ImageView
-    private lateinit var tvRoleName: TextView
-    private lateinit var tvRoleNameSmall: TextView
-    private lateinit var tvChipTag: TextView
-    private lateinit var tvChipLang: TextView
-    private lateinit var tvChipTimbre: TextView
-    private lateinit var btnEditRole: TextView
-    private lateinit var btnSwitchRole: TextView
+    /** Lives in the device layout's role card; null for the app identity. */
+    protected var tvEmoji: TextView? = null
 
-    private lateinit var chatAdapter: ChatAdapter
-    private val messageList = mutableListOf<ChatMessage>()
+    protected lateinit var chatAdapter: ChatAdapter
+    protected val messageList = mutableListOf<ChatMessage>()
 
-    private var currentSessionId: String? = null
-    private var mCurrentEventId: String? = null // Represents the active event being constructed
+    protected var currentSessionId: String? = null
+    private var mCurrentEventId: String? = null // The active event being constructed
 
     // Reply-in-flight tracking: the finalized event the cloud is answering,
     // plus whether NLG text is still streaming / TTS is still playing. While
@@ -146,32 +133,51 @@ class AiChatActivity : AppCompatActivity() {
     private var isFingerOutsideButton = false
     private var originalButtonBackground: Drawable? = null
     private var initialTouchY: Float = 0f
-    private lateinit var mOwnerId: String
-    private lateinit var mAiSolutionCode: String
-    private lateinit var mMiniProgramId: String
+
+    protected lateinit var mOwnerId: String
+    protected lateinit var mAiSolutionCode: String
+    protected lateinit var mMiniProgramId: String
 
     /**
      * Device identity: the picked device id (stream + role APIs).
      * App identity: a local surrogate ("app:<solutionCode>") used only as the
-     * chat-history DB key — stream connects via connectWithApp and role
-     * management is unavailable (those ATOP APIs are devId-scoped).
+     * chat-history DB key.
      */
-    private lateinit var mDevId: String
-    private var mIdentity: Int = AiIdentityConfig.IDENTITY_DEVICE
-    private val isAppIdentity: Boolean
-        get() = mIdentity == AiIdentityConfig.IDENTITY_APP
+    protected lateinit var mDevId: String
 
-    private lateinit var agent: AiAgentManager
     private var dbHelper: AiChatRecordDbHelper? = null
-    private var currentRoleId: String = "default"
-    private var currentBindRoleType: Int = BindRoleType.DEFAULT
-    private var currentRoleDetail: RoleDetail? = null
+
+    /** Persistence scope; the device subclass updates it on role changes. */
+    protected var currentRoleId: String = "default"
 
     private data class SkillEmojiStep(val emoji: String, val startTime: Long, val endTime: Long)
 
+    // --- Identity contract ---
+
+    /** AiIdentityConfig.IDENTITY_APP or IDENTITY_DEVICE. */
+    protected abstract val identity: Int
+
+    /** Layout to inflate; must contain the shared chat/input view ids. */
+    protected abstract val layoutResId: Int
+
+    protected val isAppIdentity: Boolean
+        get() = identity == AiIdentityConfig.IDENTITY_APP
+
+    /** Resolve [mDevId] from the intent. Return false to abort (finishing). */
+    protected abstract fun initIdentity(): Boolean
+
+    /** Bind identity-specific views/handlers after the common ones. */
+    protected open fun setupIdentityUi() {}
+
+    /** Called on the main thread once the session is created. */
+    protected open fun onSessionEstablished() {}
+
+    /** Called before the local history loads, for cached UI state. */
+    protected open fun preloadIdentityState() {}
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_ai_chat)
+        setContentView(layoutResId)
         val ownerId = intent.getStringExtra("ownerId")
         val aiSolutionCode = intent.getStringExtra("aiSolutionCode")
         val miniProgramId = intent.getStringExtra("miniProgramId")
@@ -194,26 +200,14 @@ class AiChatActivity : AppCompatActivity() {
         }
         mAiSolutionCode = aiSolutionCode
         mMiniProgramId = miniProgramId
-        mIdentity = intent.getIntExtra(
-            AiIdentityConfig.EXTRA_IDENTITY, AiIdentityConfig.IDENTITY_DEVICE
-        )
-        if (isAppIdentity) {
-            mDevId = "app:$mAiSolutionCode" // local history key only
-        } else {
-            mDevId = intent.getStringExtra("devId") ?: ""
-            if (mDevId.isEmpty()) {
-                Log.e(TAG, "devId is required for device-identity connection.")
-                Toast.makeText(this, "devId is required", Toast.LENGTH_SHORT).show()
-                finish()
-                return
-            }
-        }
-        agent = AiAgentManager(mDevId)
+        if (!initIdentity()) return
+
         val uid = ThingHomeSdk.getUserInstance().user?.uid ?: "0"
         dbHelper = AiChatRecordDbHelper(this, uid)
 
         initViews()
         setupHeader()
+        setupIdentityUi()
         initAiStream()
         setupChatRecyclerView()
         setupInputControls()
@@ -221,23 +215,7 @@ class AiChatActivity : AppCompatActivity() {
 
         connectToAiStream()
         updateUiForSessionState()
-        if (isAppIdentity) {
-            // No role concept for app identity: hide the role card and the
-            // role/memory menu; chat history persists under the surrogate key.
-            findViewById<View>(R.id.card_role).visibility = View.GONE
-            findViewById<ImageView>(R.id.iv_more).visibility = View.GONE
-            // The call icon anchors to iv_more (toStartOf); with that anchor
-            // GONE the rule resolves wrong, so pin it to the parent end.
-            findViewById<ImageView>(R.id.iv_call).updateLayoutParams<RelativeLayout.LayoutParams> {
-                removeRule(RelativeLayout.START_OF)
-                addRule(RelativeLayout.ALIGN_PARENT_END)
-            }
-            findViewById<TextView>(R.id.tv_title).setText(R.string.ai_identity_app_chat_title)
-        } else {
-            // Render the cached role + local history immediately; the network
-            // chain (connect -> session -> getBindRole) only refreshes later.
-            loadCachedRole()
-        }
+        preloadIdentityState()
         loadLocalHistory()
     }
 
@@ -254,70 +232,22 @@ class AiChatActivity : AppCompatActivity() {
         btnHoldToTalk = findViewById(R.id.btn_hold_to_talk)
         audioAmplitudeView = findViewById(R.id.audio_amplitude_view)
         originalButtonBackground = btnHoldToTalk.background
-
-        tvEmoji = findViewById(R.id.tv_emoji)
-        llRoleExpanded = findViewById(R.id.ll_role_expanded)
-        llRoleCollapsed = findViewById(R.id.ll_role_collapsed)
-        ivRoleAvatar = findViewById(R.id.iv_role_avatar)
-        ivRoleAvatarSmall = findViewById(R.id.iv_role_avatar_small)
-        tvRoleName = findViewById(R.id.tv_role_name)
-        tvRoleNameSmall = findViewById(R.id.tv_role_name_small)
-        tvChipTag = findViewById(R.id.tv_chip_tag)
-        tvChipLang = findViewById(R.id.tv_chip_lang)
-        tvChipTimbre = findViewById(R.id.tv_chip_timbre)
-        btnEditRole = findViewById(R.id.btn_edit_role)
-        btnSwitchRole = findViewById(R.id.btn_switch_role)
     }
 
     private fun setupHeader() {
         findViewById<ImageView>(R.id.iv_back).setOnClickListener { finish() }
-        findViewById<ImageView>(R.id.iv_more).setOnClickListener { showMoreMenu(it) }
         findViewById<ImageView>(R.id.iv_call).setOnClickListener { startCall() }
-        findViewById<ImageView>(R.id.iv_role_collapse).setOnClickListener {
-            setRoleCardExpanded(false)
-        }
-        llRoleCollapsed.setOnClickListener { setRoleCardExpanded(true) }
-
-        btnSwitchRole.setOnClickListener {
-            if (!isSessionActive()) {
-                showToast("Session not active")
-                return@setOnClickListener
-            }
-            startActivityForResult(
-                Intent(this, RoleListActivity::class.java)
-                    .putExtra(RoleListActivity.EXTRA_DEV_ID, mDevId)
-                    .putExtra(RoleListActivity.EXTRA_CURRENT_ROLE_ID, currentRoleId),
-                REQUEST_SWITCH_ROLE
-            )
-        }
-        btnEditRole.setOnClickListener {
-            if (!requireRole()) return@setOnClickListener
-            if (currentBindRoleType != BindRoleType.CUSTOM) {
-                showToast("Only custom roles can be edited")
-                return@setOnClickListener
-            }
-            startActivity(
-                Intent(this, RoleEditActivity::class.java)
-                    .putExtra("devId", mDevId)
-                    .putExtra("roleId", currentRoleId)
-            )
-        }
     }
 
     private fun startCall() {
         startActivity(
             Intent(this, AiCallActivity::class.java)
-                .putExtra(AiIdentityConfig.EXTRA_IDENTITY, mIdentity)
+                .putExtra(AiIdentityConfig.EXTRA_IDENTITY, identity)
                 .putExtra("ownerId", mOwnerId)
                 .putExtra("aiSolutionCode", mAiSolutionCode)
                 .putExtra("miniProgramId", mMiniProgramId)
                 .putExtra("devId", if (isAppIdentity) null else mDevId)
         )
-    }
-
-    private fun setRoleCardExpanded(expanded: Boolean) {
-        llRoleExpanded.visibility = if (expanded) View.VISIBLE else View.GONE
-        llRoleCollapsed.visibility = if (expanded) View.GONE else View.VISIBLE
     }
 
     private fun initAiStream() {
@@ -557,7 +487,7 @@ class AiChatActivity : AppCompatActivity() {
         updateSendButtonIcon() // restores the "+" per the current state
     }
 
-    private fun hideKeyboard() {
+    protected fun hideKeyboard() {
         val view = this.currentFocus
         if (view != null) {
             val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
@@ -601,7 +531,7 @@ class AiChatActivity : AppCompatActivity() {
     }
 
     // --- AI Stream Connection & Session Management ---
-    private fun connectToAiStream() {
+    protected fun connectToAiStream() {
         if (isStreamConnected()) {
             Log.i(TAG, "Already connected.")
             if (currentSessionId.isNullOrEmpty()) createNewSession()
@@ -626,7 +556,7 @@ class AiChatActivity : AppCompatActivity() {
                 runOnUiThread {
                     tvStatus.text = "Status: Connect failed ($error)"
                     Toast.makeText(
-                        this@AiChatActivity,
+                        this@BaseAiChatActivity,
                         "Connect failed: $error",
                         Toast.LENGTH_SHORT
                     ).show()
@@ -682,7 +612,7 @@ class AiChatActivity : AppCompatActivity() {
                 // (solution/timbre config), not a local playback issue.
                 Log.i(
                     TAG,
-                    "createSession onSuccess: $sessionId identity=$mIdentity " +
+                    "createSession onSuccess: $sessionId identity=$identity " +
                         "sendDataCodes=$sendDataCodes revDataCodes=$revDataCodes"
                 )
                 // State change will be handled by listener
@@ -694,7 +624,7 @@ class AiChatActivity : AppCompatActivity() {
                 runOnUiThread {
                     updateStatusText("Status: Session Failed (Error: $code)")
                     Toast.makeText(
-                        this@AiChatActivity,
+                        this@BaseAiChatActivity,
                         "Session creation failed: $message",
                         Toast.LENGTH_SHORT
                     ).show()
@@ -709,17 +639,8 @@ class AiChatActivity : AppCompatActivity() {
         aiStream?.isConnected(Constants.ClientType.DEVICE, mDevId) == true
     }
 
-    private fun isSessionActive(): Boolean =
+    protected fun isSessionActive(): Boolean =
         isStreamConnected() && !currentSessionId.isNullOrEmpty()
-
-    private fun canUpdateUi(): Boolean = !isFinishing && !isDestroyed
-
-    private inline fun runOnUiThreadIfActive(crossinline action: () -> Unit) {
-        if (!canUpdateUi()) return
-        runOnUiThread {
-            if (canUpdateUi()) action()
-        }
-    }
 
     private fun updateStatusText(status: String) {
         tvStatus.text = status
@@ -822,20 +743,6 @@ class AiChatActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_PICK_IMAGE && resultCode == RESULT_OK && data?.data != null) {
             handleImageSelectionResult(data.data!!)
-        }
-        if (requestCode == REQUEST_SWITCH_ROLE && resultCode == RESULT_OK && data != null) {
-            val bindRoleType =
-                data.getIntExtra(RoleListActivity.EXTRA_BIND_ROLE_TYPE, BindRoleType.TEMPLATE)
-            val roleId = data.getStringExtra(RoleListActivity.EXTRA_ROLE_ID)
-            if (!roleId.isNullOrEmpty() && roleId != currentRoleId) {
-                switchRole(bindRoleType, roleId)
-            }
-        }
-        if (requestCode == REQUEST_MEMORY && resultCode == RESULT_OK &&
-            data?.getBooleanExtra(MemoryActivity.EXTRA_HISTORY_CLEARED, false) == true
-        ) {
-            messageList.clear()
-            chatAdapter.notifyDataSetChanged()
         }
     }
 
@@ -1174,7 +1081,6 @@ class AiChatActivity : AppCompatActivity() {
                     finalizeLogic()
                 }
 
-
                 override fun onError(code: Int, message: String) {
                     Log.e(TAG, "sendTextData failed for $eventId: $code $message")
                     showToast("Send text failed: $message")
@@ -1194,7 +1100,7 @@ class AiChatActivity : AppCompatActivity() {
     }
 
     // --- Chat Message Display ---
-    private fun addMessage(message: ChatMessage) {
+    protected fun addMessage(message: ChatMessage) {
         runOnUiThread {
             messageList.add(message)
             chatAdapter.notifyItemInserted(messageList.size - 1)
@@ -1222,7 +1128,7 @@ class AiChatActivity : AppCompatActivity() {
         Thread { helper.insert(record) }.start()
     }
 
-    private fun persistNlg(bizId: String) {
+    protected fun persistNlg(bizId: String) {
         val helper = dbHelper ?: return
         if (bizId.isEmpty()) return
         val msg = messageList.lastOrNull {
@@ -1235,7 +1141,7 @@ class AiChatActivity : AppCompatActivity() {
         Thread { helper.upsertNlg(dev, role, bizId, content, ts) }.start()
     }
 
-    private fun loadLocalHistory() {
+    protected fun loadLocalHistory() {
         val helper = dbHelper ?: return
         Thread {
             val records = helper.query(mDevId, currentRoleId)
@@ -1263,261 +1169,6 @@ class AiChatActivity : AppCompatActivity() {
             messageType = type,
             bizId = bizId
         )
-    }
-
-    // --- Role management ---
-    private fun resolveBoundRole() {
-        agent.initAgentRoleBinding(object : Cb<RoleDetail> {
-            override fun onOk(data: RoleDetail?) {
-                agent.getBindRole(object : Cb<RoleDetail> {
-                    override fun onOk(bind: RoleDetail?) {
-                        applyRole(bind ?: data)
-                    }
-
-                    override fun onErr(code: Int, msg: String?) {
-                        applyRole(data)
-                    }
-                })
-            }
-
-            override fun onErr(code: Int, msg: String?) {
-                Log.e(TAG, "initAgentRoleBinding failed: $code $msg")
-            }
-        })
-    }
-
-    private fun applyRole(detail: RoleDetail?) {
-        if (detail?.roleId.isNullOrEmpty()) return
-        if (!canUpdateUi()) return
-        // Same role as the one rendered from cache: refresh the header and
-        // merge cloud history without clearing the visible conversation.
-        val sameRole = detail!!.roleId == currentRoleId
-        currentRoleId = detail.roleId!!
-        currentBindRoleType = detail.bindRoleType
-        currentRoleDetail = detail
-        saveRoleCache(detail)
-        runOnUiThreadIfActive {
-            updateRoleHeader(detail)
-            if (!sameRole) {
-                messageList.clear()
-                chatAdapter.notifyDataSetChanged()
-            }
-        }
-        if (!sameRole) loadLocalHistory()
-        loadCloudHistory()
-    }
-
-    // --- Role cache: render last known role/header before any network IO ---
-    private fun saveRoleCache(detail: RoleDetail) {
-        getSharedPreferences(PREFS_ROLE_CACHE, Context.MODE_PRIVATE).edit()
-            .putString("$mDevId.roleId", detail.roleId)
-            .putInt("$mDevId.bindRoleType", detail.bindRoleType)
-            .putString("$mDevId.roleName", detail.roleName)
-            .putString("$mDevId.roleImgUrl", detail.roleImgUrl)
-            .putString("$mDevId.useLangName", detail.useLangName ?: detail.useLangCode)
-            .putString("$mDevId.useTimbreName", detail.useTimbreName)
-            .apply()
-    }
-
-    private fun loadCachedRole() {
-        val sp = getSharedPreferences(PREFS_ROLE_CACHE, Context.MODE_PRIVATE)
-        val roleId = sp.getString("$mDevId.roleId", null) ?: return
-        currentRoleId = roleId
-        currentBindRoleType = sp.getInt("$mDevId.bindRoleType", BindRoleType.DEFAULT)
-        updateRoleHeader(
-            RoleDetail(
-                roleId = roleId,
-                roleName = sp.getString("$mDevId.roleName", null),
-                roleImgUrl = sp.getString("$mDevId.roleImgUrl", null),
-                useLangName = sp.getString("$mDevId.useLangName", null),
-                useTimbreName = sp.getString("$mDevId.useTimbreName", null),
-                bindRoleType = currentBindRoleType
-            )
-        )
-    }
-
-    private fun updateRoleHeader(detail: RoleDetail) {
-        if (!canUpdateUi()) return
-        val name = detail.roleName ?: detail.roleId ?: ""
-        tvRoleName.text = name
-        tvRoleNameSmall.text = name
-
-        tvChipTag.setText(
-            when (detail.bindRoleType) {
-                BindRoleType.CUSTOM -> R.string.ai_role_tag_custom
-                BindRoleType.TEMPLATE -> R.string.ai_role_tag_template
-                else -> R.string.ai_role_tag_default
-            }
-        )
-
-        val lang = detail.useLangName ?: detail.useLangCode
-        tvChipLang.text = lang ?: ""
-        tvChipLang.visibility = if (lang.isNullOrEmpty()) View.GONE else View.VISIBLE
-        tvChipTimbre.text = detail.useTimbreName ?: ""
-        tvChipTimbre.visibility =
-            if (detail.useTimbreName.isNullOrEmpty()) View.GONE else View.VISIBLE
-
-        if (!detail.roleImgUrl.isNullOrEmpty()) {
-            Glide.with(this).load(detail.roleImgUrl)
-                .transform(RoundedCorners(resources.displayMetrics.density.times(14).toInt()))
-                .into(ivRoleAvatar)
-            Glide.with(this).load(detail.roleImgUrl).circleCrop().into(ivRoleAvatarSmall)
-        }
-
-        btnEditRole.visibility =
-            if (detail.bindRoleType == BindRoleType.CUSTOM) View.VISIBLE else View.GONE
-    }
-
-    private fun switchRole(bindRoleType: Int, roleId: String) {
-        if (roleId.isEmpty()) return
-        agent.bindRole(bindRoleType, roleId, object : Cb<Boolean> {
-            override fun onOk(data: Boolean?) {
-                showToast("Role switched")
-                currentRoleId = roleId
-                currentBindRoleType = bindRoleType
-                // Re-fetch the bound role so the header card reflects the new role.
-                agent.getBindRole(object : Cb<RoleDetail> {
-                    override fun onOk(bind: RoleDetail?) {
-                        if (bind?.roleId.isNullOrEmpty()) refreshAfterRoleChange()
-                        else applyRole(bind)
-                    }
-
-                    override fun onErr(code: Int, msg: String?) {
-                        refreshAfterRoleChange()
-                    }
-                })
-            }
-
-            override fun onErr(code: Int, msg: String?) {
-                showToast("Switch role failed: $msg")
-            }
-        })
-    }
-
-    private fun refreshAfterRoleChange() {
-        runOnUiThread {
-            tvRoleName.text = currentRoleId
-            tvRoleNameSmall.text = currentRoleId
-            messageList.clear()
-            chatAdapter.notifyDataSetChanged()
-        }
-        loadLocalHistory()
-        loadCloudHistory()
-    }
-
-    private fun loadCloudHistory() {
-        if (currentRoleId == "default" || currentRoleId.isEmpty()) return
-        agent.fetchHistory(
-            currentBindRoleType, currentRoleId,
-            null, System.currentTimeMillis(), 50, true,
-            object : Cb<ArrayList<ChatHistoryItem>> {
-                override fun onOk(data: ArrayList<ChatHistoryItem>?) {
-                    if (data.isNullOrEmpty()) return
-                    mergeCloudHistory(data)
-                }
-
-                override fun onErr(code: Int, msg: String?) {
-                    Log.w(TAG, "fetchHistory failed: $code $msg")
-                }
-            }
-        )
-    }
-
-    private fun mergeCloudHistory(items: List<ChatHistoryItem>) {
-        val seenBizIds = messageList.mapNotNull { it.bizId }.toMutableSet()
-        val toAdd = mutableListOf<ChatMessage>()
-        for (item in items) {
-            val key = item.requestId ?: item.gmtCreate.toString()
-            if (seenBizIds.contains(key)) continue
-            seenBizIds.add(key)
-            item.question?.forEach { part ->
-                part.context?.takeIf { it.isNotEmpty() }?.let {
-                    toAdd.add(
-                        ChatMessage(
-                            text = it,
-                            isSentByUser = true,
-                            messageType = ChatMessage.MessageType.TEXT,
-                            bizId = key
-                        )
-                    )
-                }
-            }
-            item.answer?.forEach { part ->
-                part.context?.takeIf { it.isNotEmpty() }?.let {
-                    toAdd.add(
-                        ChatMessage(
-                            text = it,
-                            isSentByUser = false,
-                            messageType = ChatMessage.MessageType.NLG_TEXT,
-                            bizId = key
-                        )
-                    )
-                }
-            }
-        }
-        if (toAdd.isEmpty()) return
-        runOnUiThread {
-            messageList.addAll(toAdd)
-            chatAdapter.notifyDataSetChanged()
-            rvChatMessages.scrollToPosition(messageList.size - 1)
-        }
-    }
-
-    // --- "..." popup menu ---
-    private fun showMoreMenu(anchor: View) {
-        val popup = PopupMenu(this, anchor)
-        popup.menu.add(0, MENU_MEMORY, 0, getString(R.string.ai_menu_memory))
-        popup.menu.add(0, MENU_TEST_ALL, 1, getString(R.string.ai_menu_diagnostics))
-        popup.setOnMenuItemClickListener { item ->
-            when (item.itemId) {
-                MENU_MEMORY -> {
-                    if (!requireRole()) return@setOnMenuItemClickListener true
-                    startActivityForResult(
-                        Intent(this, MemoryActivity::class.java)
-                            .putExtra("devId", mDevId)
-                            .putExtra("roleId", currentRoleId)
-                            .putExtra("bindRoleType", currentBindRoleType),
-                        REQUEST_MEMORY
-                    )
-                    true
-                }
-
-                MENU_TEST_ALL -> {
-                    if (!isSessionActive()) {
-                        showToast("Session not active")
-                        return@setOnMenuItemClickListener true
-                    }
-                    runDiagnostics()
-                    true
-                }
-
-                else -> false
-            }
-        }
-        popup.show()
-    }
-
-    private fun requireRole(): Boolean {
-        if (!isSessionActive()) { showToast("Session not active"); return false }
-        if (currentRoleId == "default" || currentRoleId.isEmpty()) {
-            showToast("Role not resolved yet")
-            return false
-        }
-        return true
-    }
-
-    private fun runDiagnostics() {
-        showToast("Running API diagnostics...")
-        AiAgentDiagnostics(this, mDevId, currentBindRoleType, currentRoleId).runAll { file ->
-            runOnUiThread {
-                val path = file?.absolutePath ?: "(write failed, see logcat tag ai_stream_Diag)"
-                AlertDialog.Builder(this)
-                    .setTitle("Diagnostics done")
-                    .setMessage("Saved to:\n$path\n\nAlso logged to logcat (tag: ai_stream_Diag).")
-                    .setPositiveButton("OK", null)
-                    .show()
-            }
-        }
     }
 
     // --- AI Stream Listener Callbacks ---
@@ -1549,7 +1200,7 @@ class AiChatActivity : AppCompatActivity() {
                     Constants.SessionState.CREATE_SUCCESS -> {
                         currentSessionId = sessionId
                         updateStatusText("Status: Session Created ($sessionId)")
-                        if (!isAppIdentity) resolveBoundRole()
+                        onSessionEstablished()
                     }
 
                     Constants.SessionState.CREATE_FAILED -> {
@@ -1777,6 +1428,7 @@ class AiChatActivity : AppCompatActivity() {
     }
 
     private fun showSkillEmojis() {
+        val emojiView = tvEmoji ?: return
         if (emojiSteps.isEmpty()) return
 
         emojiRunnable?.let { emojiHandler.removeCallbacks(it) }
@@ -1785,11 +1437,11 @@ class AiChatActivity : AppCompatActivity() {
         emojiRunnable = object : Runnable {
             override fun run() {
                 if (currentEmojiIndex >= emojiSteps.size) {
-                    tvEmoji.text = "😀" // Reset to default
+                    emojiView.text = "😀" // Reset to default
                     return
                 }
                 val step = emojiSteps[currentEmojiIndex]
-                tvEmoji.text = step.emoji
+                emojiView.text = step.emoji
 
                 var duration = step.endTime - step.startTime
                 if (duration <= 0) {
@@ -1851,7 +1503,7 @@ class AiChatActivity : AppCompatActivity() {
     }
 
     // --- UI State & Utilities ---
-    private fun updateUiForSessionState() {
+    protected fun updateUiForSessionState() {
         val active = isSessionActive()
         etMessageInput.isEnabled = active
         ivSelectImage.isEnabled = active
@@ -1864,8 +1516,14 @@ class AiChatActivity : AppCompatActivity() {
         updateSendButtonIcon()
     }
 
-    private fun showToast(message: String) {
-        runOnUiThread { Toast.makeText(this@AiChatActivity, message, Toast.LENGTH_SHORT).show() }
+    protected fun showToast(message: String) {
+        runOnUiThread { Toast.makeText(this@BaseAiChatActivity, message, Toast.LENGTH_SHORT).show() }
+    }
+
+    /** Clears the visible conversation; used after history/role changes. */
+    protected fun clearConversationView() {
+        messageList.clear()
+        chatAdapter.notifyDataSetChanged()
     }
 
     private fun getPathFromUri(uri: Uri?): String? {
@@ -1920,7 +1578,6 @@ class AiChatActivity : AppCompatActivity() {
                     showToast("Record audio permission denied.")
                 }
             }
-
         }
     }
 

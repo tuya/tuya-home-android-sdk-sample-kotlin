@@ -74,8 +74,7 @@ class AiEntryActivity : AppCompatActivity() {
     private fun launchAppChat() {
         val keys = requireKeys(AiIdentityConfig.IDENTITY_APP) ?: return
         startActivity(
-            Intent(this, AiChatActivity::class.java)
-                .putExtra(AiIdentityConfig.EXTRA_IDENTITY, AiIdentityConfig.IDENTITY_APP)
+            Intent(this, AiAppChatActivity::class.java)
                 .putExtra("ownerId", homeId.toString())
                 .putExtra("aiSolutionCode", keys.aiSolutionCode)
                 .putExtra("miniProgramId", keys.miniProgramId)
@@ -100,11 +99,7 @@ class AiEntryActivity : AppCompatActivity() {
                     .setTitle(R.string.ai_select_device)
                     .setItems(names) { _, which ->
                         startActivity(
-                            Intent(this@AiEntryActivity, AiChatActivity::class.java)
-                                .putExtra(
-                                    AiIdentityConfig.EXTRA_IDENTITY,
-                                    AiIdentityConfig.IDENTITY_DEVICE
-                                )
+                            Intent(this@AiEntryActivity, AiDeviceChatActivity::class.java)
                                 .putExtra("ownerId", homeId.toString())
                                 .putExtra("aiSolutionCode", keys.aiSolutionCode)
                                 .putExtra("miniProgramId", keys.miniProgramId)

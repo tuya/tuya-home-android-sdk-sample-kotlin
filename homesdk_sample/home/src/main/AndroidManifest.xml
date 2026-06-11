@@ -32,7 +32,12 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity
-            android:name="com.thingclips.sdk.aistream.ai.AiChatActivity"
+            android:name="com.thingclips.sdk.aistream.ai.AiDeviceChatActivity"
+            android:exported="false"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
+            android:name="com.thingclips.sdk.aistream.ai.AiAppChatActivity"
+            android:exported="false"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity
             android:name="com.thingclips.sdk.aistream.ai.AiCallActivity"

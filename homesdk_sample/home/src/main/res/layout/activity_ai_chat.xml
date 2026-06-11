@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/ai_bg_gradient"
     android:orientation="vertical"
-    tools:context="com.thingclips.sdk.aistream.ai.AiChatActivity">
+    tools:context="com.thingclips.sdk.aistream.ai.AiDeviceChatActivity">
 
     <!-- Top bar: back / title+status / more -->
     <RelativeLayout
