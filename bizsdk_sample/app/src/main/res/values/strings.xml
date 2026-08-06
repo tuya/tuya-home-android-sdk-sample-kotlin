@@ -17,4 +17,11 @@
     <string name="family_biz">Family management</string>
     <string name="device_biz">Device management</string>
     <string name="ota_biz">Batch OTA</string>
+
+    <!-- In-app language switching -->
+    <string name="language_setting">Language</string>
+    <string name="language_dialog_title">Select Language</string>
+    <string name="language_en">English</string>
+    <string name="language_zh">简体中文</string>
+    <string name="language_system">Follow System</string>
 </resources>

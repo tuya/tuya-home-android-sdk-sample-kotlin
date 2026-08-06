@@ -2,7 +2,9 @@ package com.tuya.appbizsdk.sample.main
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AlertDialog
+import com.tuya.appbizsdk.sample.language.BaseActivity
+import com.tuya.appbizsdk.sample.language.LocaleHelper
 import com.thing.appbizsdk.familybiz.ChooseFamilyPopupWindow
 import com.thing.appbizsdk.familybiz.IChooseFamilyListener
 import com.thing.appbizsdk.sample.R
@@ -16,7 +18,7 @@ import com.thingclips.smart.home.sdk.ThingHomeSdk
 import com.thingclips.smart.home.sdk.bean.HomeBean
 import com.thingclips.smart.utils.ProgressUtil
 
-class MainActivity : AppCompatActivity(), IHomeView {
+class MainActivity : BaseActivity(), IHomeView {
 
     private lateinit var binding: ActivityMainBinding
     private var homePresenter: HomePresenter? = null
@@ -74,6 +76,11 @@ class MainActivity : AppCompatActivity(), IHomeView {
             i.setClassName(this@MainActivity, "com.thingclips.smart.devicebiz.biz.ota.OtaActivity")
             i.putExtra("homeId",homePresenter?.mCurrentHomeId)
             startActivity(i)
+        }
+
+        binding.language.setOnClickListener {
+            // In-app language switching
+            showLanguageDialog()
         }
 
     }
@@ -153,6 +160,34 @@ class MainActivity : AppCompatActivity(), IHomeView {
         ToastUtil.showToast(this, getString(com.thing.appbizsdk.familybiz.R.string.current_family_delete_tip))
 
     }
+    /**
+     * Show a single-choice list to switch the in-app language.
+     * Mirrors the Tuya SDK ThingLanguageUtils.switchLanguage(Locale) mechanism;
+     * recreates the current screen afterwards so the new language takes effect immediately.
+     */
+    private fun showLanguageDialog() {
+        val options = arrayOf(
+            LocaleHelper.LANG_ENGLISH to getString(R.string.language_en),
+            LocaleHelper.LANG_CHINESE to getString(R.string.language_zh),
+            LocaleHelper.LANG_SYSTEM to getString(R.string.language_system)
+        )
+        val labels = options.map { it.second }.toTypedArray()
+        val checkedItem = options.indexOfFirst { it.first == LocaleHelper.getLanguage(this) }
+
+        AlertDialog.Builder(this)
+            .setTitle(R.string.language_dialog_title)
+            .setSingleChoiceItems(labels, checkedItem) { dialog, which ->
+                val selected = options[which].first
+                dialog.dismiss()
+                // Persist + update app-level resources (same as ThingLanguageUtils.switchLanguage)
+                LocaleHelper.switchLanguage(this, selected)
+                // Refresh the current screen UI
+                recreate()
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         homePresenter?.onDestroy()
