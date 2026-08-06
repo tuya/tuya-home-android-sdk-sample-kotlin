@@ -1,6 +1,7 @@
 package com.tuya.appbizsdk.sample.language
 
 import android.content.Context
+import android.content.Intent
 import android.content.res.Configuration
 import android.content.res.Resources
 import android.os.Build
@@ -35,7 +36,9 @@ object LocaleHelper {
     /**
      * Switch language: persists the choice and immediately updates app-level
      * resources (same as ThingLanguageUtils.switchLanguage).
-     * The caller can then call `recreate()` to refresh the current screen.
+     * The caller should then call [restartApp] so the new locale fully takes
+     * effect across the whole app (the Tuya SDK itself restarts the app after
+     * a language switch — see DebugPresenter / ApplicationUtil.relaunchApp).
      *
      * @param language one of [LANG_ENGLISH], [LANG_CHINESE], [LANG_SYSTEM].
      */
@@ -52,6 +55,29 @@ object LocaleHelper {
         val config = Configuration(res.configuration)
         applyLocale(config, resolveLocale(context, language))
         res.updateConfiguration(config, res.displayMetrics)
+    }
+
+    /**
+     * Relaunch the app so the switched language fully takes effect.
+     *
+     * Mirrors the Tuya SDK's `ApplicationUtil.relaunchApp(true)`: re-launch the
+     * launcher activity with a clean task, then kill the current process so the
+     * app restarts fresh and [com.tuya.appbizsdk.sample.TuyaSmartApp] re-applies
+     * the persisted locale in attachBaseContext. Call this right after
+     * [switchLanguage].
+     */
+    fun restartApp(context: Context) {
+        val intent = context.packageManager
+            .getLaunchIntentForPackage(context.packageName)
+            ?: return
+        intent.addFlags(
+            Intent.FLAG_ACTIVITY_NEW_TASK or
+                Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                Intent.FLAG_ACTIVITY_CLEAR_TASK
+        )
+        context.startActivity(intent)
+        android.os.Process.killProcess(android.os.Process.myPid())
+        System.exit(0)
     }
 
     /**
@@ -87,10 +113,9 @@ object LocaleHelper {
     }
 
     /** Real system locale, unaffected by the app's own override. */
-    private fun systemLocale(): Locale {
-        val list = ConfigurationCompat.getLocales(Resources.getSystem().configuration)
-        return if (list.isEmpty) Locale.getDefault() else list.get(0)
-    }
+    private fun systemLocale(): Locale =
+        ConfigurationCompat.getLocales(Resources.getSystem().configuration).get(0)
+            ?: Locale.getDefault()
 
     private fun applyLocale(config: Configuration, locale: Locale) {
         config.setLocale(locale)

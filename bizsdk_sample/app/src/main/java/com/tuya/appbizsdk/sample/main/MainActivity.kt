@@ -181,8 +181,9 @@ class MainActivity : BaseActivity(), IHomeView {
                 dialog.dismiss()
                 // Persist + update app-level resources (same as ThingLanguageUtils.switchLanguage)
                 LocaleHelper.switchLanguage(this, selected)
-                // Refresh the current screen UI
-                recreate()
+                // Restart the app so the new locale fully takes effect
+                // (matches Tuya SDK ApplicationUtil.relaunchApp)
+                LocaleHelper.restartApp(this)
             }
             .setNegativeButton(android.R.string.cancel, null)
             .show()
